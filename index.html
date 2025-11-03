@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Monitoring System</title>
+    <title>Engineering Monitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -44,7 +44,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             position: fixed;
             top: 0;
@@ -89,18 +89,33 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 1.5rem;
+            flex-direction: column;
+            text-align: center;
         }
 
         .auth-logo-icon {
-            font-size: 2rem;
+            font-size: 3rem;
             color: var(--primary);
-            margin-right: 0.75rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .auth-logo-text {
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--dark);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-subtitle {
+            text-align: center;
+            color: var(--secondary);
+            margin-bottom: 2rem;
+            font-size: 1rem;
         }
 
         .auth-form {
@@ -147,7 +162,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             font-size: 1rem;
             margin-top: 0.5rem;
@@ -156,7 +171,6 @@
         }
 
         .auth-submit-btn:hover {
-            background-color: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
         }
@@ -259,6 +273,9 @@
             font-size: 1.8rem;
             color: var(--primary);
             margin-right: 0.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .sidebar.collapsed .logo-icon {
@@ -270,6 +287,9 @@
             font-size: 1.25rem;
             color: var(--dark);
             transition: opacity 0.3s ease;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .sidebar.collapsed .logo-text {
@@ -947,7 +967,7 @@
             projectTableBody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                projectTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data project yang cocok.</td></tr>';
+                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project yang cocok.</td></tr>';
                 renderPagination(0, 0); // Render empty pagination
                 return;
             }
@@ -1146,22 +1166,12 @@
 
         // --- Apply Filters Function ---
         function applyFilters() {
-            const startDate = document.getElementById('filter-start-date').value;
-            const endDate = document.getElementById('filter-end-date').value;
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
             const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
                 let matches = true;
-
-                // Date filter (Start Date)
-                if (startDate && project.Start_Date < startDate) {
-                    matches = false;
-                }
-                if (endDate && project.Start_Date > endDate) {
-                    matches = false;
-                }
 
                 // Status filter
                 if (statusFilter && statusFilter !== '' && project.Status !== statusFilter) {
@@ -1299,88 +1309,149 @@
             }
         }
 
-        // --- Initialize App ---
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication state
+        // --- Improved Login Functionality ---
+        function initLogin() {
+            const loginForm = document.getElementById('login-form');
+            const loginBtn = document.getElementById('login-btn');
+            const loginError = document.getElementById('login-error');
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleLogin();
+                });
+            }
+
+            // Check if user is already logged in
             auth.onAuthStateChanged(user => {
                 if (user) {
-                    // User is signed in
+                    // User is signed in, hide login and show main content
                     document.getElementById('auth-container').style.display = 'none';
                     document.getElementById('main-container').style.display = 'flex';
+                    // Load initial data dan tampilkan dashboard
                     loadDashboardData();
-                    loadProjectsToTable();
+                    showSection('dashboard-section');
                 } else {
-                    // User is signed out
+                    // User is signed out, show login
                     document.getElementById('auth-container').style.display = 'flex';
                     document.getElementById('main-container').style.display = 'none';
                 }
             });
+        }
 
-            // Login form handler
-            const loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    const submitBtn = document.getElementById('login-submit-btn');
-                    const errorMessage = document.getElementById('login-error-message');
+        function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loginError = document.getElementById('login-error');
 
-                    // Show loading state
-                    submitBtn.classList.add('loading');
-                    errorMessage.style.display = 'none';
+            // Show loading state
+            loginBtn.classList.add('loading');
+            loginError.style.display = 'none';
 
-                    try {
-                        await auth.signInWithEmailAndPassword(email, password);
-                        // Success - onAuthStateChanged will handle the UI update
-                    } catch (error) {
-                        errorMessage.textContent = error.message;
-                        errorMessage.style.display = 'block';
-                    } finally {
-                        submitBtn.classList.remove('loading');
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Login successful
+                    loginBtn.classList.remove('loading');
+                    showAlert('Login berhasil!', 'success');
+                })
+                .catch((error) => {
+                    // Login failed
+                    loginBtn.classList.remove('loading');
+                    let errorMessage = 'Email atau password salah.';
+                    
+                    if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Password yang Anda masukkan salah.';
+                    } else if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'Email tidak ditemukan.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Format email tidak valid.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = 'Terlalu banyak percobaan login. Coba lagi nanti.';
                     }
+                    
+                    loginError.textContent = errorMessage;
+                    loginError.style.display = 'block';
+                    console.error("Login error:", error);
                 });
-            }
+        }
 
-            // Logout button handler
-            const logoutBtn = document.getElementById('logout-btn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    auth.signOut();
-                });
-            }
+        function logout() {
+            auth.signOut().then(() => {
+                showAlert('Logout berhasil!', 'success');
+            }).catch((error) => {
+                console.error("Logout error:", error);
+            });
+        }
 
-            // Sidebar toggle
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-            const sidebar = document.getElementById('sidebar');
-            if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('collapsed');
-                });
-            }
-
-            // Navigation menu items
+        // --- Fungsi Navigasi Sidebar ---
+        function showSection(targetId) {
+            const contentSections = document.querySelectorAll('.content-section');
             const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetId = this.getAttribute('data-target');
-                    showSection(targetId);
-                });
+            
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+
+            navItems.forEach(item => item.classList.remove('active'));
+            const activeNavItem = document.querySelector(`.nav-item[data-target="${targetId}"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+
+            if (targetId === 'dashboard-section') {
+                loadDashboardData();
+            } else if (targetId === 'project-list-section') {
+                loadProjectsToTable();
+            }
+        }
+        window.showSection = showSection;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initLogin();
+            
+            // Setup event listeners untuk navigasi setelah login
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.nav-item')) {
+                    const navItem = e.target.closest('.nav-item');
+                    const targetId = navItem.dataset.target;
+                    if (targetId) {
+                        e.preventDefault();
+                        showSection(targetId);
+                    } else if (navItem.id === 'logout-btn') {
+                        e.preventDefault();
+                        logout();
+                    }
+                }
             });
 
-            // Add Project button
-            const addProjectBtn = document.getElementById('add-project-btn');
-            if (addProjectBtn) {
-                addProjectBtn.addEventListener('click', () => {
-                    showAddProjectModal();
+            // Setup sidebar toggle
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggleBtn && sidebar) {
+                sidebarToggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    localStorage.setItem('sidebarCollapsed', isCollapsed);
                 });
+
+                // Load saved sidebar state
+                const savedSidebarState = localStorage.getItem('sidebarCollapsed');
+                if (savedSidebarState === 'true') {
+                    sidebar.classList.add('collapsed');
+                }
             }
 
-            // Filter form submission
-            const filterForm = document.getElementById('filter-form');
+            // Filter form handler
+            const filterForm = document.querySelector('#filter-form');
             if (filterForm) {
-                filterForm.addEventListener('submit', (e) => {
+                filterForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     applyFilters();
                 });
@@ -1389,15 +1460,26 @@
             // Reset filters button
             const resetFiltersBtn = document.getElementById('reset-filters-btn');
             if (resetFiltersBtn) {
-                resetFiltersBtn.addEventListener('click', () => {
-                    document.getElementById('filter-start-date').value = '';
-                    document.getElementById('filter-end-date').value = '';
+                resetFiltersBtn.addEventListener('click', function() {
                     document.getElementById('filter-status').value = '';
                     document.getElementById('filter-type').value = '';
                     document.getElementById('filter-search').value = '';
                     filteredProjectData = [...allProjectData];
                     window.currentPage = 1;
                     renderProjectsTable(filteredProjectData);
+                });
+            }
+
+            // Add project button
+            const addProjectBtn = document.getElementById('add-project-btn');
+            if (addProjectBtn) {
+                addProjectBtn.addEventListener('click', function() {
+                    // Reset form
+                    document.getElementById('project-form').reset();
+                    document.getElementById('other-sales-container').style.display = 'none';
+                    
+                    // Show modal
+                    document.getElementById('project-modal').style.display = 'flex';
                 });
             }
 
@@ -1410,25 +1492,34 @@
                 }
             });
 
-            // Status button click handler (event delegation)
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('status-button')) {
-                    const projectId = e.target.getAttribute('data-project-id');
-                    const currentStatus = e.target.getAttribute('data-current-status');
-                    showStatusChangeModal(projectId, currentStatus);
-                }
-            });
+            // Project form submission
+            const projectForm = document.getElementById('project-form');
+            if (projectForm) {
+                projectForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const salesClient = document.getElementById('sales-client').value;
+                    const otherSales = document.getElementById('other-sales').value;
+                    const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+                    
+                    const projectData = {
+                        salesClient: finalSalesClient,
+                        projectName: document.getElementById('project-name').value,
+                        dataIn: document.getElementById('data-in').value,
+                        noUrutDokumen: document.getElementById('no-urut-dokumen').value,
+                        type: document.getElementById('type').value,
+                        pic: document.getElementById('pic').value,
+                        startDate: document.getElementById('start-date').value,
+                        status: document.getElementById('status').value,
+                        remarks: document.getElementById('remarks').value
+                    };
 
-            // Edit and Delete buttons (event delegation)
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.edit-project-btn')) {
-                    const projectId = e.target.closest('.edit-project-btn').getAttribute('data-project-id');
-                    showEditProjectModal(projectId);
-                } else if (e.target.closest('.delete-project-btn')) {
-                    const projectId = e.target.closest('.delete-project-btn').getAttribute('data-project-id');
-                    showDeleteProjectModal(projectId);
-                }
-            });
+                    const success = await addProject(projectData);
+                    if (success) {
+                        document.getElementById('project-modal').style.display = 'none';
+                    }
+                });
+            }
 
             // Modal close buttons
             const closeButtons = document.querySelectorAll('.modal-close-btn');
@@ -1440,263 +1531,78 @@
 
             // Close modal when clicking outside
             window.addEventListener('click', function(e) {
-                const modals = document.querySelectorAll('.modal');
-                modals.forEach(modal => {
-                    if (e.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                }
             });
-
-            // Show dashboard by default
-            showSection('dashboard');
         });
 
-        // --- Show Section Function ---
-        function showSection(sectionId) {
-            // Hide all sections
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.style.display = 'none';
-            });
-
-            // Remove active class from all nav items
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // Show the selected section
-            const targetSection = document.getElementById(sectionId);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-            }
-
-            // Add active class to the clicked nav item
-            const activeNavItem = document.querySelector(`[data-target="${sectionId}"]`);
-            if (activeNavItem) {
-                activeNavItem.classList.add('active');
-            }
-
-            // Load data if needed
-            if (sectionId === 'dashboard') {
-                loadDashboardData();
-            } else if (sectionId === 'projects') {
-                loadProjectsToTable();
-            }
-        }
-
-        // --- Show Add Project Modal ---
-        function showAddProjectModal() {
-            const modal = document.getElementById('project-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const projectForm = document.getElementById('project-form');
-
-            modalTitle.textContent = 'Tambah Project Baru';
-            projectForm.reset();
-            document.getElementById('other-sales-container').style.display = 'none';
-            modal.style.display = 'flex';
-
-            // Set up form submission for new project
-            projectForm.onsubmit = async (e) => {
-                e.preventDefault();
-                
-                const salesClient = document.getElementById('sales-client').value;
-                const otherSales = document.getElementById('other-sales').value;
-                const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
-                
-                const projectData = {
-                    salesClient: finalSalesClient,
-                    projectName: document.getElementById('project-name').value,
-                    dataIn: document.getElementById('data-in').value,
-                    noUrutDokumen: document.getElementById('no-urut-dokumen').value,
-                    type: document.getElementById('type').value,
-                    pic: document.getElementById('pic').value,
-                    startDate: document.getElementById('start-date').value,
-                    status: document.getElementById('status').value,
-                    remarks: document.getElementById('remarks').value
-                };
-
-                const success = await addProject(projectData);
-                if (success) {
-                    modal.style.display = 'none';
-                }
-            };
-        }
-
-        // --- Show Edit Project Modal ---
-        async function showEditProjectModal(projectId) {
-            const modal = document.getElementById('project-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const projectForm = document.getElementById('project-form');
-
-            modalTitle.textContent = 'Edit Project';
-            projectForm.reset();
-            modal.style.display = 'flex';
-
-            // Load project data
-            const project = await getProject(projectId);
-            if (project) {
-                document.getElementById('sales-client').value = project.salesClient;
-                document.getElementById('project-name').value = project.projectName;
-                document.getElementById('data-in').value = project.dataIn;
-                document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
-                document.getElementById('type').value = project.type;
-                document.getElementById('pic').value = project.pic;
-                document.getElementById('start-date').value = project.startDate;
-                document.getElementById('status').value = project.status;
-                document.getElementById('remarks').value = project.remarks;
-
-                // Disable noUrutDokumen field for editing
-                document.getElementById('no-urut-dokumen').disabled = true;
-            }
-
-            // Set up form submission for editing
-            projectForm.onsubmit = async (e) => {
-                e.preventDefault();
-                
-                const salesClient = document.getElementById('sales-client').value;
-                const otherSales = document.getElementById('other-sales').value;
-                const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
-                
-                const updatedData = {
-                    salesClient: finalSalesClient,
-                    projectName: document.getElementById('project-name').value,
-                    dataIn: document.getElementById('data-in').value,
-                    type: document.getElementById('type').value,
-                    pic: document.getElementById('pic').value,
-                    startDate: document.getElementById('start-date').value,
-                    status: document.getElementById('status').value,
-                    remarks: document.getElementById('remarks').value
-                };
-
-                const success = await updateProject(projectId, updatedData);
-                if (success) {
-                    modal.style.display = 'none';
-                    document.getElementById('no-urut-dokumen').disabled = false;
-                }
-            };
-        }
-
-        // --- Show Status Change Modal ---
-        function showStatusChangeModal(projectId, currentStatus) {
-            const modal = document.getElementById('status-modal');
-            const statusForm = document.getElementById('status-form');
-            const statusSelect = document.getElementById('status-select');
-
-            // Set current status
-            statusSelect.value = currentStatus;
-            modal.style.display = 'flex';
-
-            // Set up form submission
-            statusForm.onsubmit = async (e) => {
-                e.preventDefault();
-                const newStatus = statusSelect.value;
-
-                const success = await updateProject(projectId, { status: newStatus });
-                if (success) {
-                    modal.style.display = 'none';
-                }
-            };
-        }
-
-        // --- Show Delete Project Modal ---
-        function showDeleteProjectModal(projectId) {
-            const modal = document.getElementById('delete-modal');
-            const confirmBtn = document.getElementById('confirm-delete-btn');
-            const cancelBtn = document.getElementById('cancel-delete-btn');
-
-            modal.style.display = 'flex';
-
-            // Set up event listeners
-            const handleConfirm = async () => {
-                const success = await deleteProject(projectId);
-                if (success) {
-                    modal.style.display = 'none';
-                    confirmBtn.removeEventListener('click', handleConfirm);
-                    cancelBtn.removeEventListener('click', handleCancel);
-                }
-            };
-
-            const handleCancel = () => {
-                modal.style.display = 'none';
-                confirmBtn.removeEventListener('click', handleConfirm);
-                cancelBtn.removeEventListener('click', handleCancel);
-            };
-
-            confirmBtn.addEventListener('click', handleConfirm);
-            cancelBtn.addEventListener('click', handleCancel);
-        }
     </script>
 
-    <!-- AUTHENTICATION CONTAINER -->
+    <!-- Improved Login Screen -->
     <div id="auth-container" class="auth-container">
         <div class="auth-card">
             <div class="auth-logo">
-                <i class="fas fa-chart-line auth-logo-icon"></i>
-                <span class="auth-logo-text">Project Monitoring</span>
+                <i class="fas fa-cogs auth-logo-icon"></i>
+                <span class="auth-logo-text">Engineering Monitor</span>
             </div>
-            <h2>Masuk ke Akun Anda</h2>
+            <p class="auth-subtitle">Sistem Monitoring Project Engineering</p>
             <form id="login-form" class="auth-form">
                 <div class="auth-input-group">
                     <i class="fas fa-envelope auth-input-icon"></i>
-                    <input type="email" id="email" class="auth-input" placeholder="Email" required>
+                    <input type="email" id="email" class="auth-input" placeholder="Alamat Email" required>
                 </div>
                 <div class="auth-input-group">
                     <i class="fas fa-lock auth-input-icon"></i>
                     <input type="password" id="password" class="auth-input" placeholder="Password" required>
                 </div>
-                <div id="login-error-message" class="auth-error-message"></div>
-                <button type="submit" id="login-submit-btn" class="auth-submit-btn">Masuk</button>
+                <div id="login-error" class="auth-error-message"></div>
+                <button type="submit" id="login-btn" class="auth-submit-btn">Login</button>
             </form>
             <div class="auth-footer">
-                <p>© 2023 Project Monitoring System</p>
+                <p>© 2023 Engineering Monitor - Genetek</p>
             </div>
         </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
+    <!-- Main Application (hidden until login) -->
     <div id="main-container" class="container" style="display: none;">
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar">
-            <button id="sidebar-toggle" class="sidebar-toggle">
+        <aside class="sidebar">
+            <button id="sidebar-toggle-btn" class="sidebar-toggle">
                 <i class="fas fa-chevron-left"></i>
             </button>
             <div class="logo">
-                <i class="fas fa-chart-line logo-icon"></i>
-                <span class="logo-text">Project Monitoring</span>
+                <div class="logo-icon"><i class="fas fa-cogs"></i></div>
+                <div class="logo-text">Engineering Monitor</div>
             </div>
-            <div class="nav-menu">
-                <a href="#" class="nav-item active" data-target="dashboard">
-                    <i class="fas fa-home nav-icon"></i>
-                    <span class="nav-text">Dashboard</span>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="dashboard-section">
+                    <div class="nav-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="nav-text">Dashboard</div>
                 </a>
-                <a href="#" class="nav-item" data-target="projects">
-                    <i class="fas fa-file-invoice nav-icon"></i>
-                    <span class="nav-text">Project</span>
+                <a href="#" class="nav-item" data-target="project-list-section">
+                    <div class="nav-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="nav-text">Project</div>
                 </a>
-            </div>
-        </div>
+                <a href="#" class="nav-item" id="logout-btn">
+                    <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
+                    <div class="nav-text">Logout</div>
+                </a>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1 class="page-title" id="page-title">Dashboard</h1>
-                <div class="header-actions">
-                    <button id="logout-btn" class="btn btn-outline">
-                        <i class="fas fa-sign-out-alt btn-icon"></i> Keluar
-                    </button>
-                </div>
-            </div>
-
+        <main class="main-content">
             <!-- Dashboard Section -->
-            <div id="dashboard" class="section">
+            <section id="dashboard-section" class="content-section">
+                <div class="header">
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
                 <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Ringkasan Project</h2>
-                    </div>
                     <div class="card-body">
+                        <h3>Ringkasan Project Berdasarkan Type</h3>
                         <div class="dashboard-summary-grid">
                             <div class="summary-item">
                                 <div class="summary-value" id="inquiry-count">0</div>
@@ -1717,31 +1623,29 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Projects Section -->
-            <div id="projects" class="section" style="display: none;">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Data Project</h2>
-                        <button id="add-project-btn" class="btn btn-primary">
+            <!-- Project List Section -->
+            <section id="project-list-section" class="content-section" style="display: none;">
+                <div class="header">
+                    <h1 class="page-title">Daftar Project</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="add-project-btn">
                             <i class="fas fa-plus btn-icon"></i> Tambah Project
                         </button>
                     </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Filter Data</h2>
+                    </div>
                     <div class="card-body">
-                        <!-- Filter Section -->
                         <form id="filter-form" class="filter-section">
                             <div class="filter-group">
-                                <label class="filter-label">Tanggal Mulai</label>
-                                <input type="date" id="filter-start-date" class="filter-input">
-                            </div>
-                            <div class="filter-group">
-                                <label class="filter-label">Tanggal Selesai</label>
-                                <input type="date" id="filter-end-date" class="filter-input">
-                            </div>
-                            <div class="filter-group">
                                 <label class="filter-label">Status</label>
-                                <select id="filter-status" class="filter-input">
+                                <select class="filter-input" id="filter-status">
                                     <option value="">Semua Status</option>
                                     <option value="On Progress">On Progress</option>
                                     <option value="Done">Done</option>
@@ -1750,7 +1654,7 @@
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Type</label>
-                                <select id="filter-type" class="filter-input">
+                                <select class="filter-input" id="filter-type">
                                     <option value="">Semua Type</option>
                                     <option value="Inquiry">Inquiry</option>
                                     <option value="DWG">DWG</option>
@@ -1759,20 +1663,27 @@
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label class="filter-label">Pencarian</label>
-                                <input type="text" id="filter-search" class="filter-input" placeholder="Cari...">
+                                <label class="filter-label">Cari</label>
+                                <input type="text" class="filter-input" id="filter-search" placeholder="Cari project...">
                             </div>
-                            <div class="filter-group" style="justify-content: flex-end;">
-                                <button type="button" id="reset-filters-btn" class="btn btn-outline" style="margin-top: 1.6rem;">
-                                    Reset
+                            <div class="filter-group" style="align-self: flex-end;">
+                                <button type="button" class="btn btn-outline" id="reset-filters-btn">
+                                    Reset Filter
                                 </button>
-                                <button type="submit" class="btn btn-primary" style="margin-top: 1.6rem;">
+                                <button type="submit" class="btn btn-primary">
                                     Terapkan Filter
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
 
-                        <!-- Table Section -->
+                <!-- Data Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Daftar Project</h2>
+                    </div>
+                    <div class="card-body">
                         <div class="table-container">
                             <table id="project-table">
                                 <thead>
@@ -1791,31 +1702,33 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Data akan diisi oleh JavaScript -->
+                                    <!-- Data will be loaded here by JavaScript -->
                                 </tbody>
                             </table>
                         </div>
 
                         <!-- Pagination -->
                         <div class="pagination">
-                            <div class="page-info">Menampilkan 0-0 dari 0 data</div>
+                            <div class="page-info">
+                                Menampilkan 0-0 dari 0 data
+                            </div>
                             <div class="page-controls">
-                                <!-- Pagination buttons will be inserted here by JavaScript -->
+                                <!-- Pagination buttons will be rendered here by JavaScript -->
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
-    <!-- MODALS -->
+    <!-- Modals -->
 
-    <!-- Project Modal (Add/Edit) -->
+    <!-- Modal Tambah/Edit Project -->
     <div id="project-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
-            <h2 id="modal-title">Tambah Project Baru</h2>
+            <h2 class="card-title" style="margin-bottom: 1.5rem;">Form Project</h2>
             <form id="project-form">
                 <div class="form-group">
                     <label for="sales-client">Sales/Client</label>
@@ -1884,46 +1797,13 @@
                     <textarea id="remarks" class="filter-input" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-outline modal-close-btn">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="submit" class="btn btn-primary">Simpan Project</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Status Change Modal -->
-    <div id="status-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
-            <h2>Ubah Status Project</h2>
-            <form id="status-form">
-                <div class="form-group">
-                    <label for="status-select">Status</label>
-                    <select id="status-select" class="filter-input" required>
-                        <option value="On Progress">On Progress</option>
-                        <option value="Done">Done</option>
-                        <option value="Hold">Hold</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline modal-close-btn">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
-            <h2>Konfirmasi Hapus</h2>
-            <p>Apakah Anda yakin ingin menghapus project ini? Tindakan ini tidak dapat dibatalkan.</p>
-            <div class="form-actions">
-                <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
-                <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
-            </div>
-        </div>
-    </div>
+    <!-- Custom Alert Box -->
+    <div id="custom-alert-box" class="custom-alert"></div>
 </body>
 </html>
