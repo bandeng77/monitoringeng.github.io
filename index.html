@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Monitoring System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #94a3b8;
+            --border: #e2e8f0;
+            --bg: #ffffff;
+            --card-bg: #ffffff;
+            --sidebar-bg: #f1f5f9;
+            --hover: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #334155;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ========== IMPROVED LOGIN STYLES ========== */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+        }
+
+        .auth-card {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .auth-card h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 1.75rem;
+        }
+
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-logo-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-right: 0.75rem;
+        }
+
+        .auth-logo-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .auth-input-group {
+            position: relative;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .auth-input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+
+        .auth-submit-btn {
+            padding: 0.9rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .auth-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .auth-submit-btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .auth-submit-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid transparent;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .auth-error-message {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+            border-left: 4px solid var(--danger);
+            text-align: center;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ========== EXISTING STYLES (FULL SCREEN) ========== */
+        .container {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-right: 0.75rem;
+        }
+
+        .sidebar.collapsed .logo-icon {
+            margin-right: 0;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--dark);
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background-color: var(--hover);
+            color: var(--primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+        }
+
+        .nav-text {
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: -12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: right 0.3s ease, transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .sidebar.collapsed .sidebar-toggle {
+            right: -12px;
+            transform: rotate(180deg);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            transition: margin-left 0.3s ease;
+            background-color: #f1f5f9;
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--secondary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--hover);
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+
+        .filter-input {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+        }
+
+        th, td {
+            padding: 0.875rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        td {
+            color: var(--secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .status-button {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .status-button:hover {
+            opacity: 0.9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .status-on-progress {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-done {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-hold {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .action-cell {
+            display: flex;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.6rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--secondary);
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background-color: var(--hover);
+            color: var(--primary);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding: 1rem 0;
+        }
+
+        .page-info {
+            font-size: 0.875rem;
+            color: var(--secondary);
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background-color: var(--hover);
+        }
+
+        .page-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: auto;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close-btn {
+            color: var(--secondary);
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-close-btn:hover,
+        .modal-close-btn:focus {
+            color: var(--dark);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            background-color: var(--light);
+        }
+
+        .detail-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-item {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-item strong {
+            width: 180px;
+            flex-shrink: 0;
+            color: var(--dark);
+        }
+
+        .detail-item span {
+            flex-grow: 1;
+            color: var(--secondary);
+        }
+
+        /* Custom Alert/Notification Styles */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            color: white;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 300px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .custom-alert.show {
+            opacity: 1;
+        }
+
+        .custom-alert.success {
+            background-color: var(--success);
+        }
+
+        .custom-alert.error {
+            background-color: var(--danger);
+        }
+
+        .custom-alert.info {
+            background-color: var(--primary);
+        }
+
+        /* Dashboard Summary Grid */
+        .dashboard-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .summary-item {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease;
+        }
+
+        .summary-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .summary-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+
+        /* Specific colors for summary items */
+        .summary-item:nth-child(1) .summary-value { color: var(--dark); }
+        .summary-item:nth-child(2) .summary-value { color: var(--success); }
+        .summary-item:nth-child(3) .summary-value { color: var(--warning); }
+        .summary-item:nth-child(4) .summary-value { color: var(--primary); }
+
+        /* Settings Layout */
+        .settings-layout {
+            display: flex;
+            justify-content: center;
+            padding-top: 1rem;
+        }
+
+        .settings-card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 1rem;
+            }
+            
+            .nav-menu {
+                display: flex;
+                overflow-x: auto;
+                gap: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            .nav-item {
+                margin-bottom: 0;
+                white-space: nowrap;
+            }
+
+            .sidebar-toggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .filter-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .detail-item strong {
+                width: auto;
+                margin-bottom: 0.25rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            .page-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-wZ0y0jG-MstU1MPIQQg8pyLnefx8ADQ",
+            authDomain: "monitoring-finance.firebaseapp.com",
+            projectId: "monitoring-finance",
+            storageBucket: "monitoring-finance.firebasestorage.app",
+            messagingSenderId: "312581732577",
+            appId: "1:312581732577:web:0ee71d80770eea1ed39fa0"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Firestore Collections references
+        const projectsCol = db.collection('projects');
+
+        // --- Custom Alert Function ---
+        function showAlert(message, type = 'info', duration = 3000) {
+            let alertBox = document.getElementById('custom-alert-box');
+            if (!alertBox) {
+                alertBox = document.createElement('div');
+                alertBox.id = 'custom-alert-box';
+                alertBox.className = 'custom-alert';
+                document.body.appendChild(alertBox);
+            }
+
+            alertBox.textContent = message;
+            alertBox.className = `custom-alert ${type}`;
+            alertBox.style.display = 'block';
+
+            // Trigger reflow to ensure transition plays
+            void alertBox.offsetWidth;
+            alertBox.classList.add('show');
+
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+                alertBox.addEventListener('transitionend', function handler() {
+                    alertBox.style.display = 'none';
+                    alertBox.removeEventListener('transitionend', handler);
+                });
+            }, duration);
+        }
+
+        // Global variables for project data
+        let allProjectData = [];
+        let filteredProjectData = [];
+        window.currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Global variables to store unsubscribe functions for realtime listeners
+        window.projectUnsubscribe = null;
+        window.dashboardUnsubscribe = null;
+
+        // --- Render Projects to Table (with pagination and filter) ---
+        function renderProjectsTable(data) {
+            const projectTableBody = document.querySelector('#project-table tbody');
+            if (!projectTableBody) return;
+
+            projectTableBody.innerHTML = ''; // Clear existing rows
+
+            if (data.length === 0) {
+                projectTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data project yang cocok.</td></tr>';
+                renderPagination(0, 0); // Render empty pagination
+                return;
+            }
+
+            const startIndex = (window.currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = data.slice(startIndex, endIndex);
+
+            let rowNum = startIndex + 1;
+            const rowsHtml = [];
+
+            paginatedData.forEach(project => {
+                let statusClass = '';
+                if (project.Status === 'On Progress') statusClass = 'status-on-progress';
+                else if (project.Status === 'Done') statusClass = 'status-done';
+                else if (project.Status === 'Hold') statusClass = 'status-hold';
+
+                rowsHtml.push(`
+                    <tr data-project-id="${project.No_Urut_Dokumen}">
+                        <td>${rowNum++}</td>
+                        <td>${project.Sales_Client || '-'}</td>
+                        <td>${project.Project_Name || '-'}</td>
+                        <td>${project.Data_In || '-'}</td>
+                        <td>${project.No_Urut_Dokumen || '-'}</td>
+                        <td>${project.Type || '-'}</td>
+                        <td>${project.PIC || '-'}</td>
+                        <td>${project.Start_Date || '-'}</td>
+                        <td>
+                            <button class="status-button ${statusClass}" data-project-id="${project.No_Urut_Dokumen}" data-current-status="${project.Status}">
+                                ${project.Status}
+                            </button>
+                        </td>
+                        <td>${project.Remarks || '-'}</td>
+                        <td class="action-cell">
+                            <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Hapus Project"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `);
+            });
+            projectTableBody.innerHTML = rowsHtml.join('');
+            renderPagination(data.length, window.currentPage);
+        }
+
+        // --- Render Pagination Controls ---
+        function renderPagination(totalItems, currentPage) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pageControls = document.querySelector('.pagination .page-controls');
+            const pageInfo = document.querySelector('.pagination .page-info');
+            pageControls.innerHTML = ''; // Bersihkan tombol paginasi yang ada
+
+            if (totalItems === 0) {
+                pageInfo.textContent = 'Menampilkan 0-0 dari 0 data';
+                return;
+            }
+
+            const startItem = (currentPage - 1) * itemsPerPage + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+            pageInfo.textContent = `Menampilkan ${startItem}-${endItem} dari ${totalItems} data`;
+
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
+                if (window.currentPage > 1) {
+                    window.currentPage--;
+                    renderProjectsTable(filteredProjectData);
+                }
+            });
+            pageControls.appendChild(prevBtn);
+
+            // Page numbers
+            const maxPageButtons = 5; // Max number of page buttons to show
+            let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+            if (endPage - startPage + 1 < maxPageButtons) {
+                startPage = Math.max(1, endPage - maxPageButtons + 1);
+            }
+
+            if (startPage > 1) {
+                const firstPageBtn = document.createElement('button');
+                firstPageBtn.className = 'page-btn';
+                firstPageBtn.textContent = '1';
+                firstPageBtn.addEventListener('click', () => {
+                    window.currentPage = 1;
+                    renderProjectsTable(filteredProjectData);
+                });
+                pageControls.appendChild(firstPageBtn);
+                if (startPage > 2) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    pageControls.appendChild(dots);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    window.currentPage = i;
+                    renderProjectsTable(filteredProjectData);
+                });
+                pageControls.appendChild(pageBtn);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    pageControls.appendChild(dots);
+                }
+                const lastPageBtn = document.createElement('button');
+                lastPageBtn.className = 'page-btn';
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.addEventListener('click', () => {
+                    window.currentPage = totalPages;
+                    renderProjectsTable(filteredProjectData);
+                });
+                pageControls.appendChild(lastPageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
+                if (window.currentPage < totalPages) {
+                    window.currentPage++;
+                    renderProjectsTable(filteredProjectData);
+                }
+            });
+            pageControls.appendChild(nextBtn);
+        }
+
+        // --- Load Projects to Table (Initial Load and Refresh) ---
+        async function loadProjectsToTable() {
+            const projectTableBody = document.querySelector('#project-table tbody');
+            if (!projectTableBody) return;
+
+            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Memuat data...</td></tr>';
+
+            try {
+                // Unsubscribe previous listener if exists
+                if (window.projectUnsubscribe) {
+                    window.projectUnsubscribe();
+                }
+
+                window.projectUnsubscribe = projectsCol.onSnapshot((snapshot) => {
+                    if (snapshot.empty) {
+                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project.</td></tr>';
+                        allProjectData = [];
+                        filteredProjectData = [];
+                        renderPagination(0, 0);
+                        return;
+                    }
+
+                    let rowNum = 1;
+                    const currentAllProjectData = [];
+
+                    snapshot.forEach(doc => {
+                        const project = doc.data();
+                        
+                        currentAllProjectData.push({
+                            No: rowNum++,
+                            Sales_Client: project.salesClient || '',
+                            Project_Name: project.projectName || '',
+                            Data_In: project.dataIn || '',
+                            No_Urut_Dokumen: project.noUrutDokumen || '',
+                            Type: project.type || '',
+                            PIC: project.pic || '',
+                            Start_Date: project.startDate || '',
+                            Status: project.status || '',
+                            Remarks: project.remarks || ''
+                        });
+                    });
+                    
+                    allProjectData = currentAllProjectData;
+                    filteredProjectData = [...allProjectData];
+                    renderProjectsTable(filteredProjectData);
+                }, (error) => {
+                    console.error("Error loading projects: ", error);
+                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                    showAlert("Gagal memuat data project: " + error.message, 'error');
+                });
+            } catch (error) {
+                console.error("Error setting up project listener: ", error);
+                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                showAlert("Gagal memuat data project: " + error.message, 'error');
+            }
+        }
+
+        // --- Apply Filters Function ---
+        function applyFilters() {
+            const startDate = document.getElementById('filter-start-date').value;
+            const endDate = document.getElementById('filter-end-date').value;
+            const statusFilter = document.getElementById('filter-status').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
+
+            filteredProjectData = allProjectData.filter(project => {
+                let matches = true;
+
+                // Date filter (Start Date)
+                if (startDate && project.Start_Date < startDate) {
+                    matches = false;
+                }
+                if (endDate && project.Start_Date > endDate) {
+                    matches = false;
+                }
+
+                // Status filter
+                if (statusFilter && statusFilter !== '' && project.Status !== statusFilter) {
+                    matches = false;
+                }
+
+                // Type filter
+                if (typeFilter && typeFilter !== '' && project.Type !== typeFilter) {
+                    matches = false;
+                }
+
+                // Keyword search (across multiple fields)
+                if (searchKeyword) {
+                    const searchableFields = [
+                        project.Sales_Client,
+                        project.Project_Name,
+                        project.No_Urut_Dokumen,
+                        project.Type,
+                        project.PIC,
+                        project.Status,
+                        project.Remarks
+                    ];
+                    const keywordMatch = searchableFields.some(field =>
+                        String(field).toLowerCase().includes(searchKeyword)
+                    );
+                    if (!keywordMatch) {
+                        matches = false;
+                    }
+                }
+
+                return matches;
+            });
+
+            window.currentPage = 1; // Reset to first page after applying filters
+            renderProjectsTable(filteredProjectData);
+        }
+
+        // --- Load Dashboard Data ---
+        async function loadDashboardData() {
+            try {
+                // Unsubscribe previous listener if exists
+                if (window.dashboardUnsubscribe) {
+                    window.dashboardUnsubscribe();
+                }
+
+                window.dashboardUnsubscribe = projectsCol.onSnapshot((snapshot) => {
+                    let inquiryCount = 0;
+                    let dwgCount = 0;
+                    let hydrolicCount = 0;
+                    let dokumenCount = 0;
+
+                    snapshot.forEach(doc => {
+                        const project = doc.data();
+                        const type = project.type || '';
+
+                        if (type === 'Inquiry') inquiryCount++;
+                        else if (type === 'DWG') dwgCount++;
+                        else if (type === 'Hydrolic') hydrolicCount++;
+                        else if (type === 'Dokumen') dokumenCount++;
+                    });
+
+                    // Update the dashboard summary
+                    document.getElementById('inquiry-count').textContent = inquiryCount;
+                    document.getElementById('dwg-count').textContent = dwgCount;
+                    document.getElementById('hydrolic-count').textContent = hydrolicCount;
+                    document.getElementById('dokumen-count').textContent = dokumenCount;
+                }, (error) => {
+                    console.error("Error loading dashboard data: ", error);
+                    showAlert("Gagal memuat data dashboard: " + error.message, 'error');
+                });
+            } catch (error) {
+                console.error("Error setting up dashboard listener: ", error);
+                showAlert("Gagal memuat data dashboard: " + error.message, 'error');
+            }
+        }
+
+        // --- Add Project Function ---
+        async function addProject(projectData) {
+            try {
+                // Check if document with same noUrutDokumen already exists
+                const existingDoc = await projectsCol.doc(projectData.noUrutDokumen).get();
+                if (existingDoc.exists) {
+                    throw new Error(`Project dengan No. Urut Dokumen ${projectData.noUrutDokumen} sudah ada.`);
+                }
+
+                await projectsCol.doc(projectData.noUrutDokumen).set(projectData);
+                showAlert("Project berhasil ditambahkan!", 'success');
+                return true;
+            } catch (error) {
+                console.error("Error adding project: ", error);
+                showAlert("Gagal menambahkan project: " + error.message, 'error');
+                return false;
+            }
+        }
+
+        // --- Update Project Function ---
+        async function updateProject(projectId, updatedData) {
+            try {
+                await projectsCol.doc(projectId).update(updatedData);
+                showAlert("Project berhasil diperbarui!", 'success');
+                return true;
+            } catch (error) {
+                console.error("Error updating project: ", error);
+                showAlert("Gagal memperbarui project: " + error.message, 'error');
+                return false;
+            }
+        }
+
+        // --- Delete Project Function ---
+        async function deleteProject(projectId) {
+            try {
+                await projectsCol.doc(projectId).delete();
+                showAlert("Project berhasil dihapus!", 'success');
+                return true;
+            } catch (error) {
+                console.error("Error deleting project: ", error);
+                showAlert("Gagal menghapus project: " + error.message, 'error');
+                return false;
+            }
+        }
+
+        // --- Get Project Data Function ---
+        async function getProject(projectId) {
+            try {
+                const doc = await projectsCol.doc(projectId).get();
+                if (doc.exists) {
+                    return doc.data();
+                } else {
+                    throw new Error("Project tidak ditemukan.");
+                }
+            } catch (error) {
+                console.error("Error getting project: ", error);
+                showAlert("Gagal mengambil data project: " + error.message, 'error');
+                return null;
+            }
+        }
+
+        // --- Initialize App ---
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication state
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    document.getElementById('auth-container').style.display = 'none';
+                    document.getElementById('main-container').style.display = 'flex';
+                    loadDashboardData();
+                    loadProjectsToTable();
+                } else {
+                    // User is signed out
+                    document.getElementById('auth-container').style.display = 'flex';
+                    document.getElementById('main-container').style.display = 'none';
+                }
+            });
+
+            // Login form handler
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const submitBtn = document.getElementById('login-submit-btn');
+                    const errorMessage = document.getElementById('login-error-message');
+
+                    // Show loading state
+                    submitBtn.classList.add('loading');
+                    errorMessage.style.display = 'none';
+
+                    try {
+                        await auth.signInWithEmailAndPassword(email, password);
+                        // Success - onAuthStateChanged will handle the UI update
+                    } catch (error) {
+                        errorMessage.textContent = error.message;
+                        errorMessage.style.display = 'block';
+                    } finally {
+                        submitBtn.classList.remove('loading');
+                    }
+                });
+            }
+
+            // Logout button handler
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    auth.signOut();
+                });
+            }
+
+            // Sidebar toggle
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                });
+            }
+
+            // Navigation menu items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('data-target');
+                    showSection(targetId);
+                });
+            });
+
+            // Add Project button
+            const addProjectBtn = document.getElementById('add-project-btn');
+            if (addProjectBtn) {
+                addProjectBtn.addEventListener('click', () => {
+                    showAddProjectModal();
+                });
+            }
+
+            // Filter form submission
+            const filterForm = document.getElementById('filter-form');
+            if (filterForm) {
+                filterForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    applyFilters();
+                });
+            }
+
+            // Reset filters button
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', () => {
+                    document.getElementById('filter-start-date').value = '';
+                    document.getElementById('filter-end-date').value = '';
+                    document.getElementById('filter-status').value = '';
+                    document.getElementById('filter-type').value = '';
+                    document.getElementById('filter-search').value = '';
+                    filteredProjectData = [...allProjectData];
+                    window.currentPage = 1;
+                    renderProjectsTable(filteredProjectData);
+                });
+            }
+
+            // Sales dropdown handler for "Other" option
+            document.addEventListener('change', function(e) {
+                if (e.target.id === 'sales-client' && e.target.value === 'Other') {
+                    document.getElementById('other-sales-container').style.display = 'block';
+                } else if (e.target.id === 'sales-client') {
+                    document.getElementById('other-sales-container').style.display = 'none';
+                }
+            });
+
+            // Status button click handler (event delegation)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('status-button')) {
+                    const projectId = e.target.getAttribute('data-project-id');
+                    const currentStatus = e.target.getAttribute('data-current-status');
+                    showStatusChangeModal(projectId, currentStatus);
+                }
+            });
+
+            // Edit and Delete buttons (event delegation)
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-project-btn')) {
+                    const projectId = e.target.closest('.edit-project-btn').getAttribute('data-project-id');
+                    showEditProjectModal(projectId);
+                } else if (e.target.closest('.delete-project-btn')) {
+                    const projectId = e.target.closest('.delete-project-btn').getAttribute('data-project-id');
+                    showDeleteProjectModal(projectId);
+                }
+            });
+
+            // Modal close buttons
+            const closeButtons = document.querySelectorAll('.modal-close-btn');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                });
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (e.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Show dashboard by default
+            showSection('dashboard');
+        });
+
+        // --- Show Section Function ---
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Remove active class from all nav items
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Show the selected section
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+
+            // Add active class to the clicked nav item
+            const activeNavItem = document.querySelector(`[data-target="${sectionId}"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+
+            // Load data if needed
+            if (sectionId === 'dashboard') {
+                loadDashboardData();
+            } else if (sectionId === 'projects') {
+                loadProjectsToTable();
+            }
+        }
+
+        // --- Show Add Project Modal ---
+        function showAddProjectModal() {
+            const modal = document.getElementById('project-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const projectForm = document.getElementById('project-form');
+
+            modalTitle.textContent = 'Tambah Project Baru';
+            projectForm.reset();
+            document.getElementById('other-sales-container').style.display = 'none';
+            modal.style.display = 'flex';
+
+            // Set up form submission for new project
+            projectForm.onsubmit = async (e) => {
+                e.preventDefault();
+                
+                const salesClient = document.getElementById('sales-client').value;
+                const otherSales = document.getElementById('other-sales').value;
+                const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+                
+                const projectData = {
+                    salesClient: finalSalesClient,
+                    projectName: document.getElementById('project-name').value,
+                    dataIn: document.getElementById('data-in').value,
+                    noUrutDokumen: document.getElementById('no-urut-dokumen').value,
+                    type: document.getElementById('type').value,
+                    pic: document.getElementById('pic').value,
+                    startDate: document.getElementById('start-date').value,
+                    status: document.getElementById('status').value,
+                    remarks: document.getElementById('remarks').value
+                };
+
+                const success = await addProject(projectData);
+                if (success) {
+                    modal.style.display = 'none';
+                }
+            };
+        }
+
+        // --- Show Edit Project Modal ---
+        async function showEditProjectModal(projectId) {
+            const modal = document.getElementById('project-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const projectForm = document.getElementById('project-form');
+
+            modalTitle.textContent = 'Edit Project';
+            projectForm.reset();
+            modal.style.display = 'flex';
+
+            // Load project data
+            const project = await getProject(projectId);
+            if (project) {
+                document.getElementById('sales-client').value = project.salesClient;
+                document.getElementById('project-name').value = project.projectName;
+                document.getElementById('data-in').value = project.dataIn;
+                document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
+                document.getElementById('type').value = project.type;
+                document.getElementById('pic').value = project.pic;
+                document.getElementById('start-date').value = project.startDate;
+                document.getElementById('status').value = project.status;
+                document.getElementById('remarks').value = project.remarks;
+
+                // Disable noUrutDokumen field for editing
+                document.getElementById('no-urut-dokumen').disabled = true;
+            }
+
+            // Set up form submission for editing
+            projectForm.onsubmit = async (e) => {
+                e.preventDefault();
+                
+                const salesClient = document.getElementById('sales-client').value;
+                const otherSales = document.getElementById('other-sales').value;
+                const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+                
+                const updatedData = {
+                    salesClient: finalSalesClient,
+                    projectName: document.getElementById('project-name').value,
+                    dataIn: document.getElementById('data-in').value,
+                    type: document.getElementById('type').value,
+                    pic: document.getElementById('pic').value,
+                    startDate: document.getElementById('start-date').value,
+                    status: document.getElementById('status').value,
+                    remarks: document.getElementById('remarks').value
+                };
+
+                const success = await updateProject(projectId, updatedData);
+                if (success) {
+                    modal.style.display = 'none';
+                    document.getElementById('no-urut-dokumen').disabled = false;
+                }
+            };
+        }
+
+        // --- Show Status Change Modal ---
+        function showStatusChangeModal(projectId, currentStatus) {
+            const modal = document.getElementById('status-modal');
+            const statusForm = document.getElementById('status-form');
+            const statusSelect = document.getElementById('status-select');
+
+            // Set current status
+            statusSelect.value = currentStatus;
+            modal.style.display = 'flex';
+
+            // Set up form submission
+            statusForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const newStatus = statusSelect.value;
+
+                const success = await updateProject(projectId, { status: newStatus });
+                if (success) {
+                    modal.style.display = 'none';
+                }
+            };
+        }
+
+        // --- Show Delete Project Modal ---
+        function showDeleteProjectModal(projectId) {
+            const modal = document.getElementById('delete-modal');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            const cancelBtn = document.getElementById('cancel-delete-btn');
+
+            modal.style.display = 'flex';
+
+            // Set up event listeners
+            const handleConfirm = async () => {
+                const success = await deleteProject(projectId);
+                if (success) {
+                    modal.style.display = 'none';
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                }
+            };
+
+            const handleCancel = () => {
+                modal.style.display = 'none';
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+    </script>
+
+    <!-- AUTHENTICATION CONTAINER -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-chart-line auth-logo-icon"></i>
+                <span class="auth-logo-text">Project Monitoring</span>
+            </div>
+            <h2>Masuk ke Akun Anda</h2>
+            <form id="login-form" class="auth-form">
+                <div class="auth-input-group">
+                    <i class="fas fa-envelope auth-input-icon"></i>
+                    <input type="email" id="email" class="auth-input" placeholder="Email" required>
+                </div>
+                <div class="auth-input-group">
+                    <i class="fas fa-lock auth-input-icon"></i>
+                    <input type="password" id="password" class="auth-input" placeholder="Password" required>
+                </div>
+                <div id="login-error-message" class="auth-error-message"></div>
+                <button type="submit" id="login-submit-btn" class="auth-submit-btn">Masuk</button>
+            </form>
+            <div class="auth-footer">
+                <p>© 2023 Project Monitoring System</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div id="main-container" class="container" style="display: none;">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <button id="sidebar-toggle" class="sidebar-toggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="logo">
+                <i class="fas fa-chart-line logo-icon"></i>
+                <span class="logo-text">Project Monitoring</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i class="fas fa-home nav-icon"></i>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-target="projects">
+                    <i class="fas fa-file-invoice nav-icon"></i>
+                    <span class="nav-text">Invoice</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1 class="page-title" id="page-title">Dashboard</h1>
+                <div class="header-actions">
+                    <button id="logout-btn" class="btn btn-outline">
+                        <i class="fas fa-sign-out-alt btn-icon"></i> Keluar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Ringkasan Project</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="dashboard-summary-grid">
+                            <div class="summary-item">
+                                <div class="summary-value" id="inquiry-count">0</div>
+                                <div class="summary-label">Inquiry</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="dwg-count">0</div>
+                                <div class="summary-label">DWG</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="hydrolic-count">0</div>
+                                <div class="summary-label">Hydrolic</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="dokumen-count">0</div>
+                                <div class="summary-label">Dokumen</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projects" class="section" style="display: none;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Data Project</h2>
+                        <button id="add-project-btn" class="btn btn-primary">
+                            <i class="fas fa-plus btn-icon"></i> Tambah Project
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filter Section -->
+                        <form id="filter-form" class="filter-section">
+                            <div class="filter-group">
+                                <label class="filter-label">Tanggal Mulai</label>
+                                <input type="date" id="filter-start-date" class="filter-input">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Tanggal Selesai</label>
+                                <input type="date" id="filter-end-date" class="filter-input">
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Status</label>
+                                <select id="filter-status" class="filter-input">
+                                    <option value="">Semua Status</option>
+                                    <option value="On Progress">On Progress</option>
+                                    <option value="Done">Done</option>
+                                    <option value="Hold">Hold</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Type</label>
+                                <select id="filter-type" class="filter-input">
+                                    <option value="">Semua Type</option>
+                                    <option value="Inquiry">Inquiry</option>
+                                    <option value="DWG">DWG</option>
+                                    <option value="Hydrolic">Hydrolic</option>
+                                    <option value="Dokumen">Dokumen</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Pencarian</label>
+                                <input type="text" id="filter-search" class="filter-input" placeholder="Cari...">
+                            </div>
+                            <div class="filter-group" style="justify-content: flex-end;">
+                                <button type="button" id="reset-filters-btn" class="btn btn-outline" style="margin-top: 1.6rem;">
+                                    Reset
+                                </button>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 1.6rem;">
+                                    Terapkan Filter
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Table Section -->
+                        <div class="table-container">
+                            <table id="project-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Sales/Client</th>
+                                        <th>Project Name</th>
+                                        <th>Data In</th>
+                                        <th>No Urut Dokumen</th>
+                                        <th>Type</th>
+                                        <th>PIC</th>
+                                        <th>Start Date</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data akan diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination">
+                            <div class="page-info">Menampilkan 0-0 dari 0 data</div>
+                            <div class="page-controls">
+                                <!-- Pagination buttons will be inserted here by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+
+    <!-- Project Modal (Add/Edit) -->
+    <div id="project-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2 id="modal-title">Tambah Project Baru</h2>
+            <form id="project-form">
+                <div class="form-group">
+                    <label for="sales-client">Sales/Client</label>
+                    <select id="sales-client" class="filter-input" required>
+                        <option value="">Pilih Sales/Client</option>
+                        <option value="Rangga">Rangga</option>
+                        <option value="Dhea">Dhea</option>
+                        <option value="Rory">Rory</option>
+                        <option value="Pamungkas">Pamungkas</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div id="other-sales-container" class="form-group" style="display: none;">
+                    <label for="other-sales">Keterangan Sales/Client Lainnya</label>
+                    <input type="text" id="other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
+                </div>
+                <div class="form-group">
+                    <label for="project-name">Project Name</label>
+                    <input type="text" id="project-name" class="filter-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="data-in">Data In</label>
+                    <input type="date" id="data-in" class="filter-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="no-urut-dokumen">No Urut Dokumen</label>
+                    <input type="text" id="no-urut-dokumen" class="filter-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select id="type" class="filter-input" required>
+                        <option value="">Pilih Type</option>
+                        <option value="Inquiry">Inquiry</option>
+                        <option value="DWG">DWG</option>
+                        <option value="Hydrolic">Hydrolic</option>
+                        <option value="Dokumen">Dokumen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pic">PIC</label>
+                    <select id="pic" class="filter-input" required>
+                        <option value="">Pilih PIC</option>
+                        <option value="wahyu">Wahyu</option>
+                        <option value="dhona">Dhona</option>
+                        <option value="arifah">Arifah</option>
+                        <option value="kartika">Kartika</option>
+                        <option value="ardi">Ardi</option>
+                        <option value="brian">Brian</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="start-date">Start Date</label>
+                    <input type="date" id="start-date" class="filter-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" class="filter-input" required>
+                        <option value="">Pilih Status</option>
+                        <option value="On Progress">On Progress</option>
+                        <option value="Done">Done</option>
+                        <option value="Hold">Hold</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" class="filter-input" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline modal-close-btn">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Status Change Modal -->
+    <div id="status-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2>Ubah Status Project</h2>
+            <form id="status-form">
+                <div class="form-group">
+                    <label for="status-select">Status</label>
+                    <select id="status-select" class="filter-input" required>
+                        <option value="On Progress">On Progress</option>
+                        <option value="Done">Done</option>
+                        <option value="Hold">Hold</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline modal-close-btn">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2>Konfirmasi Hapus</h2>
+            <p>Apakah Anda yakin ingin menghapus project ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="form-actions">
+                <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
+                <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
