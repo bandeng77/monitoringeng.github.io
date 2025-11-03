@@ -44,7 +44,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #ffffff;
             padding: 20px;
             position: fixed;
             top: 0;
@@ -57,13 +57,14 @@
         .auth-card {
             background-color: white;
             border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             padding: 2.5rem;
             width: 100%;
             max-width: 420px;
             position: relative;
             overflow: hidden;
             animation: fadeIn 0.5s ease-out;
+            border: 1px solid var(--border);
         }
 
         .auth-card::before {
@@ -820,6 +821,39 @@
             max-width: 500px;
         }
 
+        /* Delete Confirmation Modal */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .delete-modal-content {
+            background-color: var(--card-bg);
+            margin: auto;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .delete-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
@@ -959,6 +993,9 @@
         window.projectUnsubscribe = null;
         window.dashboardUnsubscribe = null;
 
+        // Current project being edited
+        let currentEditingProjectId = null;
+
         // --- Render Projects to Table (with pagination and filter) ---
         function renderProjectsTable(data) {
             const projectTableBody = document.querySelector('#project-table tbody');
@@ -1002,14 +1039,49 @@
                         </td>
                         <td>${project.Remarks || '-'}</td>
                         <td class="action-cell">
-                            <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Hapus Project"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Hapus Project">
+                                <i class="fas fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 `);
             });
             projectTableBody.innerHTML = rowsHtml.join('');
             renderPagination(data.length, window.currentPage);
+            
+            // Attach event listeners to the new buttons
+            attachTableEventListeners();
+        }
+
+        // --- Attach event listeners to table buttons ---
+        function attachTableEventListeners() {
+            // Edit buttons
+            document.querySelectorAll('.edit-project-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    showEditProjectModal(projectId);
+                });
+            });
+
+            // Delete buttons
+            document.querySelectorAll('.delete-project-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    showDeleteConfirmationModal(projectId);
+                });
+            });
+
+            // Status buttons
+            document.querySelectorAll('.status-button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    const currentStatus = this.getAttribute('data-current-status');
+                    showStatusChangeModal(projectId, currentStatus);
+                });
+            });
         }
 
         // --- Render Pagination Controls ---
@@ -1309,6 +1381,44 @@
             }
         }
 
+        // --- Show Edit Project Modal ---
+        async function showEditProjectModal(projectId) {
+            const project = await getProject(projectId);
+            if (!project) return;
+
+            currentEditingProjectId = projectId;
+
+            // Fill form with project data
+            document.getElementById('sales-client').value = project.salesClient;
+            document.getElementById('project-name').value = project.projectName;
+            document.getElementById('data-in').value = project.dataIn;
+            document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
+            document.getElementById('type').value = project.type;
+            document.getElementById('pic').value = project.pic;
+            document.getElementById('start-date').value = project.startDate;
+            document.getElementById('status').value = project.status;
+            document.getElementById('remarks').value = project.remarks;
+
+            // Disable noUrutDokumen field for editing
+            document.getElementById('no-urut-dokumen').disabled = true;
+
+            // Show modal
+            document.getElementById('project-modal').style.display = 'flex';
+        }
+
+        // --- Show Delete Confirmation Modal ---
+        function showDeleteConfirmationModal(projectId) {
+            currentEditingProjectId = projectId;
+            document.getElementById('delete-modal').style.display = 'flex';
+        }
+
+        // --- Show Status Change Modal ---
+        function showStatusChangeModal(projectId, currentStatus) {
+            currentEditingProjectId = projectId;
+            document.getElementById('status-select').value = currentStatus;
+            document.getElementById('status-modal').style.display = 'flex';
+        }
+
         // --- Improved Login Functionality ---
         function initLogin() {
             const loginForm = document.getElementById('login-form');
@@ -1474,9 +1584,11 @@
             const addProjectBtn = document.getElementById('add-project-btn');
             if (addProjectBtn) {
                 addProjectBtn.addEventListener('click', function() {
-                    // Reset form
+                    // Reset form and enable noUrutDokumen field
                     document.getElementById('project-form').reset();
+                    document.getElementById('no-urut-dokumen').disabled = false;
                     document.getElementById('other-sales-container').style.display = 'none';
+                    currentEditingProjectId = null;
                     
                     // Show modal
                     document.getElementById('project-modal').style.display = 'flex';
@@ -1514,10 +1626,57 @@
                         remarks: document.getElementById('remarks').value
                     };
 
-                    const success = await addProject(projectData);
+                    let success = false;
+                    if (currentEditingProjectId) {
+                        // Update existing project
+                        success = await updateProject(currentEditingProjectId, projectData);
+                    } else {
+                        // Add new project
+                        success = await addProject(projectData);
+                    }
+
                     if (success) {
                         document.getElementById('project-modal').style.display = 'none';
+                        document.getElementById('no-urut-dokumen').disabled = false;
+                        currentEditingProjectId = null;
                     }
+                });
+            }
+
+            // Status form submission
+            const statusForm = document.getElementById('status-form');
+            if (statusForm) {
+                statusForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const newStatus = document.getElementById('status-select').value;
+                    const success = await updateProject(currentEditingProjectId, { status: newStatus });
+                    
+                    if (success) {
+                        document.getElementById('status-modal').style.display = 'none';
+                        currentEditingProjectId = null;
+                    }
+                });
+            }
+
+            // Delete confirmation handlers
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async function() {
+                    const success = await deleteProject(currentEditingProjectId);
+                    if (success) {
+                        document.getElementById('delete-modal').style.display = 'none';
+                        currentEditingProjectId = null;
+                    }
+                });
+            }
+            
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.addEventListener('click', function() {
+                    document.getElementById('delete-modal').style.display = 'none';
+                    currentEditingProjectId = null;
                 });
             }
 
@@ -1526,6 +1685,8 @@
             closeButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     this.closest('.modal').style.display = 'none';
+                    document.getElementById('no-urut-dokumen').disabled = false;
+                    currentEditingProjectId = null;
                 });
             });
 
@@ -1533,6 +1694,8 @@
             window.addEventListener('click', function(e) {
                 if (e.target.classList.contains('modal')) {
                     e.target.style.display = 'none';
+                    document.getElementById('no-urut-dokumen').disabled = false;
+                    currentEditingProjectId = null;
                 }
             });
         });
@@ -1800,6 +1963,39 @@
                     <button type="submit" class="btn btn-primary">Simpan Project</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Status Change Modal -->
+    <div id="status-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2 class="card-title" style="margin-bottom: 1.5rem;">Ubah Status Project</h2>
+            <form id="status-form">
+                <div class="form-group">
+                    <label for="status-select">Status</label>
+                    <select id="status-select" class="filter-input" required>
+                        <option value="On Progress">On Progress</option>
+                        <option value="Done">Done</option>
+                        <option value="Hold">Hold</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="delete-modal">
+        <div class="delete-modal-content">
+            <h2 class="card-title" style="margin-bottom: 1rem;">Konfirmasi Hapus</h2>
+            <p>Apakah Anda yakin ingin menghapus project ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="delete-actions">
+                <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
+                <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
+            </div>
         </div>
     </div>
 
