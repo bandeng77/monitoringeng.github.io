@@ -138,7 +138,6 @@
             font-size: 0.95rem;
             transition: all 0.3s ease;
             background-color: #f8fafc;
-            text-transform: uppercase;
         }
 
         .auth-input:focus {
@@ -485,7 +484,6 @@
             font-family: inherit;
             font-size: 0.95rem;
             width: 100%;
-            text-transform: uppercase;
         }
 
         /* Table Styles */
@@ -498,15 +496,14 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed;
+            table-layout: auto;
         }
 
         th, td {
             padding: 0.875rem 1rem;
-            text-align: center;
+            text-align: left;
             border-bottom: 1px solid var(--border);
             word-wrap: break-word;
-            vertical-align: middle;
         }
 
         th {
@@ -517,7 +514,6 @@
 
         td {
             color: var(--secondary);
-            text-transform: uppercase;
         }
 
         tr:last-child td {
@@ -539,7 +535,6 @@
             transition: all 0.2s ease;
             text-align: center;
             white-space: nowrap;
-            text-transform: uppercase;
         }
 
         .status-button:hover {
@@ -598,19 +593,6 @@
             background-color: var(--hover);
             color: var(--primary);
         }
-
-        /* Column Widths untuk Table */
-        .col-no { width: 60px; }
-        .col-sales { width: 120px; }
-        .col-project-name { width: 150px; }
-        .col-data-in { width: 100px; }
-        .col-doc-number { width: 200px; }
-        .col-type { width: 120px; }
-        .col-pic { width: 100px; }
-        .col-start-date { width: 100px; }
-        .col-status { width: 120px; }
-        .col-remarks { width: 150px; }
-        .col-actions { width: 100px; }
 
         /* Pagination */
         .pagination {
@@ -717,7 +699,6 @@
             font-family: inherit;
             font-size: 0.95rem;
             width: 100%;
-            text-transform: uppercase;
         }
 
         .form-group textarea {
@@ -896,10 +877,6 @@
             .sidebar-toggle {
                 display: none;
             }
-
-            table {
-                table-layout: auto;
-            }
         }
 
         @media (max-width: 768px) {
@@ -993,11 +970,6 @@
             }, duration);
         }
 
-        // --- Helper function to convert text to uppercase ---
-        function toUpperCase(text) {
-            return text ? text.toString().toUpperCase() : '';
-        }
-
         // Global variables for project data
         let allProjectData = [];
         let filteredProjectData = [];
@@ -1022,10 +994,10 @@
         // --- Get type code ---
         function getTypeCode(types) {
             const typeMap = {
-                'INQUIRY': 'INQ',
+                'Inquiry': 'INQ',
                 'DWG': 'DWG',
-                'HYDROLIC': 'HYD',
-                'DOKUMEN': 'DOK'
+                'Hydrolic': 'HYD',
+                'Dokumen': 'DOK'
             };
             
             // Jika multiple types, gunakan kode dari type pertama
@@ -1053,7 +1025,7 @@
                 const dateCode = formatDateToDDMM(dataIn);
                 const typeCode = getTypeCode(types);
                 
-                return `ENG-${formattedNumber}-${dateCode}-${typeCode}-${toUpperCase(projectName)}`;
+                return `ENG-${formattedNumber}-${dateCode}-${typeCode}-${projectName}`;
             } catch (error) {
                 console.error("Error generating project number:", error);
                 throw new Error("Gagal menghasilkan nomor project");
@@ -1068,7 +1040,7 @@
             projectTableBody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">TIDAK ADA DATA PROJECT YANG COCOK.</td></tr>';
+                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project yang cocok.</td></tr>';
                 renderPagination(0, 0); // Render empty pagination
                 return;
             }
@@ -1082,34 +1054,34 @@
 
             paginatedData.forEach(project => {
                 let statusClass = '';
-                if (project.Status === 'ON PROGRESS') statusClass = 'status-on-progress';
-                else if (project.Status === 'DONE') statusClass = 'status-done';
-                else if (project.Status === 'HOLD') statusClass = 'status-hold';
+                if (project.Status === 'On Progress') statusClass = 'status-on-progress';
+                else if (project.Status === 'Done') statusClass = 'status-done';
+                else if (project.Status === 'Hold') statusClass = 'status-hold';
 
                 // Format types untuk display
                 const displayTypes = Array.isArray(project.Type) ? project.Type.join(', ') : project.Type;
 
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
-                        <td class="col-no">${rowNum++}</td>
-                        <td class="col-sales">${toUpperCase(project.Sales_Client) || '-'}</td>
-                        <td class="col-project-name">${toUpperCase(project.Project_Name) || '-'}</td>
-                        <td class="col-data-in">${project.Data_In || '-'}</td>
-                        <td class="col-doc-number">
+                        <td>${rowNum++}</td>
+                        <td>${project.Sales_Client || '-'}</td>
+                        <td>${project.Project_Name || '-'}</td>
+                        <td>${project.Data_In || '-'}</td>
+                        <td>
                             <a href="#" class="doc-number-link" data-project-id="${project.No_Urut_Dokumen}">
                                 ${project.No_Urut_Dokumen || '-'}
                             </a>
                         </td>
-                        <td class="col-type">${toUpperCase(displayTypes) || '-'}</td>
-                        <td class="col-pic">${toUpperCase(project.PIC) || '-'}</td>
-                        <td class="col-start-date">${project.Start_Date || '-'}</td>
-                        <td class="col-status status-cell">
+                        <td>${displayTypes || '-'}</td>
+                        <td>${project.PIC || '-'}</td>
+                        <td>${project.Start_Date || '-'}</td>
+                        <td class="status-cell">
                             <button class="status-button ${statusClass}" data-project-id="${project.No_Urut_Dokumen}" data-current-status="${project.Status}">
                                 ${project.Status}
                             </button>
                         </td>
-                        <td class="col-remarks">${toUpperCase(project.Remarks) || '-'}</td>
-                        <td class="col-actions action-cell">
+                        <td>${project.Remarks || '-'}</td>
+                        <td class="action-cell">
                             <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -1170,7 +1142,7 @@
                 // Get project data
                 const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
                 if (!project) {
-                    showAlert('PROJECT TIDAK DITEMUKAN', 'error');
+                    showAlert('Project tidak ditemukan', 'error');
                     return;
                 }
 
@@ -1218,55 +1190,55 @@
                 const modalContent = `
                     <div class="modal-content" style="max-width: 900px;">
                         <span class="modal-close-btn">&times;</span>
-                        <h2 class="card-title" style="margin-bottom: 1.5rem;">DETAIL PROJECT - ${project.No_Urut_Dokumen}</h2>
+                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Detail Project - ${project.No_Urut_Dokumen}</h2>
                         
                         <div class="project-main-details" style="margin-bottom: 2rem;">
-                            <h3 style="margin-bottom: 1rem; color: var(--dark);">PROJECT PERTAMA</h3>
+                            <h3 style="margin-bottom: 1rem; color: var(--dark);">Project Pertama</h3>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                                 <div>
-                                    <strong>NOMOR URUT DOKUMEN:</strong><br>
+                                    <strong>Nomor Urut Dokumen:</strong><br>
                                     ${project.No_Urut_Dokumen || '-'}
                                 </div>
                                 <div>
-                                    <strong>SALES/CLIENT:</strong><br>
-                                    ${toUpperCase(project.Sales_Client) || '-'}
+                                    <strong>Sales/Client:</strong><br>
+                                    ${project.Sales_Client || '-'}
                                 </div>
                                 <div>
-                                    <strong>NAMA PROJECT:</strong><br>
-                                    ${toUpperCase(project.Project_Name) || '-'}
+                                    <strong>Nama Project:</strong><br>
+                                    ${project.Project_Name || '-'}
                                 </div>
                                 <div>
-                                    <strong>TANGGAL MASUK:</strong><br>
+                                    <strong>Tanggal Masuk:</strong><br>
                                     ${project.Data_In || '-'}
                                 </div>
                                 <div>
-                                    <strong>TIPE:</strong><br>
-                                    ${toUpperCase(displayTypes) || '-'}
+                                    <strong>Tipe:</strong><br>
+                                    ${displayTypes || '-'}
                                 </div>
                                 <div>
                                     <strong>PIC:</strong><br>
-                                    ${toUpperCase(project.PIC) || '-'}
+                                    ${project.PIC || '-'}
                                 </div>
                                 <div>
-                                    <strong>TANGGAL MULAI:</strong><br>
+                                    <strong>Tanggal Mulai:</strong><br>
                                     ${project.Start_Date || '-'}
                                 </div>
                                 <div>
-                                    <strong>STATUS:</strong><br>
-                                    ${toUpperCase(project.Status) || '-'}
+                                    <strong>Status:</strong><br>
+                                    ${project.Status || '-'}
                                 </div>
                                 <div style="grid-column: 1 / -1;">
-                                    <strong>KETERANGAN:</strong><br>
-                                    ${toUpperCase(project.Remarks) || '-'}
+                                    <strong>Keterangan:</strong><br>
+                                    ${project.Remarks || '-'}
                                 </div>
                             </div>
                         </div>
 
                         <div class="project-additional-details">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h3 style="color: var(--dark);">PROJECT TAMBAHAN</h3>
+                                <h3 style="color: var(--dark);">Project Tambahan</h3>
                                 <button class="btn btn-primary" id="add-detail-btn">
-                                    <i class="fas fa-plus btn-icon"></i> TAMBAH PROJECT BARU
+                                    <i class="fas fa-plus btn-icon"></i> Tambah Project Baru
                                 </button>
                             </div>
                             
@@ -1275,7 +1247,7 @@
                                     ${details.map((detail, index) => `
                                         <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
                                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                                                <strong>PROJECT ${index + 2}</strong>
+                                                <strong>Project ${index + 2}</strong>
                                                 <div>
                                                     <button class="action-btn edit-detail-btn" data-detail-id="${detail.id}" title="Edit Project">
                                                         <i class="fas fa-edit"></i>
@@ -1286,19 +1258,19 @@
                                                 </div>
                                             </div>
                                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
-                                                <div><strong>SALES/CLIENT:</strong><br>${toUpperCase(detail.salesClient) || '-'}</div>
-                                                <div><strong>NAMA PROJECT:</strong><br>${toUpperCase(detail.projectName) || '-'}</div>
-                                                <div><strong>TANGGAL MASUK:</strong><br>${detail.dataIn || '-'}</div>
-                                                <div><strong>TIPE:</strong><br>${detail.types ? toUpperCase(detail.types.join(', ')) : '-'}</div>
-                                                <div><strong>PIC:</strong><br>${toUpperCase(detail.pic) || '-'}</div>
-                                                <div><strong>TANGGAL MULAI:</strong><br>${detail.startDate || '-'}</div>
-                                                <div><strong>STATUS:</strong><br>${toUpperCase(detail.status) || '-'}</div>
-                                                <div style="grid-column: 1 / -1;"><strong>KETERANGAN:</strong><br>${toUpperCase(detail.remarks) || '-'}</div>
+                                                <div><strong>Sales/Client:</strong><br>${detail.salesClient || '-'}</div>
+                                                <div><strong>Nama Project:</strong><br>${detail.projectName || '-'}</div>
+                                                <div><strong>Tanggal Masuk:</strong><br>${detail.dataIn || '-'}</div>
+                                                <div><strong>Tipe:</strong><br>${detail.types ? detail.types.join(', ') : '-'}</div>
+                                                <div><strong>PIC:</strong><br>${detail.pic || '-'}</div>
+                                                <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
+                                                <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${detail.remarks || '-'}</div>
                                             </div>
                                         </div>
                                     `).join('')}
                                 </div>` : 
-                                '<p style="text-align: center; color: var(--secondary); padding: 2rem;">BELUM ADA PROJECT TAMBAHAN</p>'
+                                '<p style="text-align: center; color: var(--secondary); padding: 2rem;">Belum ada project tambahan</p>'
                             }
                         </div>
                     </div>
@@ -1345,7 +1317,7 @@
 
             } catch (error) {
                 console.error("Error showing project details:", error);
-                showAlert('GAGAL MEMUAT DETAIL PROJECT', 'error');
+                showAlert('Gagal memuat detail project', 'error');
             }
         }
 
@@ -1354,7 +1326,7 @@
             try {
                 const detailDoc = await projectDetailsCol.doc(detailId).get();
                 if (!detailDoc.exists) {
-                    showAlert('DETAIL PROJECT TIDAK DITEMUKAN', 'error');
+                    showAlert('Detail project tidak ditemukan', 'error');
                     return;
                 }
 
@@ -1364,88 +1336,88 @@
                 const modalContent = `
                     <div class="modal-content" style="max-width: 800px;">
                         <span class="modal-close-btn">&times;</span>
-                        <h2 class="card-title" style="margin-bottom: 1.5rem;">EDIT PROJECT TAMBAHAN - ${projectId}</h2>
+                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Edit Project Tambahan - ${projectId}</h2>
                         <form id="edit-detail-form">
                             <div class="form-group">
-                                <label for="edit-sales-client">SALES/CLIENT</label>
+                                <label for="edit-sales-client">Sales/Client</label>
                                 <select id="edit-sales-client" class="filter-input" required>
-                                    <option value="">PILIH SALES/CLIENT</option>
-                                    <option value="RANGGA" ${detail.salesClient === 'RANGGA' ? 'selected' : ''}>RANGGA</option>
-                                    <option value="DHEA" ${detail.salesClient === 'DHEA' ? 'selected' : ''}>DHEA</option>
-                                    <option value="RORY" ${detail.salesClient === 'RORY' ? 'selected' : ''}>RORY</option>
-                                    <option value="PAMUNGKAS" ${detail.salesClient === 'PAMUNGKAS' ? 'selected' : ''}>PAMUNGKAS</option>
-                                    <option value="OTHER" ${!['RANGGA','DHEA','RORY','PAMUNGKAS'].includes(detail.salesClient) ? 'selected' : ''}>OTHER</option>
+                                    <option value="">Pilih Sales/Client</option>
+                                    <option value="Rangga" ${detail.salesClient === 'Rangga' ? 'selected' : ''}>Rangga</option>
+                                    <option value="Dhea" ${detail.salesClient === 'Dhea' ? 'selected' : ''}>Dhea</option>
+                                    <option value="Rory" ${detail.salesClient === 'Rory' ? 'selected' : ''}>Rory</option>
+                                    <option value="Pamungkas" ${detail.salesClient === 'Pamungkas' ? 'selected' : ''}>Pamungkas</option>
+                                    <option value="Other" ${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? 'selected' : ''}>Other</option>
                                 </select>
                             </div>
-                            <div id="edit-other-sales-container" class="form-group" style="display: ${!['RANGGA','DHEA','RORY','PAMUNGKAS'].includes(detail.salesClient) ? 'block' : 'none'};">
-                                <label for="edit-other-sales">KETERANGAN SALES/CLIENT LAINNYA</label>
-                                <input type="text" id="edit-other-sales" class="filter-input" value="${!['RANGGA','DHEA','RORY','PAMUNGKAS'].includes(detail.salesClient) ? detail.salesClient : ''}" placeholder="MASUKKAN NAMA SALES/CLIENT">
+                            <div id="edit-other-sales-container" class="form-group" style="display: ${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? 'block' : 'none'};">
+                                <label for="edit-other-sales">Keterangan Sales/Client Lainnya</label>
+                                <input type="text" id="edit-other-sales" class="filter-input" value="${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? detail.salesClient : ''}" placeholder="Masukkan nama sales/client">
                             </div>
                             <div class="form-group">
-                                <label for="edit-project-name">PROJECT NAME</label>
+                                <label for="edit-project-name">Project Name</label>
                                 <input type="text" id="edit-project-name" class="filter-input" value="${detail.projectName || ''}" required>
                             </div>
                             <div class="form-group">
-                                <label for="edit-data-in">DATA IN</label>
+                                <label for="edit-data-in">Data In</label>
                                 <input type="date" id="edit-data-in" class="filter-input" value="${detail.dataIn || ''}" required>
                             </div>
                             <div class="form-group">
-                                <label for="edit-no-urut-dokumen">NO URUT DOKUMEN</label>
+                                <label for="edit-no-urut-dokumen">No Urut Dokumen</label>
                                 <input type="text" id="edit-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
                             </div>
                             <div class="form-group">
-                                <label>TIPE *</label>
+                                <label>Tipe *</label>
                                 <div class="multiple-select-container">
                                     <div class="multiple-select-option">
-                                        <input type="checkbox" id="edit-type-inquiry" value="INQUIRY" ${detail.types && detail.types.includes('INQUIRY') ? 'checked' : ''}>
-                                        <label for="edit-type-inquiry">INQUIRY</label>
+                                        <input type="checkbox" id="edit-type-inquiry" value="Inquiry" ${detail.types && detail.types.includes('Inquiry') ? 'checked' : ''}>
+                                        <label for="edit-type-inquiry">Inquiry</label>
                                     </div>
                                     <div class="multiple-select-option">
                                         <input type="checkbox" id="edit-type-dwg" value="DWG" ${detail.types && detail.types.includes('DWG') ? 'checked' : ''}>
                                         <label for="edit-type-dwg">DWG</label>
                                     </div>
                                     <div class="multiple-select-option">
-                                        <input type="checkbox" id="edit-type-hydrolic" value="HYDROLIC" ${detail.types && detail.types.includes('HYDROLIC') ? 'checked' : ''}>
-                                        <label for="edit-type-hydrolic">HYDROLIC</label>
+                                        <input type="checkbox" id="edit-type-hydrolic" value="Hydrolic" ${detail.types && detail.types.includes('Hydrolic') ? 'checked' : ''}>
+                                        <label for="edit-type-hydrolic">Hydrolic</label>
                                     </div>
                                     <div class="multiple-select-option">
-                                        <input type="checkbox" id="edit-type-dokumen" value="DOKUMEN" ${detail.types && detail.types.includes('DOKUMEN') ? 'checked' : ''}>
-                                        <label for="edit-type-dokumen">DOKUMEN</label>
+                                        <input type="checkbox" id="edit-type-dokumen" value="Dokumen" ${detail.types && detail.types.includes('Dokumen') ? 'checked' : ''}>
+                                        <label for="edit-type-dokumen">Dokumen</label>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="edit-pic">PIC</label>
                                 <select id="edit-pic" class="filter-input" required>
-                                    <option value="">PILIH PIC</option>
-                                    <option value="WAHYU" ${detail.pic === 'WAHYU' ? 'selected' : ''}>WAHYU</option>
-                                    <option value="DHONA" ${detail.pic === 'DHONA' ? 'selected' : ''}>DHONA</option>
-                                    <option value="ARIFAH" ${detail.pic === 'ARIFAH' ? 'selected' : ''}>ARIFAH</option>
-                                    <option value="KARTIKA" ${detail.pic === 'KARTIKA' ? 'selected' : ''}>KARTIKA</option>
-                                    <option value="ARDI" ${detail.pic === 'ARDI' ? 'selected' : ''}>ARDI</option>
-                                    <option value="BRIAN" ${detail.pic === 'BRIAN' ? 'selected' : ''}>BRIAN</option>
+                                    <option value="">Pilih PIC</option>
+                                    <option value="wahyu" ${detail.pic === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                                    <option value="dhona" ${detail.pic === 'dhona' ? 'selected' : ''}>Dhona</option>
+                                    <option value="arifah" ${detail.pic === 'arifah' ? 'selected' : ''}>Arifah</option>
+                                    <option value="kartika" ${detail.pic === 'kartika' ? 'selected' : ''}>Kartika</option>
+                                    <option value="ardi" ${detail.pic === 'ardi' ? 'selected' : ''}>Ardi</option>
+                                    <option value="brian" ${detail.pic === 'brian' ? 'selected' : ''}>Brian</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="edit-start-date">START DATE</label>
+                                <label for="edit-start-date">Start Date</label>
                                 <input type="date" id="edit-start-date" class="filter-input" value="${detail.startDate || ''}">
                             </div>
                             <div class="form-group">
-                                <label for="edit-status">STATUS</label>
+                                <label for="edit-status">Status</label>
                                 <select id="edit-status" class="filter-input" required>
-                                    <option value="">PILIH STATUS</option>
-                                    <option value="ON PROGRESS" ${detail.status === 'ON PROGRESS' ? 'selected' : ''}>ON PROGRESS</option>
-                                    <option value="DONE" ${detail.status === 'DONE' ? 'selected' : ''}>DONE</option>
-                                    <option value="HOLD" ${detail.status === 'HOLD' ? 'selected' : ''}>HOLD</option>
+                                    <option value="">Pilih Status</option>
+                                    <option value="On Progress" ${detail.status === 'On Progress' ? 'selected' : ''}>On Progress</option>
+                                    <option value="Done" ${detail.status === 'Done' ? 'selected' : ''}>Done</option>
+                                    <option value="Hold" ${detail.status === 'Hold' ? 'selected' : ''}>Hold</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="edit-remarks">REMARKS</label>
+                                <label for="edit-remarks">Remarks</label>
                                 <textarea id="edit-remarks" class="filter-input" rows="3">${detail.remarks || ''}</textarea>
                             </div>
                             <div class="form-actions">
-                                <button type="button" class="btn btn-outline" id="cancel-edit-detail">BATAL</button>
-                                <button type="submit" class="btn btn-primary">UPDATE PROJECT</button>
+                                <button type="button" class="btn btn-outline" id="cancel-edit-detail">Batal</button>
+                                <button type="submit" class="btn btn-primary">Update Project</button>
                             </div>
                         </form>
                     </div>
@@ -1459,7 +1431,7 @@
 
                 // Handle "Other" option in sales client dropdown
                 document.getElementById('edit-sales-client').addEventListener('change', function() {
-                    if (this.value === 'OTHER') {
+                    if (this.value === 'Other') {
                         document.getElementById('edit-other-sales-container').style.display = 'block';
                     } else {
                         document.getElementById('edit-other-sales-container').style.display = 'none';
@@ -1478,7 +1450,6 @@
                 modal.querySelector('#edit-detail-form').addEventListener('submit', async function(e) {
                     e.preventDefault();
                     await updateProjectDetail(detailId, projectId);
-                    // Hanya close modal sekali
                     modal.remove();
                 });
 
@@ -1491,7 +1462,7 @@
 
             } catch (error) {
                 console.error("Error showing edit detail modal:", error);
-                showAlert('GAGAL MEMUAT FORM EDIT', 'error');
+                showAlert('Gagal memuat form edit', 'error');
             }
         }
 
@@ -1499,23 +1470,23 @@
         async function updateProjectDetail(detailId, projectId) {
             const salesClient = document.getElementById('edit-sales-client').value;
             const otherSales = document.getElementById('edit-other-sales').value;
-            const finalSalesClient = salesClient === 'OTHER' ? toUpperCase(otherSales) : salesClient;
-            const projectName = toUpperCase(document.getElementById('edit-project-name').value);
+            const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+            const projectName = document.getElementById('edit-project-name').value;
             const dataIn = document.getElementById('edit-data-in').value;
             const pic = document.getElementById('edit-pic').value;
             const startDate = document.getElementById('edit-start-date').value;
             const status = document.getElementById('edit-status').value;
-            const remarks = toUpperCase(document.getElementById('edit-remarks').value);
+            const remarks = document.getElementById('edit-remarks').value;
 
             // Get selected types
             const selectedTypes = [];
-            if (document.getElementById('edit-type-inquiry').checked) selectedTypes.push('INQUIRY');
+            if (document.getElementById('edit-type-inquiry').checked) selectedTypes.push('Inquiry');
             if (document.getElementById('edit-type-dwg').checked) selectedTypes.push('DWG');
-            if (document.getElementById('edit-type-hydrolic').checked) selectedTypes.push('HYDROLIC');
-            if (document.getElementById('edit-type-dokumen').checked) selectedTypes.push('DOKUMEN');
+            if (document.getElementById('edit-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+            if (document.getElementById('edit-type-dokumen').checked) selectedTypes.push('Dokumen');
 
             if (selectedTypes.length === 0) {
-                showAlert('PILIH MINIMAL SATU TIPE', 'error');
+                showAlert('Pilih minimal satu tipe', 'error');
                 return;
             }
 
@@ -1533,14 +1504,15 @@
                 };
 
                 await projectDetailsCol.doc(detailId).update(projectData);
-                showAlert('PROJECT BERHASIL DIPERBARUI', 'success');
+                showAlert('Project berhasil diperbarui', 'success');
                 
-                // Refresh dashboard untuk update type counts
-                loadDashboardData();
+                // Refresh the details modal
+                document.querySelector('.modal').remove();
+                showProjectDetailsModal(projectId);
                 
             } catch (error) {
                 console.error("Error updating project detail:", error);
-                showAlert('GAGAL MEMPERBARUI PROJECT', 'error');
+                showAlert('Gagal memperbarui project', 'error');
             }
         }
 
@@ -1549,88 +1521,88 @@
             const modalContent = `
                 <div class="modal-content" style="max-width: 800px;">
                     <span class="modal-close-btn">&times;</span>
-                    <h2 class="card-title" style="margin-bottom: 1.5rem;">TAMBAH PROJECT BARU - ${projectId}</h2>
+                    <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Project Baru - ${projectId}</h2>
                     <form id="add-project-form">
                         <div class="form-group">
-                            <label for="add-sales-client">SALES/CLIENT</label>
+                            <label for="add-sales-client">Sales/Client</label>
                             <select id="add-sales-client" class="filter-input" required>
-                                <option value="">PILIH SALES/CLIENT</option>
-                                <option value="RANGGA" ${baseProject.Sales_Client === 'RANGGA' ? 'selected' : ''}>RANGGA</option>
-                                <option value="DHEA" ${baseProject.Sales_Client === 'DHEA' ? 'selected' : ''}>DHEA</option>
-                                <option value="RORY" ${baseProject.Sales_Client === 'RORY' ? 'selected' : ''}>RORY</option>
-                                <option value="PAMUNGKAS" ${baseProject.Sales_Client === 'PAMUNGKAS' ? 'selected' : ''}>PAMUNGKAS</option>
-                                <option value="OTHER">OTHER</option>
+                                <option value="">Pilih Sales/Client</option>
+                                <option value="Rangga" ${baseProject.Sales_Client === 'Rangga' ? 'selected' : ''}>Rangga</option>
+                                <option value="Dhea" ${baseProject.Sales_Client === 'Dhea' ? 'selected' : ''}>Dhea</option>
+                                <option value="Rory" ${baseProject.Sales_Client === 'Rory' ? 'selected' : ''}>Rory</option>
+                                <option value="Pamungkas" ${baseProject.Sales_Client === 'Pamungkas' ? 'selected' : ''}>Pamungkas</option>
+                                <option value="Other">Other</option>
                             </select>
                         </div>
                         <div id="add-other-sales-container" class="form-group" style="display: none;">
-                            <label for="add-other-sales">KETERANGAN SALES/CLIENT LAINNYA</label>
-                            <input type="text" id="add-other-sales" class="filter-input" placeholder="MASUKKAN NAMA SALES/CLIENT">
+                            <label for="add-other-sales">Keterangan Sales/Client Lainnya</label>
+                            <input type="text" id="add-other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
                         </div>
                         <div class="form-group">
-                            <label for="add-project-name">PROJECT NAME</label>
+                            <label for="add-project-name">Project Name</label>
                             <input type="text" id="add-project-name" class="filter-input" value="${baseProject.Project_Name || ''}" required>
                         </div>
                         <div class="form-group">
-                            <label for="add-data-in">DATA IN</label>
+                            <label for="add-data-in">Data In</label>
                             <input type="date" id="add-data-in" class="filter-input" required>
                         </div>
                         <div class="form-group">
-                            <label for="add-no-urut-dokumen">NO URUT DOKUMEN</label>
+                            <label for="add-no-urut-dokumen">No Urut Dokumen</label>
                             <input type="text" id="add-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
                         </div>
                         <div class="form-group">
-                            <label>TIPE *</label>
+                            <label>Tipe *</label>
                             <div class="multiple-select-container">
                                 <div class="multiple-select-option">
-                                    <input type="checkbox" id="add-type-inquiry" value="INQUIRY">
-                                    <label for="add-type-inquiry">INQUIRY</label>
+                                    <input type="checkbox" id="add-type-inquiry" value="Inquiry">
+                                    <label for="add-type-inquiry">Inquiry</label>
                                 </div>
                                 <div class="multiple-select-option">
                                     <input type="checkbox" id="add-type-dwg" value="DWG">
                                     <label for="add-type-dwg">DWG</label>
                                 </div>
                                 <div class="multiple-select-option">
-                                    <input type="checkbox" id="add-type-hydrolic" value="HYDROLIC">
-                                    <label for="add-type-hydrolic">HYDROLIC</label>
+                                    <input type="checkbox" id="add-type-hydrolic" value="Hydrolic">
+                                    <label for="add-type-hydrolic">Hydrolic</label>
                                 </div>
                                 <div class="multiple-select-option">
-                                    <input type="checkbox" id="add-type-dokumen" value="DOKUMEN">
-                                    <label for="add-type-dokumen">DOKUMEN</label>
+                                    <input type="checkbox" id="add-type-dokumen" value="Dokumen">
+                                    <label for="add-type-dokumen">Dokumen</label>
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="add-pic">PIC</label>
                             <select id="add-pic" class="filter-input" required>
-                                <option value="">PILIH PIC</option>
-                                <option value="WAHYU" ${baseProject.PIC === 'WAHYU' ? 'selected' : ''}>WAHYU</option>
-                                <option value="DHONA" ${baseProject.PIC === 'DHONA' ? 'selected' : ''}>DHONA</option>
-                                <option value="ARIFAH" ${baseProject.PIC === 'ARIFAH' ? 'selected' : ''}>ARIFAH</option>
-                                <option value="KARTIKA" ${baseProject.PIC === 'KARTIKA' ? 'selected' : ''}>KARTIKA</option>
-                                <option value="ARDI" ${baseProject.PIC === 'ARDI' ? 'selected' : ''}>ARDI</option>
-                                <option value="BRIAN" ${baseProject.PIC === 'BRIAN' ? 'selected' : ''}>BRIAN</option>
+                                <option value="">Pilih PIC</option>
+                                <option value="wahyu" ${baseProject.PIC === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                                <option value="dhona" ${baseProject.PIC === 'dhona' ? 'selected' : ''}>Dhona</option>
+                                <option value="arifah" ${baseProject.PIC === 'arifah' ? 'selected' : ''}>Arifah</option>
+                                <option value="kartika" ${baseProject.PIC === 'kartika' ? 'selected' : ''}>Kartika</option>
+                                <option value="ardi" ${baseProject.PIC === 'ardi' ? 'selected' : ''}>Ardi</option>
+                                <option value="brian" ${baseProject.PIC === 'brian' ? 'selected' : ''}>Brian</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="add-start-date">START DATE</label>
+                            <label for="add-start-date">Start Date</label>
                             <input type="date" id="add-start-date" class="filter-input">
                         </div>
                         <div class="form-group">
-                            <label for="add-status">STATUS</label>
+                            <label for="add-status">Status</label>
                             <select id="add-status" class="filter-input" required>
-                                <option value="">PILIH STATUS</option>
-                                <option value="ON PROGRESS">ON PROGRESS</option>
-                                <option value="DONE">DONE</option>
-                                <option value="HOLD">HOLD</option>
+                                <option value="">Pilih Status</option>
+                                <option value="On Progress">On Progress</option>
+                                <option value="Done">Done</option>
+                                <option value="Hold">Hold</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="add-remarks">REMARKS</label>
+                            <label for="add-remarks">Remarks</label>
                             <textarea id="add-remarks" class="filter-input" rows="3"></textarea>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="btn btn-outline" id="cancel-add-project">BATAL</button>
-                            <button type="submit" class="btn btn-primary">SIMPAN PROJECT</button>
+                            <button type="button" class="btn btn-outline" id="cancel-add-project">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Project</button>
                         </div>
                     </form>
                 </div>
@@ -1648,7 +1620,7 @@
 
             // Handle "Other" option in sales client dropdown
             document.getElementById('add-sales-client').addEventListener('change', function() {
-                if (this.value === 'OTHER') {
+                if (this.value === 'Other') {
                     document.getElementById('add-other-sales-container').style.display = 'block';
                 } else {
                     document.getElementById('add-other-sales-container').style.display = 'none';
@@ -1667,7 +1639,6 @@
             modal.querySelector('#add-project-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 await addNewProjectToDetails(projectId, baseProject);
-                // Hanya close modal sekali
                 modal.remove();
             });
 
@@ -1683,23 +1654,23 @@
         async function addNewProjectToDetails(projectId, baseProject) {
             const salesClient = document.getElementById('add-sales-client').value;
             const otherSales = document.getElementById('add-other-sales').value;
-            const finalSalesClient = salesClient === 'OTHER' ? toUpperCase(otherSales) : salesClient;
-            const projectName = toUpperCase(document.getElementById('add-project-name').value);
+            const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+            const projectName = document.getElementById('add-project-name').value;
             const dataIn = document.getElementById('add-data-in').value;
             const pic = document.getElementById('add-pic').value;
             const startDate = document.getElementById('add-start-date').value;
             const status = document.getElementById('add-status').value;
-            const remarks = toUpperCase(document.getElementById('add-remarks').value);
+            const remarks = document.getElementById('add-remarks').value;
 
             // Get selected types
             const selectedTypes = [];
-            if (document.getElementById('add-type-inquiry').checked) selectedTypes.push('INQUIRY');
+            if (document.getElementById('add-type-inquiry').checked) selectedTypes.push('Inquiry');
             if (document.getElementById('add-type-dwg').checked) selectedTypes.push('DWG');
-            if (document.getElementById('add-type-hydrolic').checked) selectedTypes.push('HYDROLIC');
-            if (document.getElementById('add-type-dokumen').checked) selectedTypes.push('DOKUMEN');
+            if (document.getElementById('add-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+            if (document.getElementById('add-type-dokumen').checked) selectedTypes.push('Dokumen');
 
             if (selectedTypes.length === 0) {
-                showAlert('PILIH MINIMAL SATU TIPE', 'error');
+                showAlert('Pilih minimal satu tipe', 'error');
                 return;
             }
 
@@ -1718,33 +1689,35 @@
                 };
 
                 await projectDetailsCol.add(projectData);
-                showAlert('PROJECT BARU BERHASIL DITAMBAHKAN KE DETAIL', 'success');
+                showAlert('Project baru berhasil ditambahkan ke detail', 'success');
                 
-                // Refresh dashboard untuk update type counts
-                loadDashboardData();
+                // Refresh the details modal
+                document.querySelector('.modal').remove();
+                showProjectDetailsModal(projectId);
                 
             } catch (error) {
                 console.error("Error adding new project to details:", error);
-                showAlert('GAGAL MENAMBAHKAN PROJECT BARU', 'error');
+                showAlert('Gagal menambahkan project baru', 'error');
             }
         }
 
         // --- Delete Project Detail ---
         async function deleteProjectDetail(detailId, projectId) {
-            if (!confirm('APAKAH ANDA YAKIN INGIN MENGHAPUS PROJECT INI?')) {
+            if (!confirm('Apakah Anda yakin ingin menghapus project ini?')) {
                 return;
             }
 
             try {
                 await projectDetailsCol.doc(detailId).delete();
-                showAlert('PROJECT BERHASIL DIHAPUS', 'success');
+                showAlert('Project berhasil dihapus', 'success');
                 
-                // Refresh dashboard untuk update type counts
-                loadDashboardData();
+                // Refresh the details modal
+                document.querySelector('.modal').remove();
+                showProjectDetailsModal(projectId);
                 
             } catch (error) {
                 console.error("Error deleting project detail:", error);
-                showAlert('GAGAL MENGHAPUS PROJECT', 'error');
+                showAlert('Gagal menghapus project', 'error');
             }
         }
 
@@ -1756,13 +1729,13 @@
             pageControls.innerHTML = ''; // Bersihkan tombol paginasi yang ada
 
             if (totalItems === 0) {
-                pageInfo.textContent = 'MENAMPILKAN 0-0 DARI 0 DATA';
+                pageInfo.textContent = 'Menampilkan 0-0 dari 0 data';
                 return;
             }
 
             const startItem = (currentPage - 1) * itemsPerPage + 1;
             const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-            pageInfo.textContent = `MENAMPILKAN ${startItem}-${endItem} DARI ${totalItems} DATA`;
+            pageInfo.textContent = `Menampilkan ${startItem}-${endItem} dari ${totalItems} data`;
 
             // Previous button
             const prevBtn = document.createElement('button');
@@ -1848,7 +1821,7 @@
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
 
-            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">MEMUAT DATA...</td></tr>';
+            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Memuat data...</td></tr>';
 
             try {
                 // Unsubscribe previous listener if exists
@@ -1858,7 +1831,7 @@
 
                 window.projectUnsubscribe = projectsCol.onSnapshot((snapshot) => {
                     if (snapshot.empty) {
-                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">TIDAK ADA DATA PROJECT.</td></tr>';
+                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project.</td></tr>';
                         allProjectData = [];
                         filteredProjectData = [];
                         renderPagination(0, 0);
@@ -1890,13 +1863,13 @@
                     renderProjectsTable(filteredProjectData);
                 }, (error) => {
                     console.error("Error loading projects: ", error);
-                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">GAGAL MEMUAT DATA: ${error.message}</td></tr>`;
-                    showAlert("GAGAL MEMUAT DATA PROJECT: " + error.message, 'error');
+                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                    showAlert("Gagal memuat data project: " + error.message, 'error');
                 });
             } catch (error) {
                 console.error("Error setting up project listener: ", error);
-                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">GAGAL MEMUAT DATA: ${error.message}</td></tr>`;
-                showAlert("GAGAL MEMUAT DATA PROJECT: " + error.message, 'error');
+                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                showAlert("Gagal memuat data project: " + error.message, 'error');
             }
         }
 
@@ -1959,45 +1932,28 @@
                     let hydrolicCount = 0;
                     let dokumenCount = 0;
 
-                    // Hitung dari projects utama
                     snapshot.forEach(doc => {
                         const project = doc.data();
                         const type = project.type || '';
 
-                        if (type === 'INQUIRY' || (Array.isArray(type) && type.includes('INQUIRY'))) inquiryCount++;
-                        if (type === 'DWG' || (Array.isArray(type) && type.includes('DWG'))) dwgCount++;
-                        if (type === 'HYDROLIC' || (Array.isArray(type) && type.includes('HYDROLIC'))) hydrolicCount++;
-                        if (type === 'DOKUMEN' || (Array.isArray(type) && type.includes('DOKUMEN'))) dokumenCount++;
+                        if (type === 'Inquiry') inquiryCount++;
+                        else if (type === 'DWG') dwgCount++;
+                        else if (type === 'Hydrolic') hydrolicCount++;
+                        else if (type === 'Dokumen') dokumenCount++;
                     });
 
-                    // Hitung dari project details tambahan
-                    projectDetailsCol.get().then(detailsSnapshot => {
-                        if (!detailsSnapshot.empty) {
-                            detailsSnapshot.forEach(doc => {
-                                const detail = doc.data();
-                                const types = detail.types || [];
-
-                                if (types.includes('INQUIRY')) inquiryCount++;
-                                if (types.includes('DWG')) dwgCount++;
-                                if (types.includes('HYDROLIC')) hydrolicCount++;
-                                if (types.includes('DOKUMEN')) dokumenCount++;
-                            });
-                        }
-
-                        // Update the dashboard summary
-                        document.getElementById('inquiry-count').textContent = inquiryCount;
-                        document.getElementById('dwg-count').textContent = dwgCount;
-                        document.getElementById('hydrolic-count').textContent = hydrolicCount;
-                        document.getElementById('dokumen-count').textContent = dokumenCount;
-                    });
-
+                    // Update the dashboard summary
+                    document.getElementById('inquiry-count').textContent = inquiryCount;
+                    document.getElementById('dwg-count').textContent = dwgCount;
+                    document.getElementById('hydrolic-count').textContent = hydrolicCount;
+                    document.getElementById('dokumen-count').textContent = dokumenCount;
                 }, (error) => {
                     console.error("Error loading dashboard data: ", error);
-                    showAlert("GAGAL MEMUAT DATA DASHBOARD: " + error.message, 'error');
+                    showAlert("Gagal memuat data dashboard: " + error.message, 'error');
                 });
             } catch (error) {
                 console.error("Error setting up dashboard listener: ", error);
-                showAlert("GAGAL MEMUAT DATA DASHBOARD: " + error.message, 'error');
+                showAlert("Gagal memuat data dashboard: " + error.message, 'error');
             }
         }
 
@@ -2017,11 +1973,11 @@
                 };
 
                 await projectsCol.doc(projectNumber).set(completeProjectData);
-                showAlert("PROJECT BERHASIL DITAMBAHKAN!", 'success');
+                showAlert("Project berhasil ditambahkan!", 'success');
                 return true;
             } catch (error) {
                 console.error("Error adding project: ", error);
-                showAlert("GAGAL MENAMBAHKAN PROJECT: " + error.message, 'error');
+                showAlert("Gagal menambahkan project: " + error.message, 'error');
                 return false;
             }
         }
@@ -2030,11 +1986,11 @@
         async function updateProject(projectId, updatedData) {
             try {
                 await projectsCol.doc(projectId).update(updatedData);
-                showAlert("PROJECT BERHASIL DIPERBARUI!", 'success');
+                showAlert("Project berhasil diperbarui!", 'success');
                 return true;
             } catch (error) {
                 console.error("Error updating project: ", error);
-                showAlert("GAGAL MEMPERBARUI PROJECT: " + error.message, 'error');
+                showAlert("Gagal memperbarui project: " + error.message, 'error');
                 return false;
             }
         }
@@ -2043,11 +1999,11 @@
         async function deleteProject(projectId) {
             try {
                 await projectsCol.doc(projectId).delete();
-                showAlert("PROJECT BERHASIL DIHAPUS!", 'success');
+                showAlert("Project berhasil dihapus!", 'success');
                 return true;
             } catch (error) {
                 console.error("Error deleting project: ", error);
-                showAlert("GAGAL MENGHAPUS PROJECT: " + error.message, 'error');
+                showAlert("Gagal menghapus project: " + error.message, 'error');
                 return false;
             }
         }
@@ -2059,11 +2015,11 @@
                 if (doc.exists) {
                     return doc.data();
                 } else {
-                    throw new Error("PROJECT TIDAK DITEMUKAN.");
+                    throw new Error("Project tidak ditemukan.");
                 }
             } catch (error) {
                 console.error("Error getting project: ", error);
-                showAlert("GAGAL MENGAMBIL DATA PROJECT: " + error.message, 'error');
+                showAlert("Gagal mengambil data project: " + error.message, 'error');
                 return null;
             }
         }
@@ -2169,21 +2125,21 @@
                 .then((userCredential) => {
                     // Login successful
                     loginBtn.classList.remove('loading');
-                    showAlert('LOGIN BERHASIL!', 'success');
+                    showAlert('Login berhasil!', 'success');
                 })
                 .catch((error) => {
                     // Login failed
                     loginBtn.classList.remove('loading');
-                    let errorMessage = 'EMAIL ATAU PASSWORD SALAH.';
+                    let errorMessage = 'Email atau password salah.';
                     
                     if (error.code === 'auth/wrong-password') {
-                        errorMessage = 'PASSWORD YANG ANDA MASUKKAN SALAH.';
+                        errorMessage = 'Password yang Anda masukkan salah.';
                     } else if (error.code === 'auth/user-not-found') {
-                        errorMessage = 'EMAIL TIDAK DITEMUKAN.';
+                        errorMessage = 'Email tidak ditemukan.';
                     } else if (error.code === 'auth/invalid-email') {
-                        errorMessage = 'FORMAT EMAIL TIDAK VALID.';
+                        errorMessage = 'Format email tidak valid.';
                     } else if (error.code === 'auth/too-many-requests') {
-                        errorMessage = 'TERLALU BANYAK PERCOBAAN LOGIN. COBA LAGI NANTI.';
+                        errorMessage = 'Terlalu banyak percobaan login. Coba lagi nanti.';
                     }
                     
                     loginError.textContent = errorMessage;
@@ -2194,7 +2150,7 @@
 
         function logout() {
             auth.signOut().then(() => {
-                showAlert('LOGOUT BERHASIL!', 'success');
+                showAlert('Logout berhasil!', 'success');
             }).catch((error) => {
                 console.error("Logout error:", error);
             });
@@ -2317,7 +2273,7 @@
 
             // Sales dropdown handler for "Other" option
             document.addEventListener('change', function(e) {
-                if (e.target.id === 'sales-client' && e.target.value === 'OTHER') {
+                if (e.target.id === 'sales-client' && e.target.value === 'Other') {
                     document.getElementById('other-sales-container').style.display = 'block';
                 } else if (e.target.id === 'sales-client') {
                     document.getElementById('other-sales-container').style.display = 'none';
@@ -2332,7 +2288,7 @@
                     
                     const salesClient = document.getElementById('sales-client').value;
                     const otherSales = document.getElementById('other-sales').value;
-                    const finalSalesClient = salesClient === 'OTHER' ? toUpperCase(otherSales) : salesClient;
+                    const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
                     
                     // Get selected types
                     const selectedTypes = [];
@@ -2342,19 +2298,19 @@
                     });
                     
                     if (selectedTypes.length === 0) {
-                        showAlert('PILIH MINIMAL SATU TIPE', 'error');
+                        showAlert('Pilih minimal satu tipe', 'error');
                         return;
                     }
                     
                     const projectData = {
                         salesClient: finalSalesClient,
-                        projectName: toUpperCase(document.getElementById('project-name').value),
+                        projectName: document.getElementById('project-name').value,
                         dataIn: document.getElementById('data-in').value,
                         type: selectedTypes,
                         pic: document.getElementById('pic').value,
                         startDate: document.getElementById('start-date').value,
                         status: document.getElementById('status').value,
-                        remarks: toUpperCase(document.getElementById('remarks').value)
+                        remarks: document.getElementById('remarks').value
                     };
 
                     let success = false;
@@ -2415,7 +2371,7 @@
                 });
             }
 
-            // Modal close buttons - FIXED: Hanya close sekali
+            // Modal close buttons - FIXED: Properly handle modal closing
             const closeButtons = document.querySelectorAll('.modal-close-btn');
             closeButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -2434,7 +2390,7 @@
                 });
             });
 
-            // Close modal when clicking outside - FIXED: Hanya close sekali
+            // Close modal when clicking outside - FIXED: Properly handle modal closing
             window.addEventListener('click', function(e) {
                 if (e.target.classList.contains('modal')) {
                     e.target.style.display = 'none';
@@ -2457,23 +2413,23 @@
         <div class="auth-card">
             <div class="auth-logo">
                 <i class="fas fa-cogs auth-logo-icon"></i>
-                <span class="auth-logo-text">ENGINEERING MONITOR</span>
+                <span class="auth-logo-text">Engineering Monitor</span>
             </div>
-            <p class="auth-subtitle">SISTEM MONITORING PROJECT ENGINEERING</p>
+            <p class="auth-subtitle">Sistem Monitoring Project Engineering</p>
             <form id="login-form" class="auth-form">
                 <div class="auth-input-group">
                     <i class="fas fa-envelope auth-input-icon"></i>
-                    <input type="email" id="email" class="auth-input" placeholder="ALAMAT EMAIL" required>
+                    <input type="email" id="email" class="auth-input" placeholder="Alamat Email" required>
                 </div>
                 <div class="auth-input-group">
                     <i class="fas fa-lock auth-input-icon"></i>
-                    <input type="password" id="password" class="auth-input" placeholder="PASSWORD" required>
+                    <input type="password" id="password" class="auth-input" placeholder="Password" required>
                 </div>
                 <div id="login-error" class="auth-error-message"></div>
-                <button type="submit" id="login-btn" class="auth-submit-btn">LOGIN</button>
+                <button type="submit" id="login-btn" class="auth-submit-btn">Login</button>
             </form>
             <div class="auth-footer">
-                <p>© 2023 ENGINEERING MONITOR - GENETEK</p>
+                <p>© 2023 Engineering Monitor - Genetek</p>
             </div>
         </div>
     </div>
@@ -2487,21 +2443,21 @@
             </button>
             <div class="logo">
                 <div class="logo-icon"><i class="fas fa-cogs"></i></div>
-                <div class="logo-text">ENGINEERING MONITOR</div>
+                <div class="logo-text">Engineering Monitor</div>
             </div>
             
             <nav class="nav-menu">
                 <a href="#" class="nav-item active" data-target="dashboard-section">
                     <div class="nav-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    <div class="nav-text">DASHBOARD</div>
+                    <div class="nav-text">Dashboard</div>
                 </a>
                 <a href="#" class="nav-item" data-target="project-list-section">
                     <div class="nav-icon"><i class="fas fa-project-diagram"></i></div>
-                    <div class="nav-text">PROJECT</div>
+                    <div class="nav-text">Project</div>
                 </a>
                 <a href="#" class="nav-item" id="logout-btn">
                     <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
-                    <div class="nav-text">LOGOUT</div>
+                    <div class="nav-text">Logout</div>
                 </a>
             </nav>
         </aside>
@@ -2511,15 +2467,15 @@
             <!-- Dashboard Section -->
             <section id="dashboard-section" class="content-section">
                 <div class="header">
-                    <h1 class="page-title">DASHBOARD</h1>
+                    <h1 class="page-title">Dashboard</h1>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h3>RINGKASAN PROJECT BERDASARKAN TYPE</h3>
+                        <h3>Ringkasan Project Berdasarkan Type</h3>
                         <div class="dashboard-summary-grid">
                             <div class="summary-item">
                                 <div class="summary-value" id="inquiry-count">0</div>
-                                <div class="summary-label">INQUIRY</div>
+                                <div class="summary-label">Inquiry</div>
                             </div>
                             <div class="summary-item">
                                 <div class="summary-value" id="dwg-count">0</div>
@@ -2527,11 +2483,11 @@
                             </div>
                             <div class="summary-item">
                                 <div class="summary-value" id="hydrolic-count">0</div>
-                                <div class="summary-label">HYDROLIC</div>
+                                <div class="summary-label">Hydrolic</div>
                             </div>
                             <div class="summary-item">
                                 <div class="summary-value" id="dokumen-count">0</div>
-                                <div class="summary-label">DOKUMEN</div>
+                                <div class="summary-label">Dokumen</div>
                             </div>
                         </div>
                     </div>
@@ -2541,10 +2497,10 @@
             <!-- Project List Section -->
             <section id="project-list-section" class="content-section" style="display: none;">
                 <div class="header">
-                    <h1 class="page-title">DAFTAR PROJECT</h1>
+                    <h1 class="page-title">Daftar Project</h1>
                     <div class="header-actions">
                         <button class="btn btn-primary" id="add-project-btn">
-                            <i class="fas fa-plus btn-icon"></i> TAMBAH PROJECT
+                            <i class="fas fa-plus btn-icon"></i> Tambah Project
                         </button>
                     </div>
                 </div>
@@ -2552,39 +2508,39 @@
                 <!-- Filter Section -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">FILTER DATA</h2>
+                        <h2 class="card-title">Filter Data</h2>
                     </div>
                     <div class="card-body">
                         <form id="filter-form" class="filter-section">
                             <div class="filter-group">
-                                <label class="filter-label">STATUS</label>
+                                <label class="filter-label">Status</label>
                                 <select class="filter-input" id="filter-status">
-                                    <option value="">SEMUA STATUS</option>
-                                    <option value="ON PROGRESS">ON PROGRESS</option>
-                                    <option value="DONE">DONE</option>
-                                    <option value="HOLD">HOLD</option>
+                                    <option value="">Semua Status</option>
+                                    <option value="On Progress">On Progress</option>
+                                    <option value="Done">Done</option>
+                                    <option value="Hold">Hold</option>
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label class="filter-label">TYPE</label>
+                                <label class="filter-label">Type</label>
                                 <select class="filter-input" id="filter-type">
-                                    <option value="">SEMUA TYPE</option>
-                                    <option value="INQUIRY">INQUIRY</option>
+                                    <option value="">Semua Type</option>
+                                    <option value="Inquiry">Inquiry</option>
                                     <option value="DWG">DWG</option>
-                                    <option value="HYDROLIC">HYDROLIC</option>
-                                    <option value="DOKUMEN">DOKUMEN</option>
+                                    <option value="Hydrolic">Hydrolic</option>
+                                    <option value="Dokumen">Dokumen</option>
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label class="filter-label">CARI</label>
-                                <input type="text" class="filter-input" id="filter-search" placeholder="CARI PROJECT...">
+                                <label class="filter-label">Cari</label>
+                                <input type="text" class="filter-input" id="filter-search" placeholder="Cari project...">
                             </div>
                             <div class="filter-group" style="align-self: flex-end;">
                                 <button type="button" class="btn btn-outline" id="reset-filters-btn">
-                                    RESET FILTER
+                                    Reset Filter
                                 </button>
                                 <button type="submit" class="btn btn-primary">
-                                    TERAPKAN FILTER
+                                    Terapkan Filter
                                 </button>
                             </div>
                         </form>
@@ -2594,24 +2550,24 @@
                 <!-- Data Table -->
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">DAFTAR PROJECT</h2>
+                        <h2 class="card-title">Daftar Project</h2>
                     </div>
                     <div class="card-body">
                         <div class="table-container">
                             <table id="project-table">
                                 <thead>
                                     <tr>
-                                        <th class="col-no">NO</th>
-                                        <th class="col-sales">SALES/CLIENT</th>
-                                        <th class="col-project-name">PROJECT NAME</th>
-                                        <th class="col-data-in">DATA IN</th>
-                                        <th class="col-doc-number">NO URUT DOKUMEN</th>
-                                        <th class="col-type">TYPE</th>
-                                        <th class="col-pic">PIC</th>
-                                        <th class="col-start-date">START DATE</th>
-                                        <th class="col-status">STATUS</th>
-                                        <th class="col-remarks">REMARKS</th>
-                                        <th class="col-actions">AKSI</th>
+                                        <th>No</th>
+                                        <th>Sales/Client</th>
+                                        <th>Project Name</th>
+                                        <th>Data In</th>
+                                        <th>No Urut Dokumen</th>
+                                        <th>Type</th>
+                                        <th>PIC</th>
+                                        <th>Start Date</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2623,7 +2579,7 @@
                         <!-- Pagination -->
                         <div class="pagination">
                             <div class="page-info">
-                                MENAMPILKAN 0-0 DARI 0 DATA
+                                Menampilkan 0-0 dari 0 data
                             </div>
                             <div class="page-controls">
                                 <!-- Pagination buttons will be rendered here by JavaScript -->
@@ -2641,87 +2597,87 @@
     <div id="project-modal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <span class="modal-close-btn">&times;</span>
-            <h2 class="card-title" style="margin-bottom: 1.5rem;" id="project-modal-title">TAMBAH PROJECT BARU</h2>
+            <h2 class="card-title" style="margin-bottom: 1.5rem;" id="project-modal-title">Tambah Project Baru</h2>
             <form id="project-form">
                 <div class="form-group">
-                    <label for="sales-client">SALES/CLIENT</label>
+                    <label for="sales-client">Sales/Client</label>
                     <select id="sales-client" class="filter-input" required>
-                        <option value="">PILIH SALES/CLIENT</option>
-                        <option value="RANGGA">RANGGA</option>
-                        <option value="DHEA">DHEA</option>
-                        <option value="RORY">RORY</option>
-                        <option value="PAMUNGKAS">PAMUNGKAS</option>
-                        <option value="OTHER">OTHER</option>
+                        <option value="">Pilih Sales/Client</option>
+                        <option value="Rangga">Rangga</option>
+                        <option value="Dhea">Dhea</option>
+                        <option value="Rory">Rory</option>
+                        <option value="Pamungkas">Pamungkas</option>
+                        <option value="Other">Other</option>
                     </select>
                 </div>
                 <div id="other-sales-container" class="form-group" style="display: none;">
-                    <label for="other-sales">KETERANGAN SALES/CLIENT LAINNYA</label>
-                    <input type="text" id="other-sales" class="filter-input" placeholder="MASUKKAN NAMA SALES/CLIENT">
+                    <label for="other-sales">Keterangan Sales/Client Lainnya</label>
+                    <input type="text" id="other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
                 </div>
                 <div class="form-group">
-                    <label for="project-name">PROJECT NAME</label>
+                    <label for="project-name">Project Name</label>
                     <input type="text" id="project-name" class="filter-input" required>
                 </div>
                 <div class="form-group">
-                    <label for="data-in">DATA IN</label>
+                    <label for="data-in">Data In</label>
                     <input type="date" id="data-in" class="filter-input" required>
                 </div>
                 <div class="form-group">
-                    <label for="no-urut-dokumen">NO URUT DOKUMEN</label>
+                    <label for="no-urut-dokumen">No Urut Dokumen</label>
                     <input type="text" id="no-urut-dokumen" class="filter-input readonly-field" readonly>
                 </div>
                 <div class="form-group">
-                    <label>TIPE *</label>
+                    <label>Tipe *</label>
                     <div class="multiple-select-container" id="type-multiple-container">
                         <div class="multiple-select-option">
-                            <input type="checkbox" id="type-inquiry" value="INQUIRY">
-                            <label for="type-inquiry">INQUIRY</label>
+                            <input type="checkbox" id="type-inquiry" value="Inquiry">
+                            <label for="type-inquiry">Inquiry</label>
                         </div>
                         <div class="multiple-select-option">
                             <input type="checkbox" id="type-dwg" value="DWG">
                             <label for="type-dwg">DWG</label>
                         </div>
                         <div class="multiple-select-option">
-                            <input type="checkbox" id="type-hydrolic" value="HYDROLIC">
-                            <label for="type-hydrolic">HYDROLIC</label>
+                            <input type="checkbox" id="type-hydrolic" value="Hydrolic">
+                            <label for="type-hydrolic">Hydrolic</label>
                         </div>
                         <div class="multiple-select-option">
-                            <input type="checkbox" id="type-dokumen" value="DOKUMEN">
-                            <label for="type-dokumen">DOKUMEN</label>
+                            <input type="checkbox" id="type-dokumen" value="Dokumen">
+                            <label for="type-dokumen">Dokumen</label>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="pic">PIC</label>
                     <select id="pic" class="filter-input" required>
-                        <option value="">PILIH PIC</option>
-                        <option value="WAHYU">WAHYU</option>
-                        <option value="DHONA">DHONA</option>
-                        <option value="ARIFAH">ARIFAH</option>
-                        <option value="KARTIKA">KARTIKA</option>
-                        <option value="ARDI">ARDI</option>
-                        <option value="BRIAN">BRIAN</option>
+                        <option value="">Pilih PIC</option>
+                        <option value="wahyu">Wahyu</option>
+                        <option value="dhona">Dhona</option>
+                        <option value="arifah">Arifah</option>
+                        <option value="kartika">Kartika</option>
+                        <option value="ardi">Ardi</option>
+                        <option value="brian">Brian</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="start-date">START DATE</label>
+                    <label for="start-date">Start Date</label>
                     <input type="date" id="start-date" class="filter-input">
                 </div>
                 <div class="form-group">
-                    <label for="status">STATUS</label>
+                    <label for="status">Status</label>
                     <select id="status" class="filter-input" required>
-                        <option value="">PILIH STATUS</option>
-                        <option value="ON PROGRESS">ON PROGRESS</option>
-                        <option value="DONE">DONE</option>
-                        <option value="HOLD">HOLD</option>
+                        <option value="">Pilih Status</option>
+                        <option value="On Progress">On Progress</option>
+                        <option value="Done">Done</option>
+                        <option value="Hold">Hold</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="remarks">REMARKS</label>
+                    <label for="remarks">Remarks</label>
                     <textarea id="remarks" class="filter-input" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">SIMPAN PROJECT</button>
+                    <button type="submit" class="btn btn-primary">Simpan Project</button>
                 </div>
             </form>
         </div>
@@ -2731,18 +2687,18 @@
     <div id="status-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
-            <h2 class="card-title" style="margin-bottom: 1.5rem;">UBAH STATUS PROJECT</h2>
+            <h2 class="card-title" style="margin-bottom: 1.5rem;">Ubah Status Project</h2>
             <form id="status-form">
                 <div class="form-group">
-                    <label for="status-select">STATUS</label>
+                    <label for="status-select">Status</label>
                     <select id="status-select" class="filter-input" required>
-                        <option value="ON PROGRESS">ON PROGRESS</option>
-                        <option value="DONE">DONE</option>
-                        <option value="HOLD">HOLD</option>
+                        <option value="On Progress">On Progress</option>
+                        <option value="Done">Done</option>
+                        <option value="Hold">Hold</option>
                     </select>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">SIMPAN PERUBAHAN</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -2751,11 +2707,11 @@
     <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="delete-modal">
         <div class="delete-modal-content">
-            <h2 class="card-title" style="margin-bottom: 1rem;">KONFIRMASI HAPUS</h2>
-            <p>APAKAH ANDA YAKIN INGIN MENGHAPUS PROJECT INI? TINDAKAN INI TIDAK DAPAT DIBATALKAN.</p>
+            <h2 class="card-title" style="margin-bottom: 1rem;">Konfirmasi Hapus</h2>
+            <p>Apakah Anda yakin ingin menghapus project ini? Tindakan ini tidak dapat dibatalkan.</p>
             <div class="delete-actions">
-                <button id="cancel-delete-btn" class="btn btn-outline">BATAL</button>
-                <button id="confirm-delete-btn" class="btn btn-primary">HAPUS</button>
+                <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
+                <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
             </div>
         </div>
     </div>
