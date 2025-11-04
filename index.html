@@ -557,10 +557,14 @@
             color: #991b1b;
         }
 
+        /* PERBAIKAN: Tombol Edit dan Hapus yang Sejajar */
         .action-cell {
             display: flex;
             gap: 0.5rem;
             white-space: nowrap;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px;
         }
 
         .action-btn {
@@ -571,6 +575,11 @@
             background: transparent;
             color: var(--secondary);
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
         }
 
         .action-btn:hover {
@@ -811,6 +820,107 @@
             margin-top: 1.5rem;
         }
 
+        /* FITUR BARU: Autocomplete Styles */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .autocomplete-item:hover {
+            background-color: var(--hover);
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        /* FITUR BARU: Multiple Select Styles */
+        .multiple-select-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .multiple-select-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background-color: var(--light);
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+        }
+
+        .multiple-select-option input {
+            margin: 0;
+        }
+
+        /* FITUR BARU: Project Details Styles */
+        .project-details {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--light);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .project-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .project-details-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .project-details-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .project-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-detail-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .project-detail-value {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
@@ -873,6 +983,10 @@
             .page-controls {
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+
+            .project-details-content {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1020,7 +1134,11 @@
                         <td>${project.Sales_Client || '-'}</td>
                         <td>${project.Project_Name || '-'}</td>
                         <td>${project.Data_In || '-'}</td>
-                        <td>${project.No_Urut_Dokumen || '-'}</td>
+                        <td>
+                            <a href="#" class="doc-number-link" data-project-id="${project.No_Urut_Dokumen}">
+                                ${project.No_Urut_Dokumen || '-'}
+                            </a>
+                        </td>
                         <td>${project.Type || '-'}</td>
                         <td>${project.PIC || '-'}</td>
                         <td>${project.Start_Date || '-'}</td>
@@ -1073,6 +1191,103 @@
                     const currentStatus = this.getAttribute('data-current-status');
                     showStatusChangeModal(projectId, currentStatus);
                 });
+            });
+
+            // Document number links for showing details
+            document.querySelectorAll('.doc-number-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const projectId = this.getAttribute('data-project-id');
+                    showProjectDetails(projectId);
+                });
+            });
+        }
+
+        // --- Show Project Details ---
+        function showProjectDetails(projectId) {
+            // Hide all existing project details
+            document.querySelectorAll('.project-details').forEach(detail => {
+                detail.style.display = 'none';
+            });
+
+            // Find the row for this project
+            const projectRow = document.querySelector(`tr[data-project-id="${projectId}"]`);
+            if (!projectRow) return;
+
+            // Check if details already exist
+            let detailsRow = projectRow.nextElementSibling;
+            if (detailsRow && detailsRow.classList.contains('project-details-row')) {
+                // Toggle display
+                const detailsDiv = detailsRow.querySelector('.project-details');
+                detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+                return;
+            }
+
+            // Get project data
+            const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
+            if (!project) return;
+
+            // Create details row
+            const detailsRowHtml = `
+                <tr class="project-details-row">
+                    <td colspan="11">
+                        <div class="project-details" style="display: block;">
+                            <div class="project-details-header">
+                                <div class="project-details-title">Detail Project</div>
+                                <button class="action-btn close-details-btn" title="Tutup Detail">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="project-details-content">
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Nomor Urut Dokumen</div>
+                                    <div class="project-detail-value">${project.No_Urut_Dokumen || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Sales/Client</div>
+                                    <div class="project-detail-value">${project.Sales_Client || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Nama Project</div>
+                                    <div class="project-detail-value">${project.Project_Name || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Tanggal Masuk</div>
+                                    <div class="project-detail-value">${project.Data_In || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Tipe</div>
+                                    <div class="project-detail-value">${project.Type || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">PIC</div>
+                                    <div class="project-detail-value">${project.PIC || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Tanggal Mulai</div>
+                                    <div class="project-detail-value">${project.Start_Date || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Status</div>
+                                    <div class="project-detail-value">${project.Status || '-'}</div>
+                                </div>
+                                <div class="project-detail-item">
+                                    <div class="project-detail-label">Keterangan</div>
+                                    <div class="project-detail-value">${project.Remarks || '-'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            // Insert the details row after the project row
+            projectRow.insertAdjacentHTML('afterend', detailsRowHtml);
+
+            // Attach event listener to close button
+            const closeBtn = projectRow.nextElementSibling.querySelector('.close-details-btn');
+            closeBtn.addEventListener('click', function() {
+                projectRow.nextElementSibling.remove();
             });
         }
 
@@ -1420,6 +1635,81 @@
             document.getElementById('status-modal').style.display = 'flex';
         }
 
+        // --- Setup Autocomplete untuk Add Project ---
+        function setupAutocomplete() {
+            const input = document.getElementById('autocomplete-doc-number');
+            const list = document.getElementById('autocomplete-list');
+            
+            if (!input || !list) return;
+            
+            input.addEventListener('input', function() {
+                const value = this.value.toLowerCase();
+                list.innerHTML = '';
+                
+                if (value.length < 2) {
+                    list.style.display = 'none';
+                    return;
+                }
+                
+                const matches = allProjectData.filter(project => 
+                    project.No_Urut_Dokumen && project.No_Urut_Dokumen.toLowerCase().includes(value)
+                ).slice(0, 5);
+                
+                if (matches.length === 0) {
+                    list.style.display = 'none';
+                    return;
+                }
+                
+                matches.forEach(project => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.textContent = project.No_Urut_Dokumen;
+                    item.addEventListener('click', function() {
+                        input.value = project.No_Urut_Dokumen;
+                        list.style.display = 'none';
+                    });
+                    list.appendChild(item);
+                });
+                
+                list.style.display = 'block';
+            });
+            
+            // Hide list when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target !== input) {
+                    list.style.display = 'none';
+                }
+            });
+        }
+
+        // --- Add Project from Autocomplete ---
+        async function addProjectFromAutocomplete() {
+            const docNumber = document.getElementById('autocomplete-doc-number').value;
+            
+            // Find the project in our data
+            const project = allProjectData.find(p => p.No_Urut_Dokumen === docNumber);
+            if (!project) {
+                showAlert('Nomor dokumen tidak ditemukan', 'error');
+                return;
+            }
+
+            // Populate the form with the project data
+            document.getElementById('sales-client').value = project.Sales_Client || '';
+            document.getElementById('project-name').value = project.Project_Name || '';
+            document.getElementById('data-in').value = project.Data_In || '';
+            document.getElementById('no-urut-dokumen').value = project.No_Urut_Dokumen || '';
+            document.getElementById('type').value = project.Type || '';
+            document.getElementById('pic').value = project.PIC || '';
+            document.getElementById('start-date').value = project.Start_Date || '';
+            document.getElementById('status').value = project.Status || '';
+            document.getElementById('remarks').value = project.Remarks || '';
+
+            // Show the add project modal
+            document.getElementById('project-modal').style.display = 'flex';
+            document.getElementById('autocomplete-project-modal').style.display = 'none';
+            document.getElementById('autocomplete-doc-number').value = '';
+        }
+
         // --- Improved Login Functionality ---
         function initLogin() {
             const loginForm = document.getElementById('login-form');
@@ -1600,6 +1890,30 @@
                     
                     // Show modal
                     document.getElementById('project-modal').style.display = 'flex';
+                });
+            }
+
+            // Add project from autocomplete button
+            const addProjectAutocompleteBtn = document.getElementById('add-project-autocomplete-btn');
+            if (addProjectAutocompleteBtn) {
+                addProjectAutocompleteBtn.addEventListener('click', function() {
+                    document.getElementById('autocomplete-project-modal').style.display = 'flex';
+                    setupAutocomplete();
+                });
+            }
+
+            // Submit add project from autocomplete
+            const submitAutocompleteBtn = document.getElementById('submit-autocomplete-project');
+            if (submitAutocompleteBtn) {
+                submitAutocompleteBtn.addEventListener('click', addProjectFromAutocomplete);
+            }
+
+            // Cancel autocomplete modal
+            const cancelAutocompleteBtn = document.getElementById('cancel-autocomplete-project');
+            if (cancelAutocompleteBtn) {
+                cancelAutocompleteBtn.addEventListener('click', function() {
+                    document.getElementById('autocomplete-project-modal').style.display = 'none';
+                    document.getElementById('autocomplete-doc-number').value = '';
                 });
             }
 
@@ -1813,6 +2127,9 @@
                         <button class="btn btn-primary" id="add-project-btn">
                             <i class="fas fa-plus btn-icon"></i> Tambah Project
                         </button>
+                        <button class="btn btn-outline" id="add-project-autocomplete-btn">
+                            <i class="fas fa-plus-circle btn-icon"></i> Add Project
+                        </button>
                     </div>
                 </div>
 
@@ -1895,6 +2212,25 @@
                             <div class="page-controls">
                                 <!-- Pagination buttons will be rendered here by JavaScript -->
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Project Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Add Project</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="autocomplete-container">
+                            <input type="text" id="autocomplete-doc-number" class="filter-input" 
+                                   placeholder="Ketik nomor urut dokumen untuk menambah project...">
+                            <div id="autocomplete-list" class="autocomplete-list"></div>
+                        </div>
+                        <div class="form-actions" style="margin-top: 1rem;">
+                            <button type="button" class="btn btn-primary" id="submit-autocomplete-project">
+                                <i class="fas fa-plus btn-icon"></i> Tambah Project Baru
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2012,6 +2348,25 @@
             <div class="delete-actions">
                 <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
                 <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Autocomplete Project Modal -->
+    <div id="autocomplete-project-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2 class="card-title" style="margin-bottom: 1.5rem;">Add Project dari Nomor Dokumen</h2>
+            <div class="form-group">
+                <label for="autocomplete-doc-number">Nomor Urut Dokumen</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="autocomplete-doc-number" class="filter-input" placeholder="Ketik nomor dokumen...">
+                    <div id="autocomplete-list" class="autocomplete-list"></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" id="cancel-autocomplete-project">Batal</button>
+                <button type="button" class="btn btn-primary" id="submit-autocomplete-project">Lanjutkan</button>
             </div>
         </div>
     </div>
