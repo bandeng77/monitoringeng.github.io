@@ -1019,18 +1019,23 @@
         }
 
         // --- Get type code ---
-        function getTypeCode(type) {
+        function getTypeCode(types) {
             const typeMap = {
                 'Inquiry': 'INQ',
                 'DWG': 'DWG',
                 'Hydrolic': 'HYD',
                 'Dokumen': 'DOK'
             };
-            return typeMap[type] || 'OTH';
+            
+            // Jika multiple types, gunakan kode dari type pertama
+            if (Array.isArray(types) && types.length > 0) {
+                return typeMap[types[0]] || 'OTH';
+            }
+            return typeMap[types] || 'OTH';
         }
 
         // --- Generate project number ---
-        async function generateProjectNumber(dataIn, type, projectName) {
+        async function generateProjectNumber(dataIn, types, projectName) {
             try {
                 // Get or create counter
                 const counterDoc = await countersCol.doc('projectCounter').get();
@@ -1045,7 +1050,7 @@
 
                 const formattedNumber = String(nextNumber).padStart(3, '0');
                 const dateCode = formatDateToDDMM(dataIn);
-                const typeCode = getTypeCode(type);
+                const typeCode = getTypeCode(types);
                 
                 return `ENG-${formattedNumber}-${dateCode}-${typeCode}-${projectName}`;
             } catch (error) {
@@ -1080,6 +1085,9 @@
                 else if (project.Status === 'Done') statusClass = 'status-done';
                 else if (project.Status === 'Hold') statusClass = 'status-hold';
 
+                // Format types untuk display
+                const displayTypes = Array.isArray(project.Type) ? project.Type.join(', ') : project.Type;
+
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
@@ -1091,7 +1099,7 @@
                                 ${project.No_Urut_Dokumen || '-'}
                             </a>
                         </td>
-                        <td>${project.Type || '-'}</td>
+                        <td>${displayTypes || '-'}</td>
                         <td>${project.PIC || '-'}</td>
                         <td>${project.Start_Date || '-'}</td>
                         <td>
@@ -1182,6 +1190,9 @@
                     console.error("Error loading project details:", error);
                 }
 
+                // Format types untuk display
+                const displayTypes = Array.isArray(project.Type) ? project.Type.join(', ') : project.Type;
+
                 // Create modal content
                 const modalContent = `
                     <div class="modal-content" style="max-width: 900px;">
@@ -1209,7 +1220,7 @@
                                 </div>
                                 <div>
                                     <strong>Tipe:</strong><br>
-                                    ${project.Type || '-'}
+                                    ${displayTypes || '-'}
                                 </div>
                                 <div>
                                     <strong>PIC:</strong><br>
@@ -1234,7 +1245,7 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                                 <h3 style="color: var(--dark);">Detail Tambahan</h3>
                                 <button class="btn btn-primary" id="add-detail-btn">
-                                    <i class="fas fa-plus btn-icon"></i> Tambah Detail
+                                    <i class="fas fa-plus btn-icon"></i> Tambah Project Baru
                                 </button>
                             </div>
                             
@@ -1243,8 +1254,8 @@
                                     ${details.map((detail, index) => `
                                         <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
                                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                                                <strong>Detail ${index + 1}</strong>
-                                                <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Detail">
+                                                <strong>Project ${index + 1}</strong>
+                                                <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Project">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -1252,13 +1263,13 @@
                                                 <div><strong>Deskripsi:</strong><br>${detail.description || '-'}</div>
                                                 <div><strong>Tanggal:</strong><br>${detail.date || '-'}</div>
                                                 <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div><strong>Tipe:</strong><br>${detail.types ? detail.types.join(', ') : '-'}</div>
                                                 <div style="grid-column: 1 / -1;"><strong>Catatan:</strong><br>${detail.notes || '-'}</div>
-                                                <div style="grid-column: 1 / -1;"><strong>Tipe:</strong><br>${detail.types ? detail.types.join(', ') : '-'}</div>
                                             </div>
                                         </div>
                                     `).join('')}
                                 </div>` : 
-                                '<p style="text-align: center; color: var(--secondary); padding: 2rem;">Belum ada detail tambahan</p>'
+                                '<p style="text-align: center; color: var(--secondary); padding: 2rem;">Belum ada project tambahan</p>'
                             }
                         </div>
                     </div>
@@ -1277,7 +1288,7 @@
                 });
 
                 modal.querySelector('#add-detail-btn').addEventListener('click', function() {
-                    showAddDetailModal(projectId);
+                    showAddProjectModal(projectId, project);
                 });
 
                 // Add delete detail event listeners
@@ -1301,24 +1312,80 @@
             }
         }
 
-        // --- Show Add Detail Modal ---
-        function showAddDetailModal(projectId) {
+        // --- Show Add Project Modal (untuk menambah project baru dengan nomor urut sama) ---
+        function showAddProjectModal(projectId, baseProject) {
             const modalContent = `
-                <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-content" style="max-width: 800px;">
                     <span class="modal-close-btn">&times;</span>
-                    <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Detail Project</h2>
-                    <form id="add-detail-form">
+                    <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Project Baru - ${projectId}</h2>
+                    <form id="add-project-form">
                         <div class="form-group">
-                            <label for="detail-description">Deskripsi *</label>
-                            <input type="text" id="detail-description" class="filter-input" required>
+                            <label for="add-sales-client">Sales/Client</label>
+                            <select id="add-sales-client" class="filter-input" required>
+                                <option value="">Pilih Sales/Client</option>
+                                <option value="Rangga" ${baseProject.Sales_Client === 'Rangga' ? 'selected' : ''}>Rangga</option>
+                                <option value="Dhea" ${baseProject.Sales_Client === 'Dhea' ? 'selected' : ''}>Dhea</option>
+                                <option value="Rory" ${baseProject.Sales_Client === 'Rory' ? 'selected' : ''}>Rory</option>
+                                <option value="Pamungkas" ${baseProject.Sales_Client === 'Pamungkas' ? 'selected' : ''}>Pamungkas</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div id="add-other-sales-container" class="form-group" style="display: none;">
+                            <label for="add-other-sales">Keterangan Sales/Client Lainnya</label>
+                            <input type="text" id="add-other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
                         </div>
                         <div class="form-group">
-                            <label for="detail-date">Tanggal *</label>
-                            <input type="date" id="detail-date" class="filter-input" required>
+                            <label for="add-project-name">Project Name</label>
+                            <input type="text" id="add-project-name" class="filter-input" value="${baseProject.Project_Name || ''}" required>
                         </div>
                         <div class="form-group">
-                            <label for="detail-status">Status *</label>
-                            <select id="detail-status" class="filter-input" required>
+                            <label for="add-data-in">Data In</label>
+                            <input type="date" id="add-data-in" class="filter-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-no-urut-dokumen">No Urut Dokumen</label>
+                            <input type="text" id="add-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipe *</label>
+                            <div class="multiple-select-container">
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-type-inquiry" value="Inquiry">
+                                    <label for="add-type-inquiry">Inquiry</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-type-dwg" value="DWG">
+                                    <label for="add-type-dwg">DWG</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-type-hydrolic" value="Hydrolic">
+                                    <label for="add-type-hydrolic">Hydrolic</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-type-dokumen" value="Dokumen">
+                                    <label for="add-type-dokumen">Dokumen</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-pic">PIC</label>
+                            <select id="add-pic" class="filter-input" required>
+                                <option value="">Pilih PIC</option>
+                                <option value="wahyu" ${baseProject.PIC === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                                <option value="dhona" ${baseProject.PIC === 'dhona' ? 'selected' : ''}>Dhona</option>
+                                <option value="arifah" ${baseProject.PIC === 'arifah' ? 'selected' : ''}>Arifah</option>
+                                <option value="kartika" ${baseProject.PIC === 'kartika' ? 'selected' : ''}>Kartika</option>
+                                <option value="ardi" ${baseProject.PIC === 'ardi' ? 'selected' : ''}>Ardi</option>
+                                <option value="brian" ${baseProject.PIC === 'brian' ? 'selected' : ''}>Brian</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-start-date">Start Date</label>
+                            <input type="date" id="add-start-date" class="filter-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="add-status">Status</label>
+                            <select id="add-status" class="filter-input" required>
                                 <option value="">Pilih Status</option>
                                 <option value="On Progress">On Progress</option>
                                 <option value="Done">Done</option>
@@ -1326,33 +1393,12 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Tipe *</label>
-                            <div class="multiple-select-container">
-                                <div class="multiple-select-option">
-                                    <input type="checkbox" id="type-inquiry" value="Inquiry">
-                                    <label for="type-inquiry">Inquiry</label>
-                                </div>
-                                <div class="multiple-select-option">
-                                    <input type="checkbox" id="type-dwg" value="DWG">
-                                    <label for="type-dwg">DWG</label>
-                                </div>
-                                <div class="multiple-select-option">
-                                    <input type="checkbox" id="type-hydrolic" value="Hydrolic">
-                                    <label for="type-hydrolic">Hydrolic</label>
-                                </div>
-                                <div class="multiple-select-option">
-                                    <input type="checkbox" id="type-dokumen" value="Dokumen">
-                                    <label for="type-dokumen">Dokumen</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="detail-notes">Catatan</label>
-                            <textarea id="detail-notes" class="filter-input" rows="3"></textarea>
+                            <label for="add-remarks">Remarks</label>
+                            <textarea id="add-remarks" class="filter-input" rows="3"></textarea>
                         </div>
                         <div class="form-actions">
-                            <button type="button" class="btn btn-outline" id="cancel-add-detail">Batal</button>
-                            <button type="submit" class="btn btn-primary">Simpan Detail</button>
+                            <button type="button" class="btn btn-outline" id="cancel-add-project">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Project</button>
                         </div>
                     </form>
                 </div>
@@ -1366,20 +1412,29 @@
 
             // Set today's date as default
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('detail-date').value = today;
+            document.getElementById('add-data-in').value = today;
+
+            // Handle "Other" option in sales client dropdown
+            document.getElementById('add-sales-client').addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    document.getElementById('add-other-sales-container').style.display = 'block';
+                } else {
+                    document.getElementById('add-other-sales-container').style.display = 'none';
+                }
+            });
 
             // Add event listeners
             modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                 modal.remove();
             });
 
-            modal.querySelector('#cancel-add-detail').addEventListener('click', function() {
+            modal.querySelector('#cancel-add-project').addEventListener('click', function() {
                 modal.remove();
             });
 
-            modal.querySelector('#add-detail-form').addEventListener('submit', async function(e) {
+            modal.querySelector('#add-project-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                await addProjectDetail(projectId);
+                await addNewProjectToDetails(projectId, baseProject);
                 modal.remove();
             });
 
@@ -1391,19 +1446,24 @@
             });
         }
 
-        // --- Add Project Detail ---
-        async function addProjectDetail(projectId) {
-            const description = document.getElementById('detail-description').value;
-            const date = document.getElementById('detail-date').value;
-            const status = document.getElementById('detail-status').value;
-            const notes = document.getElementById('detail-notes').value;
+        // --- Add New Project to Details (tidak masuk daftar project utama) ---
+        async function addNewProjectToDetails(projectId, baseProject) {
+            const salesClient = document.getElementById('add-sales-client').value;
+            const otherSales = document.getElementById('add-other-sales').value;
+            const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+            const projectName = document.getElementById('add-project-name').value;
+            const dataIn = document.getElementById('add-data-in').value;
+            const pic = document.getElementById('add-pic').value;
+            const startDate = document.getElementById('add-start-date').value;
+            const status = document.getElementById('add-status').value;
+            const remarks = document.getElementById('add-remarks').value;
 
             // Get selected types
             const selectedTypes = [];
-            if (document.getElementById('type-inquiry').checked) selectedTypes.push('Inquiry');
-            if (document.getElementById('type-dwg').checked) selectedTypes.push('DWG');
-            if (document.getElementById('type-hydrolic').checked) selectedTypes.push('Hydrolic');
-            if (document.getElementById('type-dokumen').checked) selectedTypes.push('Dokumen');
+            if (document.getElementById('add-type-inquiry').checked) selectedTypes.push('Inquiry');
+            if (document.getElementById('add-type-dwg').checked) selectedTypes.push('DWG');
+            if (document.getElementById('add-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+            if (document.getElementById('add-type-dokumen').checked) selectedTypes.push('Dokumen');
 
             if (selectedTypes.length === 0) {
                 showAlert('Pilih minimal satu tipe', 'error');
@@ -1411,38 +1471,41 @@
             }
 
             try {
-                const detailData = {
+                const projectData = {
                     projectId: projectId,
-                    description: description,
-                    date: date,
+                    salesClient: finalSalesClient,
+                    projectName: projectName,
+                    dataIn: dataIn,
+                    pic: pic,
+                    startDate: startDate,
                     status: status,
+                    remarks: remarks,
                     types: selectedTypes,
-                    notes: notes,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                await projectDetailsCol.add(detailData);
-                showAlert('Detail project berhasil ditambahkan', 'success');
+                await projectDetailsCol.add(projectData);
+                showAlert('Project baru berhasil ditambahkan ke detail', 'success');
                 
                 // Refresh the details modal
                 document.querySelector('.modal').remove();
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
-                console.error("Error adding project detail:", error);
-                showAlert('Gagal menambahkan detail project', 'error');
+                console.error("Error adding new project to details:", error);
+                showAlert('Gagal menambahkan project baru', 'error');
             }
         }
 
         // --- Delete Project Detail ---
         async function deleteProjectDetail(detailId, projectId) {
-            if (!confirm('Apakah Anda yakin ingin menghapus detail ini?')) {
+            if (!confirm('Apakah Anda yakin ingin menghapus project ini?')) {
                 return;
             }
 
             try {
                 await projectDetailsCol.doc(detailId).delete();
-                showAlert('Detail project berhasil dihapus', 'success');
+                showAlert('Project berhasil dihapus', 'success');
                 
                 // Refresh the details modal
                 document.querySelector('.modal').remove();
@@ -1450,7 +1513,7 @@
                 
             } catch (error) {
                 console.error("Error deleting project detail:", error);
-                showAlert('Gagal menghapus detail project', 'error');
+                showAlert('Gagal menghapus project', 'error');
             }
         }
 
@@ -1690,7 +1753,7 @@
             }
         }
 
-        // --- Add Project Function ---
+        // --- Add Project Function (untuk project utama) ---
         async function addProject(projectData) {
             try {
                 // Generate project number
@@ -1856,8 +1919,8 @@
                 return;
             }
 
-            // Show add detail modal langsung tanpa membuat project baru
-            showAddDetailModal(docNumber);
+            // Show add project modal langsung
+            showAddProjectModal(docNumber, project);
             document.getElementById('autocomplete-project-modal').style.display = 'none';
             document.getElementById('autocomplete-doc-number').value = '';
         }
@@ -2027,7 +2090,7 @@
                 });
             }
 
-            // Add project button
+            // Add project button (untuk project utama)
             const addProjectBtn = document.getElementById('add-project-btn');
             if (addProjectBtn) {
                 addProjectBtn.addEventListener('click', function() {
@@ -2073,7 +2136,7 @@
                 }
             });
 
-            // Project form submission
+            // Project form submission (untuk project utama)
             const projectForm = document.getElementById('project-form');
             if (projectForm) {
                 projectForm.addEventListener('submit', async function(e) {
@@ -2370,7 +2433,7 @@
 
     <!-- Modals -->
 
-    <!-- Modal Tambah/Edit Project -->
+    <!-- Modal Tambah/Edit Project (untuk project utama) -->
     <div id="project-modal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <span class="modal-close-btn">&times;</span>
