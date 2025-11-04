@@ -561,8 +561,6 @@
             display: flex;
             gap: 0.5rem;
             white-space: nowrap;
-            justify-content: center;
-            align-items: center;
         }
 
         .action-btn {
@@ -573,9 +571,6 @@
             background: transparent;
             color: var(--secondary);
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .action-btn:hover {
@@ -816,107 +811,6 @@
             margin-top: 1.5rem;
         }
 
-        /* Autocomplete Styles */
-        .autocomplete-container {
-            position: relative;
-        }
-
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: white;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .autocomplete-item {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .autocomplete-item:hover {
-            background-color: var(--hover);
-        }
-
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Multiple Select Styles */
-        .multiple-select-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .multiple-select-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background-color: var(--light);
-            border-radius: 0.375rem;
-            border: 1px solid var(--border);
-        }
-
-        .multiple-select-option input {
-            margin: 0;
-        }
-
-        /* Project Details Styles */
-        .project-details {
-            display: none;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: var(--light);
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .project-details-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .project-details-title {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .project-details-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .project-detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .project-detail-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .project-detail-value {
-            font-weight: 500;
-            color: var(--dark);
-        }
-
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
@@ -979,10 +873,6 @@
             .page-controls {
                 flex-wrap: wrap;
                 justify-content: center;
-            }
-
-            .project-details-content {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1130,11 +1020,7 @@
                         <td>${project.Sales_Client || '-'}</td>
                         <td>${project.Project_Name || '-'}</td>
                         <td>${project.Data_In || '-'}</td>
-                        <td>
-                            <a href="#" class="doc-number-link" data-project-id="${project.No_Urut_Dokumen}">
-                                ${project.No_Urut_Dokumen || '-'}
-                            </a>
-                        </td>
+                        <td>${project.No_Urut_Dokumen || '-'}</td>
                         <td>${project.Type || '-'}</td>
                         <td>${project.PIC || '-'}</td>
                         <td>${project.Start_Date || '-'}</td>
@@ -1188,794 +1074,872 @@
                     showStatusChangeModal(projectId, currentStatus);
                 });
             });
-
-            // Document number links for showing details
-            document.querySelectorAll('.doc-number-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const projectId = this.getAttribute('data-project-id');
-                    showProjectDetails(projectId);
-                });
-            });
         }
 
-        // --- Show Project Details ---
-        function showProjectDetails(projectId) {
-            // Hide all existing project details
-            document.querySelectorAll('.project-details').forEach(detail => {
-                detail.style.display = 'none';
-            });
+        // --- Render Pagination Controls ---
+        function renderPagination(totalItems, currentPage) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pageControls = document.querySelector('.pagination .page-controls');
+            const pageInfo = document.querySelector('.pagination .page-info');
+            pageControls.innerHTML = ''; // Bersihkan tombol paginasi yang ada
 
-            // Find the row for this project
-            const projectRow = document.querySelector(`tr[data-project-id="${projectId}"]`);
-            if (!projectRow) return;
-
-            // Check if details already exist
-            let detailsRow = projectRow.nextElementSibling;
-            if (detailsRow && detailsRow.classList.contains('project-details-row')) {
-                // Toggle display
-                const detailsDiv = detailsRow.querySelector('.project-details');
-                detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
+            if (totalItems === 0) {
+                pageInfo.textContent = 'Menampilkan 0-0 dari 0 data';
                 return;
             }
 
-            // Get project data
-            const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
-            if (!project) return;
-
-            // Create details row
-            const detailsRowHtml = `
-                <tr class="project-details-row">
-                    <td colspan="11">
-                        <div class="project-details" style="display: block;">
-                            <div class="project-details-header">
-                                <div class="project-details-title">Detail Project</div>
-                                <button class="action-btn close-details-btn" title="Tutup Detail">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="project-details-content">
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Nomor Urut Dokumen</div>
-                                    <div class="project-detail-value">${project.No_Urut_Dokumen || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Sales/Client</div>
-                                    <div class="project-detail-value">${project.Sales_Client || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Nama Project</div>
-                                    <div class="project-detail-value">${project.Project_Name || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Tanggal Masuk</div>
-                                    <div class="project-detail-value">${project.Data_In || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Tipe</div>
-                                    <div class="project-detail-value">${project.Type || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">PIC</div>
-                                    <div class="project-detail-value">${project.PIC || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Tanggal Mulai</div>
-                                    <div class="project-detail-value">${project.Start_Date || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Status</div>
-                                    <div class="project-detail-value">${project.Status || '-'}</div>
-                                </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Keterangan</div>
-                                    <div class="project-detail-value">${project.Remarks || '-'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            `;
-
-            // Insert the details row after the project row
-            projectRow.insertAdjacentHTML('afterend', detailsRowHtml);
-
-            // Attach event listener to close button
-            const closeBtn = projectRow.nextElementSibling.querySelector('.close-details-btn');
-            closeBtn.addEventListener('click', function() {
-                projectRow.nextElementSibling.remove();
-            });
-        }
-
-        // --- Render Pagination ---
-        function renderPagination(totalItems, currentPage) {
-            const paginationContainer = document.querySelector('.pagination');
-            if (!paginationContainer) return;
-
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startItem = (currentPage - 1) * itemsPerPage + 1;
             const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+            pageInfo.textContent = `Menampilkan ${startItem}-${endItem} dari ${totalItems} data`;
 
-            paginationContainer.innerHTML = `
-                <div class="page-info">
-                    Menampilkan ${startItem} - ${endItem} dari ${totalItems} project
-                </div>
-                <div class="page-controls">
-                    <button class="page-btn prev-btn" ${currentPage === 1 ? 'disabled' : ''}>
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    ${Array.from({length: totalPages}, (_, i) => i + 1).map(page => 
-                        `<button class="page-btn ${page === currentPage ? 'active' : ''}">${page}</button>`
-                    ).join('')}
-                    <button class="page-btn next-btn" ${currentPage === totalPages ? 'disabled' : ''}>
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            `;
-
-            // Attach event listeners to pagination buttons
-            document.querySelectorAll('.page-btn:not(.prev-btn):not(.next-btn)').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    window.currentPage = parseInt(this.textContent);
-                    renderProjectsTable(filteredProjectData);
-                });
-            });
-
-            document.querySelector('.prev-btn').addEventListener('click', function() {
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.addEventListener('click', () => {
                 if (window.currentPage > 1) {
                     window.currentPage--;
                     renderProjectsTable(filteredProjectData);
                 }
             });
+            pageControls.appendChild(prevBtn);
 
-            document.querySelector('.next-btn').addEventListener('click', function() {
+            // Page numbers
+            const maxPageButtons = 5; // Max number of page buttons to show
+            let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+            let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+            if (endPage - startPage + 1 < maxPageButtons) {
+                startPage = Math.max(1, endPage - maxPageButtons + 1);
+            }
+
+            if (startPage > 1) {
+                const firstPageBtn = document.createElement('button');
+                firstPageBtn.className = 'page-btn';
+                firstPageBtn.textContent = '1';
+                firstPageBtn.addEventListener('click', () => {
+                    window.currentPage = 1;
+                    renderProjectsTable(filteredProjectData);
+                });
+                pageControls.appendChild(firstPageBtn);
+                if (startPage > 2) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    pageControls.appendChild(dots);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.addEventListener('click', () => {
+                    window.currentPage = i;
+                    renderProjectsTable(filteredProjectData);
+                });
+                pageControls.appendChild(pageBtn);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const dots = document.createElement('span');
+                    dots.textContent = '...';
+                    pageControls.appendChild(dots);
+                }
+                const lastPageBtn = document.createElement('button');
+                lastPageBtn.className = 'page-btn';
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.addEventListener('click', () => {
+                    window.currentPage = totalPages;
+                    renderProjectsTable(filteredProjectData);
+                });
+                pageControls.appendChild(lastPageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.addEventListener('click', () => {
                 if (window.currentPage < totalPages) {
                     window.currentPage++;
                     renderProjectsTable(filteredProjectData);
                 }
             });
+            pageControls.appendChild(nextBtn);
         }
 
-        // --- Filter Projects ---
-        function filterProjects() {
-            const salesClientFilter = document.getElementById('sales-client-filter').value.toLowerCase();
-            const projectNameFilter = document.getElementById('project-name-filter').value.toLowerCase();
-            const docNumberFilter = document.getElementById('doc-number-filter').value.toLowerCase();
-            const typeFilter = document.getElementById('type-filter').value.toLowerCase();
-            const picFilter = document.getElementById('pic-filter').value.toLowerCase();
-            const statusFilter = document.getElementById('status-filter').value.toLowerCase();
+        // --- Load Projects to Table (Initial Load and Refresh) ---
+        async function loadProjectsToTable() {
+            const projectTableBody = document.querySelector('#project-table tbody');
+            if (!projectTableBody) return;
+
+            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Memuat data...</td></tr>';
+
+            try {
+                // Unsubscribe previous listener if exists
+                if (window.projectUnsubscribe) {
+                    window.projectUnsubscribe();
+                }
+
+                window.projectUnsubscribe = projectsCol.onSnapshot((snapshot) => {
+                    if (snapshot.empty) {
+                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project.</td></tr>';
+                        allProjectData = [];
+                        filteredProjectData = [];
+                        renderPagination(0, 0);
+                        return;
+                    }
+
+                    let rowNum = 1;
+                    const currentAllProjectData = [];
+
+                    snapshot.forEach(doc => {
+                        const project = doc.data();
+                        
+                        currentAllProjectData.push({
+                            No: rowNum++,
+                            Sales_Client: project.salesClient || '',
+                            Project_Name: project.projectName || '',
+                            Data_In: project.dataIn || '',
+                            No_Urut_Dokumen: project.noUrutDokumen || '',
+                            Type: project.type || '',
+                            PIC: project.pic || '',
+                            Start_Date: project.startDate || '',
+                            Status: project.status || '',
+                            Remarks: project.remarks || ''
+                        });
+                    });
+                    
+                    allProjectData = currentAllProjectData;
+                    filteredProjectData = [...allProjectData];
+                    renderProjectsTable(filteredProjectData);
+                }, (error) => {
+                    console.error("Error loading projects: ", error);
+                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                    showAlert("Gagal memuat data project: " + error.message, 'error');
+                });
+            } catch (error) {
+                console.error("Error setting up project listener: ", error);
+                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                showAlert("Gagal memuat data project: " + error.message, 'error');
+            }
+        }
+
+        // --- Apply Filters Function ---
+        function applyFilters() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
-                return (
-                    (project.Sales_Client || '').toLowerCase().includes(salesClientFilter) &&
-                    (project.Project_Name || '').toLowerCase().includes(projectNameFilter) &&
-                    (project.No_Urut_Dokumen || '').toLowerCase().includes(docNumberFilter) &&
-                    (project.Type || '').toLowerCase().includes(typeFilter) &&
-                    (project.PIC || '').toLowerCase().includes(picFilter) &&
-                    (project.Status || '').toLowerCase().includes(statusFilter)
-                );
+                let matches = true;
+
+                // Status filter
+                if (statusFilter && statusFilter !== '' && project.Status !== statusFilter) {
+                    matches = false;
+                }
+
+                // Type filter
+                if (typeFilter && typeFilter !== '' && project.Type !== typeFilter) {
+                    matches = false;
+                }
+
+                // Keyword search (across multiple fields)
+                if (searchKeyword) {
+                    const searchableFields = [
+                        project.Sales_Client,
+                        project.Project_Name,
+                        project.No_Urut_Dokumen,
+                        project.Type,
+                        project.PIC,
+                        project.Status,
+                        project.Remarks
+                    ];
+                    const keywordMatch = searchableFields.some(field =>
+                        String(field).toLowerCase().includes(searchKeyword)
+                    );
+                    if (!keywordMatch) {
+                        matches = false;
+                    }
+                }
+
+                return matches;
             });
 
-            window.currentPage = 1;
+            window.currentPage = 1; // Reset to first page after applying filters
             renderProjectsTable(filteredProjectData);
+        }
+
+        // --- Load Dashboard Data ---
+        async function loadDashboardData() {
+            try {
+                // Unsubscribe previous listener if exists
+                if (window.dashboardUnsubscribe) {
+                    window.dashboardUnsubscribe();
+                }
+
+                window.dashboardUnsubscribe = projectsCol.onSnapshot((snapshot) => {
+                    let inquiryCount = 0;
+                    let dwgCount = 0;
+                    let hydrolicCount = 0;
+                    let dokumenCount = 0;
+
+                    snapshot.forEach(doc => {
+                        const project = doc.data();
+                        const type = project.type || '';
+
+                        if (type === 'Inquiry') inquiryCount++;
+                        else if (type === 'DWG') dwgCount++;
+                        else if (type === 'Hydrolic') hydrolicCount++;
+                        else if (type === 'Dokumen') dokumenCount++;
+                    });
+
+                    // Update the dashboard summary
+                    document.getElementById('inquiry-count').textContent = inquiryCount;
+                    document.getElementById('dwg-count').textContent = dwgCount;
+                    document.getElementById('hydrolic-count').textContent = hydrolicCount;
+                    document.getElementById('dokumen-count').textContent = dokumenCount;
+                }, (error) => {
+                    console.error("Error loading dashboard data: ", error);
+                    showAlert("Gagal memuat data dashboard: " + error.message, 'error');
+                });
+            } catch (error) {
+                console.error("Error setting up dashboard listener: ", error);
+                showAlert("Gagal memuat data dashboard: " + error.message, 'error');
+            }
+        }
+
+        // --- Add Project Function ---
+        async function addProject(projectData) {
+            try {
+                // Generate project number
+                const projectNumber = await generateProjectNumber(
+                    projectData.dataIn, 
+                    projectData.type, 
+                    projectData.projectName
+                );
+
+                const completeProjectData = {
+                    ...projectData,
+                    noUrutDokumen: projectNumber
+                };
+
+                await projectsCol.doc(projectNumber).set(completeProjectData);
+                showAlert("Project berhasil ditambahkan!", 'success');
+                return true;
+            } catch (error) {
+                console.error("Error adding project: ", error);
+                showAlert("Gagal menambahkan project: " + error.message, 'error');
+                return false;
+            }
+        }
+
+        // --- Update Project Function ---
+        async function updateProject(projectId, updatedData) {
+            try {
+                await projectsCol.doc(projectId).update(updatedData);
+                showAlert("Project berhasil diperbarui!", 'success');
+                return true;
+            } catch (error) {
+                console.error("Error updating project: ", error);
+                showAlert("Gagal memperbarui project: " + error.message, 'error');
+                return false;
+            }
+        }
+
+        // --- Delete Project Function ---
+        async function deleteProject(projectId) {
+            try {
+                await projectsCol.doc(projectId).delete();
+                showAlert("Project berhasil dihapus!", 'success');
+                return true;
+            } catch (error) {
+                console.error("Error deleting project: ", error);
+                showAlert("Gagal menghapus project: " + error.message, 'error');
+                return false;
+            }
+        }
+
+        // --- Get Project Data Function ---
+        async function getProject(projectId) {
+            try {
+                const doc = await projectsCol.doc(projectId).get();
+                if (doc.exists) {
+                    return doc.data();
+                } else {
+                    throw new Error("Project tidak ditemukan.");
+                }
+            } catch (error) {
+                console.error("Error getting project: ", error);
+                showAlert("Gagal mengambil data project: " + error.message, 'error');
+                return null;
+            }
         }
 
         // --- Show Edit Project Modal ---
         async function showEditProjectModal(projectId) {
-            try {
-                const projectDoc = await projectsCol.doc(projectId).get();
-                if (!projectDoc.exists) {
-                    showAlert('Project tidak ditemukan', 'error');
-                    return;
-                }
+            const project = await getProject(projectId);
+            if (!project) return;
 
-                const project = projectDoc.data();
-                currentEditingProjectId = projectId;
+            currentEditingProjectId = projectId;
 
-                // Populate the edit form
-                document.getElementById('edit-sales-client').value = project.Sales_Client || '';
-                document.getElementById('edit-project-name').value = project.Project_Name || '';
-                document.getElementById('edit-data-in').value = project.Data_In || '';
-                document.getElementById('edit-no-urut-dokumen').value = project.No_Urut_Dokumen || '';
-                document.getElementById('edit-type').value = project.Type || '';
-                document.getElementById('edit-pic').value = project.PIC || '';
-                document.getElementById('edit-start-date').value = project.Start_Date || '';
-                document.getElementById('edit-status').value = project.Status || '';
-                document.getElementById('edit-remarks').value = project.Remarks || '';
+            // Fill form with project data
+            document.getElementById('sales-client').value = project.salesClient;
+            document.getElementById('project-name').value = project.projectName;
+            document.getElementById('data-in').value = project.dataIn;
+            document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
+            document.getElementById('type').value = project.type;
+            document.getElementById('pic').value = project.pic;
+            document.getElementById('start-date').value = project.startDate;
+            document.getElementById('status').value = project.status;
+            document.getElementById('remarks').value = project.remarks;
 
-                // Show the modal
-                document.getElementById('edit-project-modal').style.display = 'flex';
-            } catch (error) {
-                console.error("Error fetching project for edit:", error);
-                showAlert('Gagal memuat data project', 'error');
-            }
-        }
+            // Make data-in and no-urut-dokumen readonly
+            document.getElementById('data-in').disabled = true;
+            document.getElementById('no-urut-dokumen').disabled = true;
+            document.getElementById('data-in').classList.add('readonly-field');
+            document.getElementById('no-urut-dokumen').classList.add('readonly-field');
 
-        // --- Update Project ---
-        async function updateProject() {
-            const projectId = currentEditingProjectId;
-            if (!projectId) return;
-
-            const updatedData = {
-                Sales_Client: document.getElementById('edit-sales-client').value,
-                Project_Name: document.getElementById('edit-project-name').value,
-                Data_In: document.getElementById('edit-data-in').value,
-                No_Urut_Dokumen: document.getElementById('edit-no-urut-dokumen').value,
-                Type: document.getElementById('edit-type').value,
-                PIC: document.getElementById('edit-pic').value,
-                Start_Date: document.getElementById('edit-start-date').value,
-                Status: document.getElementById('edit-status').value,
-                Remarks: document.getElementById('edit-remarks').value,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            try {
-                await projectsCol.doc(projectId).update(updatedData);
-                showAlert('Project berhasil diperbarui', 'success');
-                document.getElementById('edit-project-modal').style.display = 'none';
-                currentEditingProjectId = null;
-            } catch (error) {
-                console.error("Error updating project:", error);
-                showAlert('Gagal memperbarui project', 'error');
-            }
+            // Show modal
+            document.getElementById('project-modal').style.display = 'flex';
         }
 
         // --- Show Delete Confirmation Modal ---
         function showDeleteConfirmationModal(projectId) {
-            document.getElementById('delete-project-id').value = projectId;
-            document.getElementById('delete-confirmation-modal').style.display = 'flex';
-        }
-
-        // --- Delete Project ---
-        async function deleteProject() {
-            const projectId = document.getElementById('delete-project-id').value;
-
-            try {
-                await projectsCol.doc(projectId).delete();
-                showAlert('Project berhasil dihapus', 'success');
-                document.getElementById('delete-confirmation-modal').style.display = 'none';
-            } catch (error) {
-                console.error("Error deleting project:", error);
-                showAlert('Gagal menghapus project', 'error');
-            }
+            currentEditingProjectId = projectId;
+            document.getElementById('delete-modal').style.display = 'flex';
         }
 
         // --- Show Status Change Modal ---
         function showStatusChangeModal(projectId, currentStatus) {
-            document.getElementById('status-project-id').value = projectId;
-            document.getElementById('new-status').value = currentStatus;
-            document.getElementById('status-change-modal').style.display = 'flex';
+            currentEditingProjectId = projectId;
+            document.getElementById('status-select').value = currentStatus;
+            document.getElementById('status-modal').style.display = 'flex';
         }
 
-        // --- Update Project Status ---
-        async function updateProjectStatus() {
-            const projectId = document.getElementById('status-project-id').value;
-            const newStatus = document.getElementById('new-status').value;
-
-            try {
-                await projectsCol.doc(projectId).update({
-                    Status: newStatus,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showAlert('Status project berhasil diperbarui', 'success');
-                document.getElementById('status-change-modal').style.display = 'none';
-            } catch (error) {
-                console.error("Error updating project status:", error);
-                showAlert('Gagal memperbarui status project', 'error');
-            }
-        }
-
-        // --- Add Project ---
-        async function addProject() {
-            const salesClient = document.getElementById('sales-client').value;
-            const projectName = document.getElementById('project-name').value;
-            const dataIn = document.getElementById('data-in').value;
-            const type = document.getElementById('type').value;
-            const pic = document.getElementById('pic').value;
-            const startDate = document.getElementById('start-date').value;
-            const status = document.getElementById('status').value;
-            const remarks = document.getElementById('remarks').value;
-
-            if (!salesClient || !projectName || !dataIn || !type || !pic || !startDate || !status) {
-                showAlert('Harap isi semua field yang wajib diisi', 'error');
-                return;
-            }
-
-            try {
-                // Generate project number
-                const noUrutDokumen = await generateProjectNumber(dataIn, type, projectName);
-
-                // Add project to Firestore
-                await projectsCol.doc(noUrutDokumen).set({
-                    Sales_Client: salesClient,
-                    Project_Name: projectName,
-                    Data_In: dataIn,
-                    No_Urut_Dokumen: noUrutDokumen,
-                    Type: type,
-                    PIC: pic,
-                    Start_Date: startDate,
-                    Status: status,
-                    Remarks: remarks,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                showAlert('Project berhasil ditambahkan', 'success');
-                document.getElementById('add-project-modal').style.display = 'none';
-                document.getElementById('add-project-form').reset();
-            } catch (error) {
-                console.error("Error adding project:", error);
-                showAlert('Gagal menambahkan project', 'error');
-            }
-        }
-
-        // --- Add Project from Autocomplete ---
-        async function addProjectFromAutocomplete() {
-            const docNumber = document.getElementById('autocomplete-doc-number').value;
-            
-            // Find the project in our data
-            const project = allProjectData.find(p => p.No_Urut_Dokumen === docNumber);
-            if (!project) {
-                showAlert('Nomor dokumen tidak ditemukan', 'error');
-                return;
-            }
-
-            // Populate the form with the project data
-            document.getElementById('add-sales-client').value = project.Sales_Client || '';
-            document.getElementById('add-project-name').value = project.Project_Name || '';
-            document.getElementById('add-data-in').value = project.Data_In || '';
-            document.getElementById('add-no-urut-dokumen').value = project.No_Urut_Dokumen || '';
-            document.getElementById('add-type').value = project.Type || '';
-            document.getElementById('add-pic').value = project.PIC || '';
-            document.getElementById('add-start-date').value = project.Start_Date || '';
-            document.getElementById('add-status').value = project.Status || '';
-            document.getElementById('add-remarks').value = project.Remarks || '';
-
-            // Show the add project modal
-            document.getElementById('add-project-modal').style.display = 'flex';
-            document.getElementById('autocomplete-project-modal').style.display = 'none';
-        }
-
-        // --- Setup Autocomplete ---
-        function setupAutocomplete() {
-            const input = document.getElementById('autocomplete-doc-number');
-            const list = document.getElementById('autocomplete-list');
-            
-            input.addEventListener('input', function() {
-                const value = this.value.toLowerCase();
-                list.innerHTML = '';
-                
-                if (value.length < 2) {
-                    list.style.display = 'none';
-                    return;
-                }
-                
-                const matches = allProjectData.filter(project => 
-                    project.No_Urut_Dokumen && project.No_Urut_Dokumen.toLowerCase().includes(value)
-                ).slice(0, 5);
-                
-                if (matches.length === 0) {
-                    list.style.display = 'none';
-                    return;
-                }
-                
-                matches.forEach(project => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.textContent = project.No_Urut_Dokumen;
-                    item.addEventListener('click', function() {
-                        input.value = project.No_Urut_Dokumen;
-                        list.style.display = 'none';
-                    });
-                    list.appendChild(item);
-                });
-                
-                list.style.display = 'block';
-            });
-            
-            // Hide list when clicking outside
-            document.addEventListener('click', function(e) {
-                if (e.target !== input) {
-                    list.style.display = 'none';
-                }
-            });
-        }
-
-        // --- Setup Event Listeners ---
-        function setupEventListeners() {
-            // Filter inputs
-            document.getElementById('sales-client-filter').addEventListener('input', filterProjects);
-            document.getElementById('project-name-filter').addEventListener('input', filterProjects);
-            document.getElementById('doc-number-filter').addEventListener('input', filterProjects);
-            document.getElementById('type-filter').addEventListener('input', filterProjects);
-            document.getElementById('pic-filter').addEventListener('input', filterProjects);
-            document.getElementById('status-filter').addEventListener('input', filterProjects);
-
-            // Modal close buttons
-            document.querySelectorAll('.modal-close-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
-                });
-            });
-
-            // Add project button
-            document.getElementById('add-project-btn').addEventListener('click', function() {
-                document.getElementById('add-project-modal').style.display = 'flex';
-            });
-
-            // Add project from autocomplete button
-            document.getElementById('add-project-autocomplete-btn').addEventListener('click', function() {
-                document.getElementById('autocomplete-project-modal').style.display = 'flex';
-            });
-
-            // Submit add project form
-            document.getElementById('submit-add-project').addEventListener('click', addProject);
-
-            // Submit edit project form
-            document.getElementById('submit-edit-project').addEventListener('click', updateProject);
-
-            // Delete project confirmation
-            document.getElementById('confirm-delete').addEventListener('click', deleteProject);
-
-            // Cancel delete
-            document.getElementById('cancel-delete').addEventListener('click', function() {
-                document.getElementById('delete-confirmation-modal').style.display = 'none';
-            });
-
-            // Update status
-            document.getElementById('submit-status-change').addEventListener('click', updateProjectStatus);
-
-            // Cancel status change
-            document.getElementById('cancel-status-change').addEventListener('click', function() {
-                document.getElementById('status-change-modal').style.display = 'none';
-            });
-
-            // Add project from autocomplete
-            document.getElementById('submit-autocomplete-project').addEventListener('click', addProjectFromAutocomplete);
-
-            // Cancel autocomplete
-            document.getElementById('cancel-autocomplete-project').addEventListener('click', function() {
-                document.getElementById('autocomplete-project-modal').style.display = 'none';
-            });
-
-            // Setup autocomplete
-            setupAutocomplete();
-        }
-
-        // --- Setup Real-time Listeners ---
-        function setupRealtimeListeners() {
-            // Unsubscribe from previous listeners if they exist
-            if (window.projectUnsubscribe) {
-                window.projectUnsubscribe();
-            }
-
-            // Listen for projects changes
-            window.projectUnsubscribe = projectsCol
-                .orderBy('createdAt', 'desc')
-                .onSnapshot(snapshot => {
-                    allProjectData = [];
-                    snapshot.forEach(doc => {
-                        allProjectData.push({ id: doc.id, ...doc.data() });
-                    });
-                    filteredProjectData = [...allProjectData];
-                    renderProjectsTable(filteredProjectData);
-                }, error => {
-                    console.error("Error listening to projects:", error);
-                    showAlert('Gagal memuat data project', 'error');
-                });
-        }
-
-        // --- Initialize App ---
-        function initializeApp() {
-            setupEventListeners();
-            setupRealtimeListeners();
-        }
-
-        // --- Authentication Functions ---
-        function showLoginScreen() {
-            document.getElementById('auth-container').style.display = 'flex';
-            document.getElementById('app-container').style.display = 'none';
-        }
-
-        function showAppScreen() {
-            document.getElementById('auth-container').style.display = 'none';
-            document.getElementById('app-container').style.display = 'flex';
-            initializeApp();
-        }
-
-        // --- Login Function ---
-        function login() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+        // --- Improved Login Functionality ---
+        function initLogin() {
+            const loginForm = document.getElementById('login-form');
             const loginBtn = document.getElementById('login-btn');
-            const errorMessage = document.getElementById('login-error-message');
+            const loginError = document.getElementById('login-error');
 
-            // Reset error message
-            errorMessage.style.display = 'none';
-
-            // Validate inputs
-            if (!email || !password) {
-                errorMessage.textContent = 'Harap isi email dan password';
-                errorMessage.style.display = 'block';
-                return;
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    handleLogin();
+                });
             }
+
+            // Check if user is already logged in
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in, hide login and show main content
+                    document.getElementById('auth-container').style.display = 'none';
+                    document.getElementById('main-container').style.display = 'flex';
+                    // Load initial data dan tampilkan dashboard
+                    loadDashboardData();
+                    showSection('dashboard-section');
+                } else {
+                    // User is signed out, show login
+                    document.getElementById('auth-container').style.display = 'flex';
+                    document.getElementById('main-container').style.display = 'none';
+                }
+            });
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loginError = document.getElementById('login-error');
 
             // Show loading state
             loginBtn.classList.add('loading');
-            loginBtn.disabled = true;
+            loginError.style.display = 'none';
 
-            // Sign in with Firebase
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     // Login successful
-                    showAppScreen();
+                    loginBtn.classList.remove('loading');
+                    showAlert('Login berhasil!', 'success');
                 })
                 .catch((error) => {
                     // Login failed
-                    let errorMsg = 'Login gagal. Periksa email dan password Anda.';
+                    loginBtn.classList.remove('loading');
+                    let errorMessage = 'Email atau password salah.';
                     
-                    if (error.code === 'auth/user-not-found') {
-                        errorMsg = 'Email tidak terdaftar.';
-                    } else if (error.code === 'auth/wrong-password') {
-                        errorMsg = 'Password salah.';
+                    if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Password yang Anda masukkan salah.';
+                    } else if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'Email tidak ditemukan.';
                     } else if (error.code === 'auth/invalid-email') {
-                        errorMsg = 'Format email tidak valid.';
+                        errorMessage = 'Format email tidak valid.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = 'Terlalu banyak percobaan login. Coba lagi nanti.';
                     }
                     
-                    errorMessage.textContent = errorMsg;
-                    errorMessage.style.display = 'block';
-                })
-                .finally(() => {
-                    // Reset loading state
-                    loginBtn.classList.remove('loading');
-                    loginBtn.disabled = false;
+                    loginError.textContent = errorMessage;
+                    loginError.style.display = 'block';
+                    console.error("Login error:", error);
                 });
         }
 
-        // --- Check Auth State ---
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in
-                showAppScreen();
-            } else {
-                // User is signed out
-                showLoginScreen();
-            }
-        });
-
-        // --- Logout Function ---
         function logout() {
             auth.signOut().then(() => {
-                showLoginScreen();
+                showAlert('Logout berhasil!', 'success');
             }).catch((error) => {
-                console.error('Logout error:', error);
+                console.error("Logout error:", error);
             });
         }
 
-        // --- Initialize when DOM is loaded ---
+        // --- Fungsi Navigasi Sidebar ---
+        function showSection(targetId) {
+            const contentSections = document.querySelectorAll('.content-section');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            contentSections.forEach(section => {
+                section.style.display = 'none';
+            });
+            const targetSection = document.getElementById(targetId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+
+            navItems.forEach(item => item.classList.remove('active'));
+            const activeNavItem = document.querySelector(`.nav-item[data-target="${targetId}"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+
+            if (targetId === 'dashboard-section') {
+                loadDashboardData();
+            } else if (targetId === 'project-list-section') {
+                loadProjectsToTable();
+            }
+        }
+        window.showSection = showSection;
+
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            // Set up login form submission
-            document.getElementById('login-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                login();
+            initLogin();
+            
+            // Setup event listeners untuk navigasi setelah login
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.nav-item')) {
+                    const navItem = e.target.closest('.nav-item');
+                    const targetId = navItem.dataset.target;
+                    if (targetId) {
+                        e.preventDefault();
+                        showSection(targetId);
+                    } else if (navItem.id === 'logout-btn') {
+                        e.preventDefault();
+                        logout();
+                    }
+                }
             });
 
-            // Set up logout button
-            document.getElementById('logout-btn').addEventListener('click', logout);
+            // Setup sidebar toggle
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggleBtn && sidebar) {
+                sidebarToggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    localStorage.setItem('sidebarCollapsed', isCollapsed);
+                });
 
-            // Check if user is already logged in
-            const user = auth.currentUser;
-            if (user) {
-                showAppScreen();
-            } else {
-                showLoginScreen();
+                // Load saved sidebar state
+                const savedSidebarState = localStorage.getItem('sidebarCollapsed');
+                if (savedSidebarState === 'true') {
+                    sidebar.classList.add('collapsed');
+                }
             }
+
+            // Filter form handler
+            const filterForm = document.querySelector('#filter-form');
+            if (filterForm) {
+                filterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    applyFilters();
+                });
+            }
+
+            // Reset filters button
+            const resetFiltersBtn = document.getElementById('reset-filters-btn');
+            if (resetFiltersBtn) {
+                resetFiltersBtn.addEventListener('click', function() {
+                    document.getElementById('filter-status').value = '';
+                    document.getElementById('filter-type').value = '';
+                    document.getElementById('filter-search').value = '';
+                    filteredProjectData = [...allProjectData];
+                    window.currentPage = 1;
+                    renderProjectsTable(filteredProjectData);
+                });
+            }
+
+            // Add project button
+            const addProjectBtn = document.getElementById('add-project-btn');
+            if (addProjectBtn) {
+                addProjectBtn.addEventListener('click', function() {
+                    // Reset form and enable all fields
+                    document.getElementById('project-form').reset();
+                    document.getElementById('data-in').disabled = false;
+                    document.getElementById('no-urut-dokumen').disabled = true;
+                    document.getElementById('data-in').classList.remove('readonly-field');
+                    document.getElementById('no-urut-dokumen').classList.add('readonly-field');
+                    document.getElementById('other-sales-container').style.display = 'none';
+                    currentEditingProjectId = null;
+                    
+                    // Set today's date as default for data-in
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('data-in').value = today;
+                    
+                    // Show modal
+                    document.getElementById('project-modal').style.display = 'flex';
+                });
+            }
+
+            // Sales dropdown handler for "Other" option
+            document.addEventListener('change', function(e) {
+                if (e.target.id === 'sales-client' && e.target.value === 'Other') {
+                    document.getElementById('other-sales-container').style.display = 'block';
+                } else if (e.target.id === 'sales-client') {
+                    document.getElementById('other-sales-container').style.display = 'none';
+                }
+            });
+
+            // Project form submission
+            const projectForm = document.getElementById('project-form');
+            if (projectForm) {
+                projectForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const salesClient = document.getElementById('sales-client').value;
+                    const otherSales = document.getElementById('other-sales').value;
+                    const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+                    
+                    const projectData = {
+                        salesClient: finalSalesClient,
+                        projectName: document.getElementById('project-name').value,
+                        dataIn: document.getElementById('data-in').value,
+                        type: document.getElementById('type').value,
+                        pic: document.getElementById('pic').value,
+                        startDate: document.getElementById('start-date').value,
+                        status: document.getElementById('status').value,
+                        remarks: document.getElementById('remarks').value
+                    };
+
+                    let success = false;
+                    if (currentEditingProjectId) {
+                        // Update existing project - exclude dataIn and noUrutDokumen from update
+                        const { dataIn, noUrutDokumen, ...updateData } = projectData;
+                        success = await updateProject(currentEditingProjectId, updateData);
+                    } else {
+                        // Add new project
+                        success = await addProject(projectData);
+                    }
+
+                    if (success) {
+                        document.getElementById('project-modal').style.display = 'none';
+                        document.getElementById('data-in').disabled = false;
+                        document.getElementById('no-urut-dokumen').disabled = false;
+                        document.getElementById('data-in').classList.remove('readonly-field');
+                        document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
+                        currentEditingProjectId = null;
+                    }
+                });
+            }
+
+            // Status form submission
+            const statusForm = document.getElementById('status-form');
+            if (statusForm) {
+                statusForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const newStatus = document.getElementById('status-select').value;
+                    const success = await updateProject(currentEditingProjectId, { status: newStatus });
+                    
+                    if (success) {
+                        document.getElementById('status-modal').style.display = 'none';
+                        currentEditingProjectId = null;
+                    }
+                });
+            }
+
+            // Delete confirmation handlers
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async function() {
+                    const success = await deleteProject(currentEditingProjectId);
+                    if (success) {
+                        document.getElementById('delete-modal').style.display = 'none';
+                        currentEditingProjectId = null;
+                    }
+                });
+            }
+            
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.addEventListener('click', function() {
+                    document.getElementById('delete-modal').style.display = 'none';
+                    currentEditingProjectId = null;
+                });
+            }
+
+            // Modal close buttons
+            const closeButtons = document.querySelectorAll('.modal-close-btn');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.closest('.modal').style.display = 'none';
+                    document.getElementById('data-in').disabled = false;
+                    document.getElementById('no-urut-dokumen').disabled = false;
+                    document.getElementById('data-in').classList.remove('readonly-field');
+                    document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
+                    currentEditingProjectId = null;
+                });
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal')) {
+                    e.target.style.display = 'none';
+                    document.getElementById('data-in').disabled = false;
+                    document.getElementById('no-urut-dokumen').disabled = false;
+                    document.getElementById('data-in').classList.remove('readonly-field');
+                    document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
+                    currentEditingProjectId = null;
+                }
+            });
         });
+
     </script>
 
-    <!-- Login Screen -->
+    <!-- Improved Login Screen -->
     <div id="auth-container" class="auth-container">
         <div class="auth-card">
             <div class="auth-logo">
-                <div class="auth-logo-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="auth-logo-text">Engineering Monitor</div>
+                <i class="fas fa-cogs auth-logo-icon"></i>
+                <span class="auth-logo-text">Engineering Monitor</span>
             </div>
-            <p class="auth-subtitle">Silakan masuk untuk melanjutkan</p>
+            <p class="auth-subtitle">Sistem Monitoring Project Engineering</p>
             <form id="login-form" class="auth-form">
                 <div class="auth-input-group">
                     <i class="fas fa-envelope auth-input-icon"></i>
-                    <input type="email" id="login-email" class="auth-input" placeholder="Email" required>
+                    <input type="email" id="email" class="auth-input" placeholder="Alamat Email" required>
                 </div>
                 <div class="auth-input-group">
                     <i class="fas fa-lock auth-input-icon"></i>
-                    <input type="password" id="login-password" class="auth-input" placeholder="Password" required>
+                    <input type="password" id="password" class="auth-input" placeholder="Password" required>
                 </div>
-                <div id="login-error-message" class="auth-error-message"></div>
-                <button type="submit" id="login-btn" class="auth-submit-btn">Masuk</button>
+                <div id="login-error" class="auth-error-message"></div>
+                <button type="submit" id="login-btn" class="auth-submit-btn">Login</button>
             </form>
             <div class="auth-footer">
-                <p>Lupa password? <a href="#">Hubungi Administrator</a></p>
+                <p>© 2023 Engineering Monitor - Genetek</p>
             </div>
         </div>
     </div>
 
-    <!-- Main App Container -->
-    <div id="app-container" class="container" style="display: none;">
+    <!-- Main Application (hidden until login) -->
+    <div id="main-container" class="container" style="display: none;">
         <!-- Sidebar -->
-        <div class="sidebar">
-            <button class="sidebar-toggle">
+        <aside class="sidebar">
+            <button id="sidebar-toggle-btn" class="sidebar-toggle">
                 <i class="fas fa-chevron-left"></i>
             </button>
             <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
+                <div class="logo-icon"><i class="fas fa-cogs"></i></div>
                 <div class="logo-text">Engineering Monitor</div>
             </div>
-            <div class="nav-menu">
-                <a href="#" class="nav-item active">
-                    <i class="fas fa-tachometer-alt nav-icon"></i>
-                    <span class="nav-text">Dashboard</span>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-target="dashboard-section">
+                    <div class="nav-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="nav-text">Dashboard</div>
                 </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-project-diagram nav-icon"></i>
-                    <span class="nav-text">Projects</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-chart-bar nav-icon"></i>
-                    <span class="nav-text">Reports</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="fas fa-cog nav-icon"></i>
-                    <span class="nav-text">Settings</span>
+                <a href="#" class="nav-item" data-target="project-list-section">
+                    <div class="nav-icon"><i class="fas fa-project-diagram"></i></div>
+                    <div class="nav-text">Project</div>
                 </a>
                 <a href="#" class="nav-item" id="logout-btn">
-                    <i class="fas fa-sign-out-alt nav-icon"></i>
-                    <span class="nav-text">Logout</span>
+                    <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
+                    <div class="nav-text">Logout</div>
                 </a>
-            </div>
-        </div>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1 class="page-title">Engineering Monitor</h1>
-                <div class="header-actions">
-                    <button class="btn btn-outline">
-                        <i class="fas fa-filter btn-icon"></i> Filter
-                    </button>
-                    <button class="btn btn-primary" id="add-project-btn">
-                        <i class="fas fa-plus btn-icon"></i> Tambah Project
-                    </button>
-                    <button class="btn btn-outline" id="add-project-autocomplete-btn">
-                        <i class="fas fa-plus-circle btn-icon"></i> Add Project
-                    </button>
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section">
+                <div class="header">
+                    <h1 class="page-title">Dashboard</h1>
                 </div>
-            </div>
-
-            <!-- Dashboard Summary -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Ringkasan Project</h2>
-                </div>
-                <div class="card-body">
-                    <div class="dashboard-summary-grid">
-                        <div class="summary-item">
-                            <div class="summary-value">0</div>
-                            <div class="summary-label">Total Project</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-value">0</div>
-                            <div class="summary-label">Project Selesai</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-value">0</div>
-                            <div class="summary-label">Dalam Pengerjaan</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-value">0</div>
-                            <div class="summary-label">Project Tertunda</div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Ringkasan Project Berdasarkan Type</h3>
+                        <div class="dashboard-summary-grid">
+                            <div class="summary-item">
+                                <div class="summary-value" id="inquiry-count">0</div>
+                                <div class="summary-label">Inquiry</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="dwg-count">0</div>
+                                <div class="summary-label">DWG</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="hydrolic-count">0</div>
+                                <div class="summary-label">Hydrolic</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="dokumen-count">0</div>
+                                <div class="summary-label">Dokumen</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Project List -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Daftar Project</h2>
-                </div>
-                <div class="card-body">
-                    <!-- Filter Section -->
-                    <div class="filter-section">
-                        <div class="filter-group">
-                            <label class="filter-label">Sales/Client</label>
-                            <input type="text" id="sales-client-filter" class="filter-input" placeholder="Filter Sales/Client">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Nama Project</label>
-                            <input type="text" id="project-name-filter" class="filter-input" placeholder="Filter Nama Project">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">No. Urut Dokumen</label>
-                            <input type="text" id="doc-number-filter" class="filter-input" placeholder="Filter No. Dokumen">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Type</label>
-                            <input type="text" id="type-filter" class="filter-input" placeholder="Filter Type">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">PIC</label>
-                            <input type="text" id="pic-filter" class="filter-input" placeholder="Filter PIC">
-                        </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Status</label>
-                            <input type="text" id="status-filter" class="filter-input" placeholder="Filter Status">
-                        </div>
-                    </div>
-
-                    <!-- Table -->
-                    <div class="table-container">
-                        <table id="project-table">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Sales/Client</th>
-                                    <th>Nama Project</th>
-                                    <th>Tanggal Masuk</th>
-                                    <th>No. Urut Dokumen</th>
-                                    <th>Type</th>
-                                    <th>PIC</th>
-                                    <th>Tanggal Mulai</th>
-                                    <th>Status</th>
-                                    <th>Keterangan</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Data akan diisi oleh JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="pagination">
-                        <div class="page-info">Menampilkan 0 - 0 dari 0 project</div>
-                        <div class="page-controls">
-                            <button class="page-btn prev-btn" disabled><i class="fas fa-chevron-left"></i></button>
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn next-btn" disabled><i class="fas fa-chevron-right"></i></button>
-                        </div>
+            <!-- Project List Section -->
+            <section id="project-list-section" class="content-section" style="display: none;">
+                <div class="header">
+                    <h1 class="page-title">Daftar Project</h1>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" id="add-project-btn">
+                            <i class="fas fa-plus btn-icon"></i> Tambah Project
+                        </button>
                     </div>
                 </div>
-            </div>
-        </div>
+
+                <!-- Filter Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Filter Data</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="filter-form" class="filter-section">
+                            <div class="filter-group">
+                                <label class="filter-label">Status</label>
+                                <select class="filter-input" id="filter-status">
+                                    <option value="">Semua Status</option>
+                                    <option value="On Progress">On Progress</option>
+                                    <option value="Done">Done</option>
+                                    <option value="Hold">Hold</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Type</label>
+                                <select class="filter-input" id="filter-type">
+                                    <option value="">Semua Type</option>
+                                    <option value="Inquiry">Inquiry</option>
+                                    <option value="DWG">DWG</option>
+                                    <option value="Hydrolic">Hydrolic</option>
+                                    <option value="Dokumen">Dokumen</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Cari</label>
+                                <input type="text" class="filter-input" id="filter-search" placeholder="Cari project...">
+                            </div>
+                            <div class="filter-group" style="align-self: flex-end;">
+                                <button type="button" class="btn btn-outline" id="reset-filters-btn">
+                                    Reset Filter
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    Terapkan Filter
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Daftar Project</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table id="project-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Sales/Client</th>
+                                        <th>Project Name</th>
+                                        <th>Data In</th>
+                                        <th>No Urut Dokumen</th>
+                                        <th>Type</th>
+                                        <th>PIC</th>
+                                        <th>Start Date</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Data will be loaded here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination">
+                            <div class="page-info">
+                                Menampilkan 0-0 dari 0 data
+                            </div>
+                            <div class="page-controls">
+                                <!-- Pagination buttons will be rendered here by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- Add Project Modal -->
-    <div id="add-project-modal" class="modal">
+    <!-- Modals -->
+
+    <!-- Modal Tambah/Edit Project -->
+    <div id="project-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
-            <h2 style="margin-bottom: 1.5rem;">Tambah Project Baru</h2>
-            <form id="add-project-form">
+            <h2 class="card-title" style="margin-bottom: 1.5rem;" id="project-modal-title">Tambah Project Baru</h2>
+            <form id="project-form">
                 <div class="form-group">
-                    <label for="sales-client">Sales/Client *</label>
-                    <input type="text" id="sales-client" class="form-input" required>
+                    <label for="sales-client">Sales/Client</label>
+                    <select id="sales-client" class="filter-input" required>
+                        <option value="">Pilih Sales/Client</option>
+                        <option value="Rangga">Rangga</option>
+                        <option value="Dhea">Dhea</option>
+                        <option value="Rory">Rory</option>
+                        <option value="Pamungkas">Pamungkas</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div id="other-sales-container" class="form-group" style="display: none;">
+                    <label for="other-sales">Keterangan Sales/Client Lainnya</label>
+                    <input type="text" id="other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
                 </div>
                 <div class="form-group">
-                    <label for="project-name">Nama Project *</label>
-                    <input type="text" id="project-name" class="form-input" required>
+                    <label for="project-name">Project Name</label>
+                    <input type="text" id="project-name" class="filter-input" required>
                 </div>
                 <div class="form-group">
-                    <label for="data-in">Tanggal Masuk *</label>
-                    <input type="date" id="data-in" class="form-input" required>
+                    <label for="data-in">Data In</label>
+                    <input type="date" id="data-in" class="filter-input" required>
                 </div>
                 <div class="form-group">
-                    <label for="type">Type *</label>
-                    <select id="type" class="form-input" required>
+                    <label for="no-urut-dokumen">No Urut Dokumen</label>
+                    <input type="text" id="no-urut-dokumen" class="filter-input readonly-field" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="type">Type</label>
+                    <select id="type" class="filter-input" required>
                         <option value="">Pilih Type</option>
                         <option value="Inquiry">Inquiry</option>
                         <option value="DWG">DWG</option>
@@ -1984,16 +1948,24 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="pic">PIC *</label>
-                    <input type="text" id="pic" class="form-input" required>
+                    <label for="pic">PIC</label>
+                    <select id="pic" class="filter-input" required>
+                        <option value="">Pilih PIC</option>
+                        <option value="wahyu">Wahyu</option>
+                        <option value="dhona">Dhona</option>
+                        <option value="arifah">Arifah</option>
+                        <option value="kartika">Kartika</option>
+                        <option value="ardi">Ardi</option>
+                        <option value="brian">Brian</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    <label for="start-date">Tanggal Mulai *</label>
-                    <input type="date" id="start-date" class="form-input" required>
+                    <label for="start-date">Start Date</label>
+                    <input type="date" id="start-date" class="filter-input">
                 </div>
                 <div class="form-group">
-                    <label for="status">Status *</label>
-                    <select id="status" class="form-input" required>
+                    <label for="status">Status</label>
+                    <select id="status" class="filter-input" required>
                         <option value="">Pilih Status</option>
                         <option value="On Progress">On Progress</option>
                         <option value="Done">Done</option>
@@ -2001,215 +1973,50 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="remarks">Keterangan</label>
-                    <textarea id="remarks" class="form-input"></textarea>
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" class="filter-input" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-outline" id="cancel-add-project">Batal</button>
-                    <button type="button" class="btn btn-primary" id="submit-add-project">Simpan</button>
+                    <button type="submit" class="btn btn-primary">Simpan Project</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Edit Project Modal -->
-    <div id="edit-project-modal" class="modal">
+    <!-- Status Change Modal -->
+    <div id="status-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
-            <h2 style="margin-bottom: 1.5rem;">Edit Project</h2>
-            <form id="edit-project-form">
+            <h2 class="card-title" style="margin-bottom: 1.5rem;">Ubah Status Project</h2>
+            <form id="status-form">
                 <div class="form-group">
-                    <label for="edit-sales-client">Sales/Client</label>
-                    <input type="text" id="edit-sales-client" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="edit-project-name">Nama Project</label>
-                    <input type="text" id="edit-project-name" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="edit-data-in">Tanggal Masuk</label>
-                    <input type="date" id="edit-data-in" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="edit-no-urut-dokumen">No. Urut Dokumen</label>
-                    <input type="text" id="edit-no-urut-dokumen" class="form-input readonly-field" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="edit-type">Type</label>
-                    <select id="edit-type" class="form-input">
-                        <option value="">Pilih Type</option>
-                        <option value="Inquiry">Inquiry</option>
-                        <option value="DWG">DWG</option>
-                        <option value="Hydrolic">Hydrolic</option>
-                        <option value="Dokumen">Dokumen</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-pic">PIC</label>
-                    <input type="text" id="edit-pic" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="edit-start-date">Tanggal Mulai</label>
-                    <input type="date" id="edit-start-date" class="form-input">
-                </div>
-                <div class="form-group">
-                    <label for="edit-status">Status</label>
-                    <select id="edit-status" class="form-input">
-                        <option value="">Pilih Status</option>
+                    <label for="status-select">Status</label>
+                    <select id="status-select" class="filter-input" required>
                         <option value="On Progress">On Progress</option>
                         <option value="Done">Done</option>
                         <option value="Hold">Hold</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="edit-remarks">Keterangan</label>
-                    <textarea id="edit-remarks" class="form-input"></textarea>
-                </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-outline" id="cancel-edit-project">Batal</button>
-                    <button type="button" class="btn btn-primary" id="submit-edit-project">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="delete-confirmation-modal" class="delete-modal">
+    <div id="delete-modal" class="delete-modal">
         <div class="delete-modal-content">
-            <h2 style="margin-bottom: 1rem;">Konfirmasi Hapus</h2>
-            <p>Apakah Anda yakin ingin menghapus project ini?</p>
-            <input type="hidden" id="delete-project-id">
+            <h2 class="card-title" style="margin-bottom: 1rem;">Konfirmasi Hapus</h2>
+            <p>Apakah Anda yakin ingin menghapus project ini? Tindakan ini tidak dapat dibatalkan.</p>
             <div class="delete-actions">
-                <button class="btn btn-outline" id="cancel-delete">Batal</button>
-                <button class="btn btn-primary" id="confirm-delete" style="background-color: var(--danger);">Hapus</button>
+                <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
+                <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
             </div>
         </div>
     </div>
 
-    <!-- Status Change Modal -->
-    <div id="status-change-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
-            <h2 style="margin-bottom: 1.5rem;">Ubah Status Project</h2>
-            <div class="form-group">
-                <label for="new-status">Status Baru</label>
-                <select id="new-status" class="form-input">
-                    <option value="On Progress">On Progress</option>
-                    <option value="Done">Done</option>
-                    <option value="Hold">Hold</option>
-                </select>
-            </div>
-            <input type="hidden" id="status-project-id">
-            <div class="form-actions">
-                <button type="button" class="btn btn-outline" id="cancel-status-change">Batal</button>
-                <button type="button" class="btn btn-primary" id="submit-status-change">Simpan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Project from Autocomplete Modal -->
-    <div id="autocomplete-project-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
-            <h2 style="margin-bottom: 1.5rem;">Add Project dari Nomor Dokumen</h2>
-            <div class="form-group">
-                <label for="autocomplete-doc-number">Nomor Urut Dokumen</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="autocomplete-doc-number" class="form-input" placeholder="Ketik nomor dokumen...">
-                    <div id="autocomplete-list" class="autocomplete-list"></div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-outline" id="cancel-autocomplete-project">Batal</button>
-                <button type="button" class="btn btn-primary" id="submit-autocomplete-project">Lanjutkan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Project Modal (for autocomplete) -->
-    <div id="add-project-modal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close-btn">&times;</span>
-            <h2 style="margin-bottom: 1.5rem;">Tambah Project Baru</h2>
-            <form id="add-project-form">
-                <div class="form-group">
-                    <label for="add-sales-client">Sales/Client *</label>
-                    <input type="text" id="add-sales-client" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-project-name">Nama Project *</label>
-                    <input type="text" id="add-project-name" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-data-in">Tanggal Masuk *</label>
-                    <input type="date" id="add-data-in" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-no-urut-dokumen">No. Urut Dokumen</label>
-                    <input type="text" id="add-no-urut-dokumen" class="form-input readonly-field" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="add-type">Type *</label>
-                    <select id="add-type" class="form-input" required>
-                        <option value="">Pilih Type</option>
-                        <option value="Inquiry">Inquiry</option>
-                        <option value="DWG">DWG</option>
-                        <option value="Hydrolic">Hydrolic</option>
-                        <option value="Dokumen">Dokumen</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="add-pic">PIC *</label>
-                    <input type="text" id="add-pic" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-start-date">Tanggal Mulai *</label>
-                    <input type="date" id="add-start-date" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label for="add-status">Status *</label>
-                    <select id="add-status" class="form-input" required>
-                        <option value="">Pilih Status</option>
-                        <option value="On Progress">On Progress</option>
-                        <option value="Done">Done</option>
-                        <option value="Hold">Hold</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="add-remarks">Keterangan</label>
-                    <textarea id="add-remarks" class="form-input"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline" id="cancel-add-project">Batal</button>
-                    <button type="button" class="btn btn-primary" id="submit-add-project">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Additional event listeners for modal cancel buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            // Cancel add project
-            document.getElementById('cancel-add-project').addEventListener('click', function() {
-                document.getElementById('add-project-modal').style.display = 'none';
-            });
-
-            // Cancel edit project
-            document.getElementById('cancel-edit-project').addEventListener('click', function() {
-                document.getElementById('edit-project-modal').style.display = 'none';
-            });
-
-            // Close modals when clicking outside
-            window.addEventListener('click', function(event) {
-                const modals = document.querySelectorAll('.modal');
-                modals.forEach(modal => {
-                    if (event.target === modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            });
-        });
-    </script>
+    <!-- Custom Alert Box -->
+    <div id="custom-alert-box" class="custom-alert"></div>
 </body>
 </html>
