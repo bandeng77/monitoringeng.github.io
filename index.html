@@ -1148,7 +1148,7 @@
                     return;
                 }
 
-                // Get additional details from projectDetails collection - SIMPLIFIED QUERY
+                // Get additional details from projectDetails collection
                 let details = [];
                 try {
                     const detailsSnapshot = await projectDetailsCol
@@ -1169,20 +1169,6 @@
                     }
                 } catch (error) {
                     console.error("Error loading project details:", error);
-                    // Fallback: try without ordering
-                    try {
-                        const detailsSnapshot = await projectDetailsCol
-                            .where('projectId', '==', projectId)
-                            .get();
-                        
-                        if (!detailsSnapshot.empty) {
-                            detailsSnapshot.forEach(doc => {
-                                details.push({ id: doc.id, ...doc.data() });
-                            });
-                        }
-                    } catch (fallbackError) {
-                        console.error("Fallback error:", fallbackError);
-                    }
                 }
 
                 // Format types untuk display - PERBAIKAN: Tambah toUpperCase
@@ -1293,6 +1279,7 @@
                 });
 
                 modal.querySelector('#add-detail-btn').addEventListener('click', function() {
+                    modal.remove();
                     showAddProjectModal(projectId, project);
                 });
 
@@ -1300,6 +1287,7 @@
                 modal.querySelectorAll('.edit-detail-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
                         const detailId = this.getAttribute('data-detail-id');
+                        modal.remove();
                         showEditDetailModal(detailId, projectId);
                     });
                 });
@@ -1511,7 +1499,6 @@
                 showAlert('Project berhasil diperbarui', 'success');
                 
                 // Refresh the details modal
-                document.querySelector('.modal').remove();
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
@@ -1642,8 +1629,7 @@
 
             modal.querySelector('#add-project-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
-                await addNewProjectToDetails(projectId, baseProject);
-                modal.remove();
+                await addNewProjectToDetails(projectId, baseProject, modal);
             });
 
             // Close modal when clicking outside
@@ -1654,8 +1640,8 @@
             });
         }
 
-        // --- Add New Project to Details (tidak masuk daftar project utama) ---
-        async function addNewProjectToDetails(projectId, baseProject) {
+        // --- PERBAIKAN: Add New Project to Details (dengan parameter modal) ---
+        async function addNewProjectToDetails(projectId, baseProject, modal) {
             const salesClient = document.getElementById('add-sales-client').value;
             const otherSales = document.getElementById('add-other-sales').value;
             const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
@@ -1697,7 +1683,7 @@
                 showAlert('Project berhasil ditambahkan', 'success');
                 
                 // PERBAIKAN: Hanya sekali close modal
-                modal.remove();
+                if (modal) modal.remove();
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
@@ -1717,7 +1703,6 @@
                 showAlert('Project berhasil dihapus', 'success');
                 
                 // Refresh the details modal
-                document.querySelector('.modal').remove();
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
@@ -1932,21 +1917,21 @@
                 }
 
                 // Listen to both projects and projectDetails collections
-                window.dashboardUnsubscribe = () => {
-                    // This function will be called to unsubscribe both listeners
-                    if (window.projectsListener) window.projectsListener();
-                    if (window.detailsListener) window.detailsListener();
-                };
+                let projectsListener = null;
+                let detailsListener = null;
 
-                // Listener for main projects
-                window.projectsListener = projectsCol.onSnapshot((snapshot) => {
+                projectsListener = projectsCol.onSnapshot((snapshot) => {
                     updateDashboardCounts(snapshot, null);
                 });
 
-                // Listener for project details
-                window.detailsListener = projectDetailsCol.onSnapshot((snapshot) => {
+                detailsListener = projectDetailsCol.onSnapshot((snapshot) => {
                     updateDashboardCounts(null, snapshot);
                 });
+
+                window.dashboardUnsubscribe = () => {
+                    if (projectsListener) projectsListener();
+                    if (detailsListener) detailsListener();
+                };
 
             } catch (error) {
                 console.error("Error setting up dashboard listener: ", error);
