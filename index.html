@@ -486,7 +486,7 @@
             width: 100%;
         }
 
-        /* PERBAIKAN: Alignment table menjadi center */
+        /* PERBAIKAN: Alignment table menjadi center dan vertical align middle */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -495,9 +495,11 @@
 
         th, td {
             padding: 0.875rem 1rem;
-            text-align: center; /* Ubah dari left menjadi center */
+            text-align: center;
+            vertical-align: middle; /* Tambahkan vertical align middle */
             border-bottom: 1px solid var(--border);
             word-wrap: break-word;
+            height: 60px; /* Set tinggi konsisten untuk semua row */
         }
 
         th {
@@ -519,7 +521,9 @@
         }
 
         .status-button {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.35rem 0.75rem;
             border-radius: 1rem;
             font-size: 0.875rem;
@@ -529,6 +533,7 @@
             transition: all 0.2s ease;
             text-align: center;
             white-space: nowrap;
+            min-height: 32px;
         }
 
         .status-button:hover {
@@ -551,7 +556,7 @@
             color: #991b1b;
         }
 
-        /* PERBAIKAN: Tombol Edit dan Hapus yang Sejajar */
+        /* PERBAIKAN: Tombol Edit dan Hapus yang Sejajar dengan vertical align */
         .action-cell {
             display: flex;
             gap: 0.5rem;
@@ -586,6 +591,23 @@
         .action-btn:hover {
             background-color: var(--hover);
             color: var(--primary);
+        }
+
+        /* PERBAIKAN: Link document number dengan vertical align */
+        .doc-number-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            min-height: 100%;
+            width: 100%;
+        }
+
+        .doc-number-link:hover {
+            text-decoration: underline;
+            color: var(--primary-dark);
         }
 
         /* Pagination */
@@ -1024,7 +1046,7 @@
                 const dateCode = formatDateToDDMM(dataIn);
                 const typeCode = getTypeCode(types);
                 
-                return `ENG-${formattedNumber}-${dateCode}-${projectName}`;
+                return `ENG-${formattedNumber}-${dateCode}-${typeCode}-${projectName}`;
             } catch (error) {
                 console.error("Error generating project number:", error);
                 throw new Error("Gagal menghasilkan nomor project");
@@ -1039,7 +1061,7 @@
             projectTableBody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project yang cocok.</td></tr>';
+                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project yang cocok.</td></tr>';
                 renderPagination(0, 0); // Render empty pagination
                 return;
             }
@@ -1062,7 +1084,7 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
-                // PERBAIKAN: Semua data diubah menjadi huruf besar
+                // PERBAIKAN: Semua data diubah menjadi huruf besar dan menggunakan vertical align middle
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
@@ -1811,7 +1833,7 @@
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
 
-            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Memuat data...</td></tr>';
+            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Memuat data...</td></tr>';
 
             try {
                 // Unsubscribe previous listener if exists
@@ -1821,7 +1843,7 @@
 
                 window.projectUnsubscribe = projectsCol.onSnapshot((snapshot) => {
                     if (snapshot.empty) {
-                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data project.</td></tr>';
+                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project.</td></tr>';
                         allProjectData = [];
                         filteredProjectData = [];
                         renderPagination(0, 0);
@@ -1853,12 +1875,12 @@
                     renderProjectsTable(filteredProjectData);
                 }, (error) => {
                     console.error("Error loading projects: ", error);
-                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
                     showAlert("Gagal memuat data project: " + error.message, 'error');
                 });
             } catch (error) {
                 console.error("Error setting up project listener: ", error);
-                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
                 showAlert("Gagal memuat data project: " + error.message, 'error');
             }
         }
