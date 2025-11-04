@@ -486,13 +486,7 @@
             width: 100%;
         }
 
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
-        }
-
+        /* PERBAIKAN: Alignment table menjadi center */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -501,7 +495,7 @@
 
         th, td {
             padding: 0.875rem 1rem;
-            text-align: left;
+            text-align: center; /* Ubah dari left menjadi center */
             border-bottom: 1px solid var(--border);
             word-wrap: break-word;
         }
@@ -983,6 +977,11 @@
         // Current project being edited
         let currentEditingProjectId = null;
 
+        // --- PERBAIKAN: Fungsi untuk mengubah teks menjadi huruf besar ---
+        function toUpperCase(text) {
+            return text ? text.toString().toUpperCase() : '';
+        }
+
         // --- Format date to DDMM ---
         function formatDateToDDMM(dateString) {
             const date = new Date(dateString);
@@ -1058,14 +1057,17 @@
                 else if (project.Status === 'Done') statusClass = 'status-done';
                 else if (project.Status === 'Hold') statusClass = 'status-hold';
 
-                // Format types untuk display
-                const displayTypes = Array.isArray(project.Type) ? project.Type.join(', ') : project.Type;
+                // Format types untuk display - PERBAIKAN: Tambah toUpperCase
+                const displayTypes = Array.isArray(project.Type) ? 
+                    project.Type.map(type => toUpperCase(type)).join(', ') : 
+                    toUpperCase(project.Type);
 
+                // PERBAIKAN: Semua data diubah menjadi huruf besar
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
-                        <td>${project.Sales_Client || '-'}</td>
-                        <td>${project.Project_Name || '-'}</td>
+                        <td>${toUpperCase(project.Sales_Client) || '-'}</td>
+                        <td>${toUpperCase(project.Project_Name) || '-'}</td>
                         <td>${project.Data_In || '-'}</td>
                         <td>
                             <a href="#" class="doc-number-link" data-project-id="${project.No_Urut_Dokumen}">
@@ -1073,14 +1075,14 @@
                             </a>
                         </td>
                         <td>${displayTypes || '-'}</td>
-                        <td>${project.PIC || '-'}</td>
+                        <td>${toUpperCase(project.PIC) || '-'}</td>
                         <td>${project.Start_Date || '-'}</td>
                         <td class="status-cell">
                             <button class="status-button ${statusClass}" data-project-id="${project.No_Urut_Dokumen}" data-current-status="${project.Status}">
                                 ${project.Status}
                             </button>
                         </td>
-                        <td>${project.Remarks || '-'}</td>
+                        <td>${toUpperCase(project.Remarks) || '-'}</td>
                         <td class="action-cell">
                             <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
                                 <i class="fas fa-edit"></i>
@@ -1183,10 +1185,12 @@
                     }
                 }
 
-                // Format types untuk display
-                const displayTypes = Array.isArray(project.Type) ? project.Type.join(', ') : project.Type;
+                // Format types untuk display - PERBAIKAN: Tambah toUpperCase
+                const displayTypes = Array.isArray(project.Type) ? 
+                    project.Type.map(type => toUpperCase(type)).join(', ') : 
+                    toUpperCase(project.Type);
 
-                // Create modal content
+                // Create modal content - PERBAIKAN: Tambah toUpperCase untuk data
                 const modalContent = `
                     <div class="modal-content" style="max-width: 900px;">
                         <span class="modal-close-btn">&times;</span>
@@ -1201,11 +1205,11 @@
                                 </div>
                                 <div>
                                     <strong>Sales/Client:</strong><br>
-                                    ${project.Sales_Client || '-'}
+                                    ${toUpperCase(project.Sales_Client) || '-'}
                                 </div>
                                 <div>
                                     <strong>Nama Project:</strong><br>
-                                    ${project.Project_Name || '-'}
+                                    ${toUpperCase(project.Project_Name) || '-'}
                                 </div>
                                 <div>
                                     <strong>Tanggal Masuk:</strong><br>
@@ -1217,7 +1221,7 @@
                                 </div>
                                 <div>
                                     <strong>PIC:</strong><br>
-                                    ${project.PIC || '-'}
+                                    ${toUpperCase(project.PIC) || '-'}
                                 </div>
                                 <div>
                                     <strong>Tanggal Mulai:</strong><br>
@@ -1229,7 +1233,7 @@
                                 </div>
                                 <div style="grid-column: 1 / -1;">
                                     <strong>Keterangan:</strong><br>
-                                    ${project.Remarks || '-'}
+                                    ${toUpperCase(project.Remarks) || '-'}
                                 </div>
                             </div>
                         </div>
@@ -1258,14 +1262,14 @@
                                                 </div>
                                             </div>
                                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
-                                                <div><strong>Sales/Client:</strong><br>${detail.salesClient || '-'}</div>
-                                                <div><strong>Nama Project:</strong><br>${detail.projectName || '-'}</div>
+                                                <div><strong>Sales/Client:</strong><br>${toUpperCase(detail.salesClient) || '-'}</div>
+                                                <div><strong>Nama Project:</strong><br>${toUpperCase(detail.projectName) || '-'}</div>
                                                 <div><strong>Tanggal Masuk:</strong><br>${detail.dataIn || '-'}</div>
-                                                <div><strong>Tipe:</strong><br>${detail.types ? detail.types.join(', ') : '-'}</div>
-                                                <div><strong>PIC:</strong><br>${detail.pic || '-'}</div>
+                                                <div><strong>Tipe:</strong><br>${detail.types ? detail.types.map(type => toUpperCase(type)).join(', ') : '-'}</div>
+                                                <div><strong>PIC:</strong><br>${toUpperCase(detail.pic) || '-'}</div>
                                                 <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
                                                 <div><strong>Status:</strong><br>${detail.status || '-'}</div>
-                                                <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${detail.remarks || '-'}</div>
+                                                <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${toUpperCase(detail.remarks) || '-'}</div>
                                             </div>
                                         </div>
                                     `).join('')}
@@ -1685,19 +1689,20 @@
                     status: status,
                     remarks: remarks,
                     types: selectedTypes,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
                 await projectDetailsCol.add(projectData);
-                showAlert('Project baru berhasil ditambahkan ke detail', 'success');
+                showAlert('Project berhasil ditambahkan', 'success');
                 
-                // Refresh the details modal
-                document.querySelector('.modal').remove();
+                // PERBAIKAN: Hanya sekali close modal
+                modal.remove();
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
-                console.error("Error adding new project to details:", error);
-                showAlert('Gagal menambahkan project baru', 'error');
+                console.error("Error adding project detail:", error);
+                showAlert('Gagal menambahkan project', 'error');
             }
         }
 
@@ -1918,7 +1923,7 @@
             renderProjectsTable(filteredProjectData);
         }
 
-        // --- Load Dashboard Data ---
+        // --- PERBAIKAN: Load Dashboard Data (termasuk dari project details) ---
         async function loadDashboardData() {
             try {
                 // Unsubscribe previous listener if exists
@@ -1926,35 +1931,76 @@
                     window.dashboardUnsubscribe();
                 }
 
-                window.dashboardUnsubscribe = projectsCol.onSnapshot((snapshot) => {
-                    let inquiryCount = 0;
-                    let dwgCount = 0;
-                    let hydrolicCount = 0;
-                    let dokumenCount = 0;
+                // Listen to both projects and projectDetails collections
+                window.dashboardUnsubscribe = () => {
+                    // This function will be called to unsubscribe both listeners
+                    if (window.projectsListener) window.projectsListener();
+                    if (window.detailsListener) window.detailsListener();
+                };
 
-                    snapshot.forEach(doc => {
-                        const project = doc.data();
-                        const type = project.type || '';
-
-                        if (type === 'Inquiry') inquiryCount++;
-                        else if (type === 'DWG') dwgCount++;
-                        else if (type === 'Hydrolic') hydrolicCount++;
-                        else if (type === 'Dokumen') dokumenCount++;
-                    });
-
-                    // Update the dashboard summary
-                    document.getElementById('inquiry-count').textContent = inquiryCount;
-                    document.getElementById('dwg-count').textContent = dwgCount;
-                    document.getElementById('hydrolic-count').textContent = hydrolicCount;
-                    document.getElementById('dokumen-count').textContent = dokumenCount;
-                }, (error) => {
-                    console.error("Error loading dashboard data: ", error);
-                    showAlert("Gagal memuat data dashboard: " + error.message, 'error');
+                // Listener for main projects
+                window.projectsListener = projectsCol.onSnapshot((snapshot) => {
+                    updateDashboardCounts(snapshot, null);
                 });
+
+                // Listener for project details
+                window.detailsListener = projectDetailsCol.onSnapshot((snapshot) => {
+                    updateDashboardCounts(null, snapshot);
+                });
+
             } catch (error) {
                 console.error("Error setting up dashboard listener: ", error);
                 showAlert("Gagal memuat data dashboard: " + error.message, 'error');
             }
+        }
+
+        // --- PERBAIKAN: Update dashboard counts from both collections ---
+        function updateDashboardCounts(projectsSnapshot, detailsSnapshot) {
+            let inquiryCount = 0;
+            let dwgCount = 0;
+            let hydrolicCount = 0;
+            let dokumenCount = 0;
+
+            // Count from main projects
+            if (projectsSnapshot) {
+                projectsSnapshot.forEach(doc => {
+                    const project = doc.data();
+                    const types = project.type || [];
+
+                    if (Array.isArray(types)) {
+                        if (types.includes('Inquiry')) inquiryCount++;
+                        if (types.includes('DWG')) dwgCount++;
+                        if (types.includes('Hydrolic')) hydrolicCount++;
+                        if (types.includes('Dokumen')) dokumenCount++;
+                    } else {
+                        if (types === 'Inquiry') inquiryCount++;
+                        else if (types === 'DWG') dwgCount++;
+                        else if (types === 'Hydrolic') hydrolicCount++;
+                        else if (types === 'Dokumen') dokumenCount++;
+                    }
+                });
+            }
+
+            // Count from project details
+            if (detailsSnapshot) {
+                detailsSnapshot.forEach(doc => {
+                    const detail = doc.data();
+                    const types = detail.types || [];
+
+                    if (Array.isArray(types)) {
+                        if (types.includes('Inquiry')) inquiryCount++;
+                        if (types.includes('DWG')) dwgCount++;
+                        if (types.includes('Hydrolic')) hydrolicCount++;
+                        if (types.includes('Dokumen')) dokumenCount++;
+                    }
+                });
+            }
+
+            // Update the dashboard summary
+            document.getElementById('inquiry-count').textContent = inquiryCount;
+            document.getElementById('dwg-count').textContent = dwgCount;
+            document.getElementById('hydrolic-count').textContent = hydrolicCount;
+            document.getElementById('dokumen-count').textContent = dokumenCount;
         }
 
         // --- Add Project Function (untuk project utama) ---
@@ -2324,6 +2370,7 @@
                     }
 
                     if (success) {
+                        // PERBAIKAN: Hanya sekali close modal
                         document.getElementById('project-modal').style.display = 'none';
                         document.getElementById('data-in').disabled = false;
                         document.getElementById('no-urut-dokumen').disabled = false;
