@@ -820,40 +820,6 @@
             margin-top: 1.5rem;
         }
 
-        /* FITUR BARU: Autocomplete Styles */
-        .autocomplete-container {
-            position: relative;
-        }
-
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: white;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: none;
-        }
-
-        .autocomplete-item {
-            padding: 0.75rem 1rem;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .autocomplete-item:hover {
-            background-color: var(--hover);
-        }
-
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-
         /* FITUR BARU: Multiple Select Styles */
         .multiple-select-container {
             display: flex;
@@ -1200,7 +1166,7 @@
                         <h2 class="card-title" style="margin-bottom: 1.5rem;">Detail Project - ${project.No_Urut_Dokumen}</h2>
                         
                         <div class="project-main-details" style="margin-bottom: 2rem;">
-                            <h3 style="margin-bottom: 1rem; color: var(--dark);">Informasi Utama</h3>
+                            <h3 style="margin-bottom: 1rem; color: var(--dark);">Project Pertama</h3>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                                 <div>
                                     <strong>Nomor Urut Dokumen:</strong><br>
@@ -1243,7 +1209,7 @@
 
                         <div class="project-additional-details">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                                <h3 style="color: var(--dark);">Detail Tambahan</h3>
+                                <h3 style="color: var(--dark);">Project Tambahan</h3>
                                 <button class="btn btn-primary" id="add-detail-btn">
                                     <i class="fas fa-plus btn-icon"></i> Tambah Project Baru
                                 </button>
@@ -1254,17 +1220,20 @@
                                     ${details.map((detail, index) => `
                                         <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
                                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                                                <strong>Project ${index + 1}</strong>
+                                                <strong>Project ${index + 2}</strong>
                                                 <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Project">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
-                                                <div><strong>Deskripsi:</strong><br>${detail.description || '-'}</div>
-                                                <div><strong>Tanggal:</strong><br>${detail.date || '-'}</div>
-                                                <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div><strong>Sales/Client:</strong><br>${detail.salesClient || '-'}</div>
+                                                <div><strong>Nama Project:</strong><br>${detail.projectName || '-'}</div>
+                                                <div><strong>Tanggal Masuk:</strong><br>${detail.dataIn || '-'}</div>
                                                 <div><strong>Tipe:</strong><br>${detail.types ? detail.types.join(', ') : '-'}</div>
-                                                <div style="grid-column: 1 / -1;"><strong>Catatan:</strong><br>${detail.notes || '-'}</div>
+                                                <div><strong>PIC:</strong><br>${detail.pic || '-'}</div>
+                                                <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
+                                                <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${detail.remarks || '-'}</div>
                                             </div>
                                         </div>
                                     `).join('')}
@@ -1832,7 +1801,23 @@
             document.getElementById('project-name').value = project.projectName;
             document.getElementById('data-in').value = project.dataIn;
             document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
-            document.getElementById('type').value = project.type;
+            
+            // Set multiple types
+            const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]');
+            typeCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            if (Array.isArray(project.type)) {
+                project.type.forEach(type => {
+                    const checkbox = document.querySelector(`#type-multiple-container input[value="${type}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            } else if (project.type) {
+                const checkbox = document.querySelector(`#type-multiple-container input[value="${project.type}"]`);
+                if (checkbox) checkbox.checked = true;
+            }
+            
             document.getElementById('pic').value = project.pic;
             document.getElementById('start-date').value = project.startDate;
             document.getElementById('status').value = project.status;
@@ -1859,70 +1844,6 @@
             currentEditingProjectId = projectId;
             document.getElementById('status-select').value = currentStatus;
             document.getElementById('status-modal').style.display = 'flex';
-        }
-
-        // --- Setup Autocomplete untuk Add Project ---
-        function setupAutocomplete() {
-            const input = document.getElementById('autocomplete-doc-number');
-            const list = document.getElementById('autocomplete-list');
-            
-            if (!input || !list) return;
-            
-            input.addEventListener('input', function() {
-                const value = this.value.toLowerCase();
-                list.innerHTML = '';
-                
-                if (value.length < 1) {
-                    list.style.display = 'none';
-                    return;
-                }
-                
-                const matches = allProjectData.filter(project => 
-                    project.No_Urut_Dokumen && project.No_Urut_Dokumen.toLowerCase().includes(value)
-                ).slice(0, 10);
-                
-                if (matches.length === 0) {
-                    list.style.display = 'none';
-                    return;
-                }
-                
-                matches.forEach(project => {
-                    const item = document.createElement('div');
-                    item.className = 'autocomplete-item';
-                    item.textContent = project.No_Urut_Dokumen;
-                    item.addEventListener('click', function() {
-                        input.value = project.No_Urut_Dokumen;
-                        list.style.display = 'none';
-                    });
-                    list.appendChild(item);
-                });
-                
-                list.style.display = 'block';
-            });
-            
-            // Hide list when clicking outside
-            document.addEventListener('click', function(e) {
-                if (e.target !== input) {
-                    list.style.display = 'none';
-                }
-            });
-        }
-
-        // --- Add Project from Autocomplete ---
-        async function addProjectFromAutocomplete() {
-            const docNumber = document.getElementById('autocomplete-doc-number').value;
-            
-            // Find the project in our data
-            const project = allProjectData.find(p => p.No_Urut_Dokumen === docNumber);
-            if (!project) {
-                showAlert('Nomor dokumen tidak ditemukan', 'error');
-                return;
-            }
-
-            // Show add project modal langsung
-            showAddProjectModal(docNumber, project);
-            document.getElementById('autocomplete-project-modal').style.display = 'none';
-            document.getElementById('autocomplete-doc-number').value = '';
         }
 
         // --- Improved Login Functionality ---
@@ -2042,10 +1963,6 @@
                     } else if (navItem.id === 'logout-btn') {
                         e.preventDefault();
                         logout();
-                    } else if (navItem.id === 'add-project-autocomplete-btn') {
-                        e.preventDefault();
-                        document.getElementById('autocomplete-project-modal').style.display = 'flex';
-                        setupAutocomplete();
                     }
                 }
             });
@@ -2101,6 +2018,13 @@
                     document.getElementById('data-in').classList.remove('readonly-field');
                     document.getElementById('no-urut-dokumen').classList.add('readonly-field');
                     document.getElementById('other-sales-container').style.display = 'none';
+                    
+                    // Reset type checkboxes
+                    const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]');
+                    typeCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                    });
+                    
                     currentEditingProjectId = null;
                     
                     // Set today's date as default for data-in
@@ -2109,21 +2033,6 @@
                     
                     // Show modal
                     document.getElementById('project-modal').style.display = 'flex';
-                });
-            }
-
-            // Submit add project from autocomplete
-            const submitAutocompleteBtn = document.getElementById('submit-autocomplete-project');
-            if (submitAutocompleteBtn) {
-                submitAutocompleteBtn.addEventListener('click', addProjectFromAutocomplete);
-            }
-
-            // Cancel autocomplete modal
-            const cancelAutocompleteBtn = document.getElementById('cancel-autocomplete-project');
-            if (cancelAutocompleteBtn) {
-                cancelAutocompleteBtn.addEventListener('click', function() {
-                    document.getElementById('autocomplete-project-modal').style.display = 'none';
-                    document.getElementById('autocomplete-doc-number').value = '';
                 });
             }
 
@@ -2146,11 +2055,23 @@
                     const otherSales = document.getElementById('other-sales').value;
                     const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
                     
+                    // Get selected types
+                    const selectedTypes = [];
+                    const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]:checked');
+                    typeCheckboxes.forEach(checkbox => {
+                        selectedTypes.push(checkbox.value);
+                    });
+                    
+                    if (selectedTypes.length === 0) {
+                        showAlert('Pilih minimal satu tipe', 'error');
+                        return;
+                    }
+                    
                     const projectData = {
                         salesClient: finalSalesClient,
                         projectName: document.getElementById('project-name').value,
                         dataIn: document.getElementById('data-in').value,
-                        type: document.getElementById('type').value,
+                        type: selectedTypes,
                         pic: document.getElementById('pic').value,
                         startDate: document.getElementById('start-date').value,
                         status: document.getElementById('status').value,
@@ -2289,11 +2210,6 @@
                 <a href="#" class="nav-item" data-target="project-list-section">
                     <div class="nav-icon"><i class="fas fa-project-diagram"></i></div>
                     <div class="nav-text">Project</div>
-                </a>
-                <!-- Menu Add Project di sidebar -->
-                <a href="#" class="nav-item" id="add-project-autocomplete-btn">
-                    <div class="nav-icon"><i class="fas fa-plus-circle"></i></div>
-                    <div class="nav-text">Add Project</div>
                 </a>
                 <a href="#" class="nav-item" id="logout-btn">
                     <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
@@ -2467,14 +2383,25 @@
                     <input type="text" id="no-urut-dokumen" class="filter-input readonly-field" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="type">Type</label>
-                    <select id="type" class="filter-input" required>
-                        <option value="">Pilih Type</option>
-                        <option value="Inquiry">Inquiry</option>
-                        <option value="DWG">DWG</option>
-                        <option value="Hydrolic">Hydrolic</option>
-                        <option value="Dokumen">Dokumen</option>
-                    </select>
+                    <label>Tipe *</label>
+                    <div class="multiple-select-container" id="type-multiple-container">
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="type-inquiry" value="Inquiry">
+                            <label for="type-inquiry">Inquiry</label>
+                        </div>
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="type-dwg" value="DWG">
+                            <label for="type-dwg">DWG</label>
+                        </div>
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="type-hydrolic" value="Hydrolic">
+                            <label for="type-hydrolic">Hydrolic</label>
+                        </div>
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="type-dokumen" value="Dokumen">
+                            <label for="type-dokumen">Dokumen</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="pic">PIC</label>
@@ -2541,25 +2468,6 @@
             <div class="delete-actions">
                 <button id="cancel-delete-btn" class="btn btn-outline">Batal</button>
                 <button id="confirm-delete-btn" class="btn btn-primary">Hapus</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Autocomplete Project Modal -->
-    <div id="autocomplete-project-modal" class="modal">
-        <div class="modal-content" style="max-width: 600px;">
-            <span class="modal-close-btn">&times;</span>
-            <h2 class="card-title" style="margin-bottom: 1.5rem;">Add Project dari Nomor Dokumen</h2>
-            <div class="form-group">
-                <label for="autocomplete-doc-number">Nomor Urut Dokumen</label>
-                <div class="autocomplete-container">
-                    <input type="text" id="autocomplete-doc-number" class="filter-input" placeholder="Ketik nomor dokumen...">
-                    <div id="autocomplete-list" class="autocomplete-list"></div>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-outline" id="cancel-autocomplete-project">Batal</button>
-                <button type="button" class="btn btn-primary" id="submit-autocomplete-project">Lanjutkan</button>
             </div>
         </div>
     </div>
