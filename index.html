@@ -1942,12 +1942,24 @@
                 let projectsListener = null;
                 let detailsListener = null;
 
+                // Store current counts
+                let currentProjects = [];
+                let currentDetails = [];
+
                 projectsListener = projectsCol.onSnapshot((snapshot) => {
-                    updateDashboardCounts(snapshot, null);
+                    currentProjects = [];
+                    snapshot.forEach(doc => {
+                        currentProjects.push(doc.data());
+                    });
+                    updateDashboardCounts(currentProjects, currentDetails);
                 });
 
                 detailsListener = projectDetailsCol.onSnapshot((snapshot) => {
-                    updateDashboardCounts(null, snapshot);
+                    currentDetails = [];
+                    snapshot.forEach(doc => {
+                        currentDetails.push(doc.data());
+                    });
+                    updateDashboardCounts(currentProjects, currentDetails);
                 });
 
                 window.dashboardUnsubscribe = () => {
@@ -1962,16 +1974,15 @@
         }
 
         // --- PERBAIKAN: Update dashboard counts from both collections ---
-        function updateDashboardCounts(projectsSnapshot, detailsSnapshot) {
+        function updateDashboardCounts(projects, details) {
             let inquiryCount = 0;
             let dwgCount = 0;
             let hydrolicCount = 0;
             let dokumenCount = 0;
 
             // Count from main projects
-            if (projectsSnapshot) {
-                projectsSnapshot.forEach(doc => {
-                    const project = doc.data();
+            if (projects && projects.length > 0) {
+                projects.forEach(project => {
                     const types = project.type || [];
 
                     if (Array.isArray(types)) {
@@ -1989,9 +2000,8 @@
             }
 
             // Count from project details
-            if (detailsSnapshot) {
-                detailsSnapshot.forEach(doc => {
-                    const detail = doc.data();
+            if (details && details.length > 0) {
+                details.forEach(detail => {
                     const types = detail.types || [];
 
                     if (Array.isArray(types)) {
