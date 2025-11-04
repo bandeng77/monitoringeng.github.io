@@ -854,73 +854,6 @@
             border-bottom: none;
         }
 
-        /* FITUR BARU: Multiple Select Styles */
-        .multiple-select-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .multiple-select-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background-color: var(--light);
-            border-radius: 0.375rem;
-            border: 1px solid var(--border);
-        }
-
-        .multiple-select-option input {
-            margin: 0;
-        }
-
-        /* FITUR BARU: Project Details Styles */
-        .project-details {
-            display: none;
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: var(--light);
-            border-radius: 0.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .project-details-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .project-details-title {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .project-details-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .project-detail-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .project-detail-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .project-detail-value {
-            font-weight: 500;
-            color: var(--dark);
-        }
-
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
@@ -984,10 +917,6 @@
                 flex-wrap: wrap;
                 justify-content: center;
             }
-
-            .project-details-content {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -1016,6 +945,7 @@
 
         // Firestore Collections references
         const projectsCol = db.collection('projects');
+        const projectDetailsCol = db.collection('projectDetails');
         const countersCol = db.collection('counters');
 
         // --- Custom Alert Function ---
@@ -1198,97 +1128,272 @@
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     const projectId = this.getAttribute('data-project-id');
-                    showProjectDetails(projectId);
+                    showProjectDetailsModal(projectId);
                 });
             });
         }
 
-        // --- Show Project Details ---
-        function showProjectDetails(projectId) {
-            // Hide all existing project details
-            document.querySelectorAll('.project-details').forEach(detail => {
-                detail.style.display = 'none';
-            });
+        // --- Show Project Details Modal ---
+        async function showProjectDetailsModal(projectId) {
+            try {
+                // Get project data
+                const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
+                if (!project) {
+                    showAlert('Project tidak ditemukan', 'error');
+                    return;
+                }
 
-            // Find the row for this project
-            const projectRow = document.querySelector(`tr[data-project-id="${projectId}"]`);
-            if (!projectRow) return;
+                // Get additional details from projectDetails collection
+                let details = [];
+                try {
+                    const detailsSnapshot = await projectDetailsCol
+                        .where('projectId', '==', projectId)
+                        .get();
+                    
+                    if (!detailsSnapshot.empty) {
+                        detailsSnapshot.forEach(doc => {
+                            details.push(doc.data());
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error loading project details:", error);
+                }
 
-            // Check if details already exist
-            let detailsRow = projectRow.nextElementSibling;
-            if (detailsRow && detailsRow.classList.contains('project-details-row')) {
-                // Toggle display
-                const detailsDiv = detailsRow.querySelector('.project-details');
-                detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none';
-                return;
-            }
-
-            // Get project data
-            const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
-            if (!project) return;
-
-            // Create details row
-            const detailsRowHtml = `
-                <tr class="project-details-row">
-                    <td colspan="11">
-                        <div class="project-details" style="display: block;">
-                            <div class="project-details-header">
-                                <div class="project-details-title">Detail Project</div>
-                                <button class="action-btn close-details-btn" title="Tutup Detail">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="project-details-content">
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Nomor Urut Dokumen</div>
-                                    <div class="project-detail-value">${project.No_Urut_Dokumen || '-'}</div>
+                // Create modal content
+                const modalContent = `
+                    <div class="modal-content">
+                        <span class="modal-close-btn">&times;</span>
+                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Detail Project</h2>
+                        
+                        <div class="project-main-details" style="margin-bottom: 2rem;">
+                            <h3 style="margin-bottom: 1rem; color: var(--dark);">Informasi Utama</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                                <div>
+                                    <strong>Nomor Urut Dokumen:</strong><br>
+                                    ${project.No_Urut_Dokumen || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Sales/Client</div>
-                                    <div class="project-detail-value">${project.Sales_Client || '-'}</div>
+                                <div>
+                                    <strong>Sales/Client:</strong><br>
+                                    ${project.Sales_Client || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Nama Project</div>
-                                    <div class="project-detail-value">${project.Project_Name || '-'}</div>
+                                <div>
+                                    <strong>Nama Project:</strong><br>
+                                    ${project.Project_Name || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Tanggal Masuk</div>
-                                    <div class="project-detail-value">${project.Data_In || '-'}</div>
+                                <div>
+                                    <strong>Tanggal Masuk:</strong><br>
+                                    ${project.Data_In || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Tipe</div>
-                                    <div class="project-detail-value">${project.Type || '-'}</div>
+                                <div>
+                                    <strong>Tipe:</strong><br>
+                                    ${project.Type || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">PIC</div>
-                                    <div class="project-detail-value">${project.PIC || '-'}</div>
+                                <div>
+                                    <strong>PIC:</strong><br>
+                                    ${project.PIC || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Tanggal Mulai</div>
-                                    <div class="project-detail-value">${project.Start_Date || '-'}</div>
+                                <div>
+                                    <strong>Tanggal Mulai:</strong><br>
+                                    ${project.Start_Date || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Status</div>
-                                    <div class="project-detail-value">${project.Status || '-'}</div>
+                                <div>
+                                    <strong>Status:</strong><br>
+                                    ${project.Status || '-'}
                                 </div>
-                                <div class="project-detail-item">
-                                    <div class="project-detail-label">Keterangan</div>
-                                    <div class="project-detail-value">${project.Remarks || '-'}</div>
+                                <div style="grid-column: 1 / -1;">
+                                    <strong>Keterangan:</strong><br>
+                                    ${project.Remarks || '-'}
                                 </div>
                             </div>
                         </div>
-                    </td>
-                </tr>
+
+                        <div class="project-additional-details">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="color: var(--dark);">Detail Tambahan</h3>
+                                <button class="btn btn-primary" id="add-detail-btn">
+                                    <i class="fas fa-plus btn-icon"></i> Tambah Detail
+                                </button>
+                            </div>
+                            
+                            ${details.length > 0 ? 
+                                `<div style="max-height: 300px; overflow-y: auto;">
+                                    ${details.map((detail, index) => `
+                                        <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
+                                            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 0.5rem;">
+                                                <strong>Detail ${index + 1}</strong>
+                                                <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Detail">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem;">
+                                                <div><strong>Deskripsi:</strong><br>${detail.description || '-'}</div>
+                                                <div><strong>Tanggal:</strong><br>${detail.date || '-'}</div>
+                                                <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div style="grid-column: 1 / -1;"><strong>Catatan:</strong><br>${detail.notes || '-'}</div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>` : 
+                                '<p style="text-align: center; color: var(--secondary); padding: 2rem;">Belum ada detail tambahan</p>'
+                            }
+                        </div>
+                    </div>
+                `;
+
+                // Create and show modal
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'flex';
+                modal.innerHTML = modalContent;
+                document.body.appendChild(modal);
+
+                // Add event listeners
+                modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+                    modal.remove();
+                });
+
+                modal.querySelector('#add-detail-btn').addEventListener('click', function() {
+                    showAddDetailModal(projectId);
+                });
+
+                // Add delete detail event listeners
+                modal.querySelectorAll('.delete-detail-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const detailId = this.getAttribute('data-detail-id');
+                        deleteProjectDetail(detailId, projectId);
+                    });
+                });
+
+                // Close modal when clicking outside
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error showing project details:", error);
+                showAlert('Gagal memuat detail project', 'error');
+            }
+        }
+
+        // --- Show Add Detail Modal ---
+        function showAddDetailModal(projectId) {
+            const modalContent = `
+                <div class="modal-content">
+                    <span class="modal-close-btn">&times;</span>
+                    <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Detail Project</h2>
+                    <form id="add-detail-form">
+                        <div class="form-group">
+                            <label for="detail-description">Deskripsi</label>
+                            <input type="text" id="detail-description" class="filter-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="detail-date">Tanggal</label>
+                            <input type="date" id="detail-date" class="filter-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="detail-status">Status</label>
+                            <select id="detail-status" class="filter-input" required>
+                                <option value="">Pilih Status</option>
+                                <option value="On Progress">On Progress</option>
+                                <option value="Done">Done</option>
+                                <option value="Hold">Hold</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="detail-notes">Catatan</label>
+                            <textarea id="detail-notes" class="filter-input" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" id="cancel-add-detail">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Detail</button>
+                        </div>
+                    </form>
+                </div>
             `;
 
-            // Insert the details row after the project row
-            projectRow.insertAdjacentHTML('afterend', detailsRowHtml);
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = modalContent;
+            document.body.appendChild(modal);
 
-            // Attach event listener to close button
-            const closeBtn = projectRow.nextElementSibling.querySelector('.close-details-btn');
-            closeBtn.addEventListener('click', function() {
-                projectRow.nextElementSibling.remove();
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('detail-date').value = today;
+
+            // Add event listeners
+            modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+                modal.remove();
             });
+
+            modal.querySelector('#cancel-add-detail').addEventListener('click', function() {
+                modal.remove();
+            });
+
+            modal.querySelector('#add-detail-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await addProjectDetail(projectId);
+                modal.remove();
+            });
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // --- Add Project Detail ---
+        async function addProjectDetail(projectId) {
+            const description = document.getElementById('detail-description').value;
+            const date = document.getElementById('detail-date').value;
+            const status = document.getElementById('detail-status').value;
+            const notes = document.getElementById('detail-notes').value;
+
+            try {
+                const detailData = {
+                    projectId: projectId,
+                    description: description,
+                    date: date,
+                    status: status,
+                    notes: notes,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await projectDetailsCol.add(detailData);
+                showAlert('Detail project berhasil ditambahkan', 'success');
+                
+                // Refresh the details modal
+                document.querySelector('.modal').remove();
+                showProjectDetailsModal(projectId);
+                
+            } catch (error) {
+                console.error("Error adding project detail:", error);
+                showAlert('Gagal menambahkan detail project', 'error');
+            }
+        }
+
+        // --- Delete Project Detail ---
+        async function deleteProjectDetail(detailId, projectId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus detail ini?')) {
+                return;
+            }
+
+            try {
+                await projectDetailsCol.doc(detailId).delete();
+                showAlert('Detail project berhasil dihapus', 'success');
+                
+                // Refresh the details modal
+                document.querySelector('.modal').remove();
+                showProjectDetailsModal(projectId);
+                
+            } catch (error) {
+                console.error("Error deleting project detail:", error);
+                showAlert('Gagal menghapus detail project', 'error');
+            }
         }
 
         // --- Render Pagination Controls ---
@@ -1646,14 +1751,14 @@
                 const value = this.value.toLowerCase();
                 list.innerHTML = '';
                 
-                if (value.length < 2) {
+                if (value.length < 1) {
                     list.style.display = 'none';
                     return;
                 }
                 
                 const matches = allProjectData.filter(project => 
                     project.No_Urut_Dokumen && project.No_Urut_Dokumen.toLowerCase().includes(value)
-                ).slice(0, 5);
+                ).slice(0, 10);
                 
                 if (matches.length === 0) {
                     list.style.display = 'none';
@@ -1693,16 +1798,18 @@
                 return;
             }
 
-            // Populate the form with the project data
-            document.getElementById('sales-client').value = project.Sales_Client || '';
-            document.getElementById('project-name').value = project.Project_Name || '';
-            document.getElementById('data-in').value = project.Data_In || '';
-            document.getElementById('no-urut-dokumen').value = project.No_Urut_Dokumen || '';
-            document.getElementById('type').value = project.Type || '';
-            document.getElementById('pic').value = project.PIC || '';
-            document.getElementById('start-date').value = project.Start_Date || '';
-            document.getElementById('status').value = project.Status || '';
-            document.getElementById('remarks').value = project.Remarks || '';
+            // Reset form untuk mode tambah baru
+            document.getElementById('project-form').reset();
+            document.getElementById('data-in').disabled = false;
+            document.getElementById('no-urut-dokumen').disabled = true;
+            document.getElementById('data-in').classList.remove('readonly-field');
+            document.getElementById('no-urut-dokumen').classList.add('readonly-field');
+            document.getElementById('other-sales-container').style.display = 'none';
+            currentEditingProjectId = null;
+
+            // Set today's date as default for data-in
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('data-in').value = today;
 
             // Show the add project modal
             document.getElementById('project-modal').style.display = 'flex';
@@ -2080,6 +2187,11 @@
                     <div class="nav-icon"><i class="fas fa-project-diagram"></i></div>
                     <div class="nav-text">Project</div>
                 </a>
+                <!-- Menu Add Project di sidebar -->
+                <a href="#" class="nav-item" id="add-project-autocomplete-btn">
+                    <div class="nav-icon"><i class="fas fa-plus-circle"></i></div>
+                    <div class="nav-text">Add Project</div>
+                </a>
                 <a href="#" class="nav-item" id="logout-btn">
                     <div class="nav-icon"><i class="fas fa-sign-out-alt"></i></div>
                     <div class="nav-text">Logout</div>
@@ -2126,9 +2238,6 @@
                     <div class="header-actions">
                         <button class="btn btn-primary" id="add-project-btn">
                             <i class="fas fa-plus btn-icon"></i> Tambah Project
-                        </button>
-                        <button class="btn btn-outline" id="add-project-autocomplete-btn">
-                            <i class="fas fa-plus-circle btn-icon"></i> Add Project
                         </button>
                     </div>
                 </div>
@@ -2212,25 +2321,6 @@
                             <div class="page-controls">
                                 <!-- Pagination buttons will be rendered here by JavaScript -->
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Add Project Section -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Add Project</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="autocomplete-container">
-                            <input type="text" id="autocomplete-doc-number" class="filter-input" 
-                                   placeholder="Ketik nomor urut dokumen untuk menambah project...">
-                            <div id="autocomplete-list" class="autocomplete-list"></div>
-                        </div>
-                        <div class="form-actions" style="margin-top: 1rem;">
-                            <button type="button" class="btn btn-primary" id="submit-autocomplete-project">
-                                <i class="fas fa-plus btn-icon"></i> Tambah Project Baru
-                            </button>
                         </div>
                     </div>
                 </div>
