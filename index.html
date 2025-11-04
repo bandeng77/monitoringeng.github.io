@@ -1024,7 +1024,7 @@
                 const dateCode = formatDateToDDMM(dataIn);
                 const typeCode = getTypeCode(types);
                 
-                return `ENG-${formattedNumber}-${dateCode}-${typeCode}-${projectName}`;
+                return `ENG-${formattedNumber}-${dateCode}-${projectName}`;
             } catch (error) {
                 console.error("Error generating project number:", error);
                 throw new Error("Gagal menghasilkan nomor project");
