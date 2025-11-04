@@ -646,8 +646,8 @@
             padding: 2rem;
             border-radius: 0.75rem;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 700px;
+            width: 95%;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -852,6 +852,28 @@
 
         .autocomplete-item:last-child {
             border-bottom: none;
+        }
+
+        /* FITUR BARU: Multiple Select Styles */
+        .multiple-select-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .multiple-select-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background-color: var(--light);
+            border-radius: 0.375rem;
+            border: 1px solid var(--border);
+        }
+
+        .multiple-select-option input {
+            margin: 0;
         }
 
         /* Responsive Styles */
@@ -1148,11 +1170,12 @@
                 try {
                     const detailsSnapshot = await projectDetailsCol
                         .where('projectId', '==', projectId)
+                        .orderBy('createdAt', 'desc')
                         .get();
                     
                     if (!detailsSnapshot.empty) {
                         detailsSnapshot.forEach(doc => {
-                            details.push(doc.data());
+                            details.push({ id: doc.id, ...doc.data() });
                         });
                     }
                 } catch (error) {
@@ -1161,9 +1184,9 @@
 
                 // Create modal content
                 const modalContent = `
-                    <div class="modal-content">
+                    <div class="modal-content" style="max-width: 900px;">
                         <span class="modal-close-btn">&times;</span>
-                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Detail Project</h2>
+                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Detail Project - ${project.No_Urut_Dokumen}</h2>
                         
                         <div class="project-main-details" style="margin-bottom: 2rem;">
                             <h3 style="margin-bottom: 1rem; color: var(--dark);">Informasi Utama</h3>
@@ -1216,10 +1239,10 @@
                             </div>
                             
                             ${details.length > 0 ? 
-                                `<div style="max-height: 300px; overflow-y: auto;">
+                                `<div style="max-height: 400px; overflow-y: auto;">
                                     ${details.map((detail, index) => `
                                         <div class="card" style="margin-bottom: 1rem; padding: 1rem;">
-                                            <div style="display: flex; justify-content: between; align-items: start; margin-bottom: 0.5rem;">
+                                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
                                                 <strong>Detail ${index + 1}</strong>
                                                 <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Detail">
                                                     <i class="fas fa-trash"></i>
@@ -1230,6 +1253,7 @@
                                                 <div><strong>Tanggal:</strong><br>${detail.date || '-'}</div>
                                                 <div><strong>Status:</strong><br>${detail.status || '-'}</div>
                                                 <div style="grid-column: 1 / -1;"><strong>Catatan:</strong><br>${detail.notes || '-'}</div>
+                                                <div style="grid-column: 1 / -1;"><strong>Tipe:</strong><br>${detail.types ? detail.types.join(', ') : '-'}</div>
                                             </div>
                                         </div>
                                     `).join('')}
@@ -1280,26 +1304,47 @@
         // --- Show Add Detail Modal ---
         function showAddDetailModal(projectId) {
             const modalContent = `
-                <div class="modal-content">
+                <div class="modal-content" style="max-width: 700px;">
                     <span class="modal-close-btn">&times;</span>
                     <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Detail Project</h2>
                     <form id="add-detail-form">
                         <div class="form-group">
-                            <label for="detail-description">Deskripsi</label>
+                            <label for="detail-description">Deskripsi *</label>
                             <input type="text" id="detail-description" class="filter-input" required>
                         </div>
                         <div class="form-group">
-                            <label for="detail-date">Tanggal</label>
+                            <label for="detail-date">Tanggal *</label>
                             <input type="date" id="detail-date" class="filter-input" required>
                         </div>
                         <div class="form-group">
-                            <label for="detail-status">Status</label>
+                            <label for="detail-status">Status *</label>
                             <select id="detail-status" class="filter-input" required>
                                 <option value="">Pilih Status</option>
                                 <option value="On Progress">On Progress</option>
                                 <option value="Done">Done</option>
                                 <option value="Hold">Hold</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipe *</label>
+                            <div class="multiple-select-container">
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="type-inquiry" value="Inquiry">
+                                    <label for="type-inquiry">Inquiry</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="type-dwg" value="DWG">
+                                    <label for="type-dwg">DWG</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="type-hydrolic" value="Hydrolic">
+                                    <label for="type-hydrolic">Hydrolic</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="type-dokumen" value="Dokumen">
+                                    <label for="type-dokumen">Dokumen</label>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="detail-notes">Catatan</label>
@@ -1353,12 +1398,25 @@
             const status = document.getElementById('detail-status').value;
             const notes = document.getElementById('detail-notes').value;
 
+            // Get selected types
+            const selectedTypes = [];
+            if (document.getElementById('type-inquiry').checked) selectedTypes.push('Inquiry');
+            if (document.getElementById('type-dwg').checked) selectedTypes.push('DWG');
+            if (document.getElementById('type-hydrolic').checked) selectedTypes.push('Hydrolic');
+            if (document.getElementById('type-dokumen').checked) selectedTypes.push('Dokumen');
+
+            if (selectedTypes.length === 0) {
+                showAlert('Pilih minimal satu tipe', 'error');
+                return;
+            }
+
             try {
                 const detailData = {
                     projectId: projectId,
                     description: description,
                     date: date,
                     status: status,
+                    types: selectedTypes,
                     notes: notes,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
@@ -1798,21 +1856,8 @@
                 return;
             }
 
-            // Reset form untuk mode tambah baru
-            document.getElementById('project-form').reset();
-            document.getElementById('data-in').disabled = false;
-            document.getElementById('no-urut-dokumen').disabled = true;
-            document.getElementById('data-in').classList.remove('readonly-field');
-            document.getElementById('no-urut-dokumen').classList.add('readonly-field');
-            document.getElementById('other-sales-container').style.display = 'none';
-            currentEditingProjectId = null;
-
-            // Set today's date as default for data-in
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('data-in').value = today;
-
-            // Show the add project modal
-            document.getElementById('project-modal').style.display = 'flex';
+            // Show add detail modal langsung tanpa membuat project baru
+            showAddDetailModal(docNumber);
             document.getElementById('autocomplete-project-modal').style.display = 'none';
             document.getElementById('autocomplete-doc-number').value = '';
         }
@@ -1934,6 +1979,10 @@
                     } else if (navItem.id === 'logout-btn') {
                         e.preventDefault();
                         logout();
+                    } else if (navItem.id === 'add-project-autocomplete-btn') {
+                        e.preventDefault();
+                        document.getElementById('autocomplete-project-modal').style.display = 'flex';
+                        setupAutocomplete();
                     }
                 }
             });
@@ -1997,15 +2046,6 @@
                     
                     // Show modal
                     document.getElementById('project-modal').style.display = 'flex';
-                });
-            }
-
-            // Add project from autocomplete button
-            const addProjectAutocompleteBtn = document.getElementById('add-project-autocomplete-btn');
-            if (addProjectAutocompleteBtn) {
-                addProjectAutocompleteBtn.addEventListener('click', function() {
-                    document.getElementById('autocomplete-project-modal').style.display = 'flex';
-                    setupAutocomplete();
                 });
             }
 
@@ -2332,7 +2372,7 @@
 
     <!-- Modal Tambah/Edit Project -->
     <div id="project-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <span class="modal-close-btn">&times;</span>
             <h2 class="card-title" style="margin-bottom: 1.5rem;" id="project-modal-title">Tambah Project Baru</h2>
             <form id="project-form">
@@ -2444,7 +2484,7 @@
 
     <!-- Autocomplete Project Modal -->
     <div id="autocomplete-project-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 600px;">
             <span class="modal-close-btn">&times;</span>
             <h2 class="card-title" style="margin-bottom: 1.5rem;">Add Project dari Nomor Dokumen</h2>
             <div class="form-group">
