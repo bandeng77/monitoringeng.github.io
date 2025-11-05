@@ -810,6 +810,69 @@
         .summary-item:nth-child(3) .summary-value { color: var(--warning); }
         .summary-item:nth-child(4) .summary-value { color: var(--primary); }
 
+        /* Status Summary Grid */
+        .status-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .status-summary-item {
+            background-color: var(--light);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .status-summary-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-summary-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-summary-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+
+        /* Specific colors for status summary items */
+        .status-on-progress-summary {
+            border-left-color: var(--warning);
+        }
+        .status-on-progress-summary .status-summary-value {
+            color: var(--warning);
+        }
+
+        .status-done-summary {
+            border-left-color: var(--success);
+        }
+        .status-done-summary .status-summary-value {
+            color: var(--success);
+        }
+
+        .status-hold-summary {
+            border-left-color: var(--danger);
+        }
+        .status-hold-summary .status-summary-value {
+            color: var(--danger);
+        }
+
+        .status-total-summary {
+            border-left-color: var(--primary);
+        }
+        .status-total-summary .status-summary-value {
+            color: var(--primary);
+        }
+
         /* Delete Confirmation Modal */
         .delete-modal {
             display: none;
@@ -1979,12 +2042,19 @@
             let dwgCount = 0;
             let hydrolicCount = 0;
             let dokumenCount = 0;
+            
+            let onProgressCount = 0;
+            let doneCount = 0;
+            let holdCount = 0;
+            let totalProjects = 0;
 
             // Count from main projects
             if (projects && projects.length > 0) {
                 projects.forEach(project => {
                     const types = project.type || [];
+                    const status = project.status || '';
 
+                    // Count by type
                     if (Array.isArray(types)) {
                         if (types.includes('Inquiry')) inquiryCount++;
                         if (types.includes('DWG')) dwgCount++;
@@ -1996,28 +2066,48 @@
                         else if (types === 'Hydrolic') hydrolicCount++;
                         else if (types === 'Dokumen') dokumenCount++;
                     }
+
+                    // Count by status
+                    if (status === 'On Progress') onProgressCount++;
+                    else if (status === 'Done') doneCount++;
+                    else if (status === 'Hold') holdCount++;
                 });
+                totalProjects += projects.length;
             }
 
             // Count from project details
             if (details && details.length > 0) {
                 details.forEach(detail => {
                     const types = detail.types || [];
+                    const status = detail.status || '';
 
+                    // Count by type
                     if (Array.isArray(types)) {
                         if (types.includes('Inquiry')) inquiryCount++;
                         if (types.includes('DWG')) dwgCount++;
                         if (types.includes('Hydrolic')) hydrolicCount++;
                         if (types.includes('Dokumen')) dokumenCount++;
                     }
+
+                    // Count by status
+                    if (status === 'On Progress') onProgressCount++;
+                    else if (status === 'Done') doneCount++;
+                    else if (status === 'Hold') holdCount++;
                 });
+                totalProjects += details.length;
             }
 
-            // Update the dashboard summary
+            // Update the dashboard summary for types
             document.getElementById('inquiry-count').textContent = inquiryCount;
             document.getElementById('dwg-count').textContent = dwgCount;
             document.getElementById('hydrolic-count').textContent = hydrolicCount;
             document.getElementById('dokumen-count').textContent = dokumenCount;
+
+            // Update the dashboard summary for status
+            document.getElementById('on-progress-count').textContent = onProgressCount;
+            document.getElementById('done-count').textContent = doneCount;
+            document.getElementById('hold-count').textContent = holdCount;
+            document.getElementById('total-projects-count').textContent = totalProjects;
         }
 
         // --- Add Project Function (untuk project utama) ---
@@ -2533,9 +2623,13 @@
                 <div class="header">
                     <h1 class="page-title">Dashboard</h1>
                 </div>
+                
+                <!-- Ringkasan Project Berdasarkan Type -->
                 <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Ringkasan Project Berdasarkan Type</h2>
+                    </div>
                     <div class="card-body">
-                        <h3>Ringkasan Project Berdasarkan Type</h3>
                         <div class="dashboard-summary-grid">
                             <div class="summary-item">
                                 <div class="summary-value" id="inquiry-count">0</div>
@@ -2552,6 +2646,33 @@
                             <div class="summary-item">
                                 <div class="summary-value" id="dokumen-count">0</div>
                                 <div class="summary-label">Dokumen</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ringkasan Project Berdasarkan Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Ringkasan Project Berdasarkan Status</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="status-summary-grid">
+                            <div class="status-summary-item status-on-progress-summary">
+                                <div class="status-summary-value" id="on-progress-count">0</div>
+                                <div class="status-summary-label">On Progress</div>
+                            </div>
+                            <div class="status-summary-item status-done-summary">
+                                <div class="status-summary-value" id="done-count">0</div>
+                                <div class="status-summary-label">Done</div>
+                            </div>
+                            <div class="status-summary-item status-hold-summary">
+                                <div class="status-summary-value" id="hold-count">0</div>
+                                <div class="status-summary-label">Hold</div>
+                            </div>
+                            <div class="status-summary-item status-total-summary">
+                                <div class="status-summary-value" id="total-projects-count">0</div>
+                                <div class="status-summary-label">Total Projects</div>
                             </div>
                         </div>
                     </div>
