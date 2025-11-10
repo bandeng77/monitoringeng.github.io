@@ -500,7 +500,7 @@
             border-bottom: 1px solid var(--border);
             word-wrap: break-word;
             height: 60px;
-            font-size: 14px;
+            font-size: 14px
         }
 
         th {
@@ -559,6 +559,7 @@
 
         /* PERBAIKAN: Tombol Edit dan Hapus yang Sejajar dengan vertical align */
         .action-cell {
+            display: flex;
             gap: 0.5rem;
             white-space: nowrap;
             justify-content: center;
@@ -567,6 +568,7 @@
         }
 
         .status-cell {
+            display: flex;
             justify-content: center;
             align-items: center;
             min-height: 60px;
@@ -1077,7 +1079,7 @@
         // --- Get type code ---
         function getTypeCode(types) {
             const typeMap = {
-                'Inquiry': 'INQ',
+                'Quotation': 'QTN', // PERUBAHAN: Inquiry menjadi Quotation, INQ menjadi QTN
                 'DWG': 'DWG',
                 'Hydrolic': 'HYD',
                 'Dokumen': 'DOK'
@@ -1445,8 +1447,8 @@
                                 <label>Tipe *</label>
                                 <div class="multiple-select-container">
                                     <div class="multiple-select-option">
-                                        <input type="checkbox" id="edit-type-inquiry" value="Inquiry" ${detail.types && detail.types.includes('Inquiry') ? 'checked' : ''}>
-                                        <label for="edit-type-inquiry">Inquiry</label>
+                                        <input type="checkbox" id="edit-type-quotation" value="Quotation" ${detail.types && detail.types.includes('Quotation') ? 'checked' : ''}>
+                                        <label for="edit-type-quotation">Quotation</label>
                                     </div>
                                     <div class="multiple-select-option">
                                         <input type="checkbox" id="edit-type-dwg" value="DWG" ${detail.types && detail.types.includes('DWG') ? 'checked' : ''}>
@@ -1466,12 +1468,12 @@
                                 <label for="edit-pic">PIC</label>
                                 <select id="edit-pic" class="filter-input" required>
                                     <option value="">Pilih PIC</option>
-                                    <option value="Wahyu" ${detail.pic === 'Wahyu' ? 'selected' : ''}>Wahyu</option>
-                                    <option value="Dhona" ${detail.pic === 'Dhona' ? 'selected' : ''}>Dhona</option>
-                                    <option value="Arifah" ${detail.pic === 'Arifah' ? 'selected' : ''}>Arifah</option>
-                                    <option value="Kartika" ${detail.pic === 'Kartika' ? 'selected' : ''}>Kartika</option>
-                                    <option value="Ardi" ${detail.pic === 'Ardi' ? 'selected' : ''}>Ardi</option>
-                                    <option value="Brian" ${detail.pic === 'Brian' ? 'selected' : ''}>Brian</option>
+                                    <option value="Wahyu" ${detail.pic === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                                    <option value="Dhona" ${detail.pic === 'dhona' ? 'selected' : ''}>Dhona</option>
+                                    <option value="Arifah" ${detail.pic === 'arifah' ? 'selected' : ''}>Arifah</option>
+                                    <option value="Kartika" ${detail.pic === 'kartika' ? 'selected' : ''}>Kartika</option>
+                                    <option value="Ardi" ${detail.pic === 'ardi' ? 'selected' : ''}>Ardi</option>
+                                    <option value="Brian" ${detail.pic === 'brian' ? 'selected' : ''}>Brian</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -1556,7 +1558,7 @@
 
             // Get selected types
             const selectedTypes = [];
-            if (document.getElementById('edit-type-inquiry').checked) selectedTypes.push('Inquiry');
+            if (document.getElementById('edit-type-quotation').checked) selectedTypes.push('Quotation');
             if (document.getElementById('edit-type-dwg').checked) selectedTypes.push('DWG');
             if (document.getElementById('edit-type-hydrolic').checked) selectedTypes.push('Hydrolic');
             if (document.getElementById('edit-type-dokumen').checked) selectedTypes.push('Dokumen');
@@ -1629,8 +1631,8 @@
                             <label>Tipe *</label>
                             <div class="multiple-select-container">
                                 <div class="multiple-select-option">
-                                    <input type="checkbox" id="add-type-inquiry" value="Inquiry">
-                                    <label for="add-type-inquiry">Inquiry</label>
+                                    <input type="checkbox" id="add-type-quotation" value="Quotation">
+                                    <label for="add-type-quotation">Quotation</label>
                                 </div>
                                 <div class="multiple-select-option">
                                     <input type="checkbox" id="add-type-dwg" value="DWG">
@@ -1650,12 +1652,12 @@
                             <label for="add-pic">PIC</label>
                             <select id="add-pic" class="filter-input" required>
                                 <option value="">Pilih PIC</option>
-                                <option value="Wahyu" ${baseProject.PIC === 'Wahyu' ? 'selected' : ''}>Wahyu</option>
-                                <option value="Dhona" ${baseProject.PIC === 'Dhona' ? 'selected' : ''}>Dhona</option>
-                                <option value="Arifah" ${baseProject.PIC === 'Arifah' ? 'selected' : ''}>Arifah</option>
-                                <option value="Kartika" ${baseProject.PIC === 'Kartika' ? 'selected' : ''}>Kartika</option>
-                                <option value="Ardi" ${baseProject.PIC === 'Ardi' ? 'selected' : ''}>Ardi</option>
-                                <option value="Brian" ${baseProject.PIC === 'Brian' ? 'selected' : ''}>Brian</option>
+                                <option value="Wahyu" ${baseProject.PIC === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                                <option value="Dhona" ${baseProject.PIC === 'dhona' ? 'selected' : ''}>Dhona</option>
+                                <option value="Arifah" ${baseProject.PIC === 'arifah' ? 'selected' : ''}>Arifah</option>
+                                <option value="Kartika" ${baseProject.PIC === 'kartika' ? 'selected' : ''}>Kartika</option>
+                                <option value="Ardi" ${baseProject.PIC === 'ardi' ? 'selected' : ''}>Ardi</option>
+                                <option value="Brian" ${baseProject.PIC === 'brian' ? 'selected' : ''}>Brian</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1738,7 +1740,7 @@
 
             // Get selected types
             const selectedTypes = [];
-            if (document.getElementById('add-type-inquiry').checked) selectedTypes.push('Inquiry');
+            if (document.getElementById('add-type-quotation').checked) selectedTypes.push('Quotation');
             if (document.getElementById('add-type-dwg').checked) selectedTypes.push('DWG');
             if (document.getElementById('add-type-hydrolic').checked) selectedTypes.push('Hydrolic');
             if (document.getElementById('add-type-dokumen').checked) selectedTypes.push('Dokumen');
@@ -1999,7 +2001,9 @@
                     const pics = project.PIC.split(',').map(pic => pic.trim());
                     pics.forEach(pic => {
                         if (pic && pic !== '-') {
-                            allPICs.add(pic);
+                            // PERBAIKAN: Gunakan huruf besar di awal kata
+                            const formattedPIC = pic.charAt(0).toUpperCase() + pic.slice(1);
+                            allPICs.add(formattedPIC);
                         }
                     });
                 }
@@ -2073,7 +2077,7 @@
             renderProjectsTable(filteredProjectData);
         }
 
-        // --- PERBAIKAN: Load Dashboard Data (termasuk dari project details) ---
+        // --- PERBAIKAN: Load Dashboard Data (hanya dari project utama) ---
         async function loadDashboardData() {
             try {
                 // Unsubscribe previous listener if exists
@@ -2081,34 +2085,19 @@
                     window.dashboardUnsubscribe();
                 }
 
-                // Listen to both projects and projectDetails collections
-                let projectsListener = null;
-                let detailsListener = null;
+                // Listen only to projects collection (project utama)
+                window.dashboardUnsubscribe = projectsCol.onSnapshot((snapshot) => {
+                    if (snapshot.empty) {
+                        updateDashboardCounts([]);
+                        return;
+                    }
 
-                // Store current counts
-                let currentProjects = [];
-                let currentDetails = [];
-
-                projectsListener = projectsCol.onSnapshot((snapshot) => {
-                    currentProjects = [];
+                    const currentProjects = [];
                     snapshot.forEach(doc => {
                         currentProjects.push(doc.data());
                     });
-                    updateDashboardCounts(currentProjects, currentDetails);
+                    updateDashboardCounts(currentProjects);
                 });
-
-                detailsListener = projectDetailsCol.onSnapshot((snapshot) => {
-                    currentDetails = [];
-                    snapshot.forEach(doc => {
-                        currentDetails.push(doc.data());
-                    });
-                    updateDashboardCounts(currentProjects, currentDetails);
-                });
-
-                window.dashboardUnsubscribe = () => {
-                    if (projectsListener) projectsListener();
-                    if (detailsListener) detailsListener();
-                };
 
             } catch (error) {
                 console.error("Error setting up dashboard listener: ", error);
@@ -2116,9 +2105,9 @@
             }
         }
 
-        // --- PERBAIKAN: Update dashboard counts from both collections ---
-        function updateDashboardCounts(projects, details) {
-            let inquiryCount = 0;
+        // --- PERBAIKAN: Update dashboard counts hanya dari project utama ---
+        function updateDashboardCounts(projects) {
+            let quotationCount = 0; // PERUBAHAN: inquiryCount menjadi quotationCount
             let dwgCount = 0;
             let hydrolicCount = 0;
             let dokumenCount = 0;
@@ -2128,7 +2117,7 @@
             let holdCount = 0;
             let totalProjects = 0;
 
-            // Count from main projects
+            // Count from main projects only
             if (projects && projects.length > 0) {
                 projects.forEach(project => {
                     const types = project.type || [];
@@ -2136,12 +2125,12 @@
 
                     // Count by type
                     if (Array.isArray(types)) {
-                        if (types.includes('Inquiry')) inquiryCount++;
+                        if (types.includes('Quotation')) quotationCount++; // PERUBAHAN: Inquiry menjadi Quotation
                         if (types.includes('DWG')) dwgCount++;
                         if (types.includes('Hydrolic')) hydrolicCount++;
                         if (types.includes('Dokumen')) dokumenCount++;
                     } else {
-                        if (types === 'Inquiry') inquiryCount++;
+                        if (types === 'Quotation') quotationCount++; // PERUBAHAN: Inquiry menjadi Quotation
                         else if (types === 'DWG') dwgCount++;
                         else if (types === 'Hydrolic') hydrolicCount++;
                         else if (types === 'Dokumen') dokumenCount++;
@@ -2152,33 +2141,11 @@
                     else if (status === 'Done') doneCount++;
                     else if (status === 'Hold') holdCount++;
                 });
-                totalProjects += projects.length;
-            }
-
-            // Count from project details
-            if (details && details.length > 0) {
-                details.forEach(detail => {
-                    const types = detail.types || [];
-                    const status = detail.status || '';
-
-                    // Count by type
-                    if (Array.isArray(types)) {
-                        if (types.includes('Inquiry')) inquiryCount++;
-                        if (types.includes('DWG')) dwgCount++;
-                        if (types.includes('Hydrolic')) hydrolicCount++;
-                        if (types.includes('Dokumen')) dokumenCount++;
-                    }
-
-                    // Count by status
-                    if (status === 'On Progress') onProgressCount++;
-                    else if (status === 'Done') doneCount++;
-                    else if (status === 'Hold') holdCount++;
-                });
-                totalProjects += details.length;
+                totalProjects = projects.length; // PERUBAHAN: Hanya menghitung project utama
             }
 
             // Update the dashboard summary for types
-            document.getElementById('inquiry-count').textContent = inquiryCount;
+            document.getElementById('inquiry-count').textContent = quotationCount; // PERUBAHAN: inquiry-count tetap sama untuk kompatibilitas
             document.getElementById('dwg-count').textContent = dwgCount;
             document.getElementById('hydrolic-count').textContent = hydrolicCount;
             document.getElementById('dokumen-count').textContent = dokumenCount;
@@ -2714,7 +2681,7 @@
                         <div class="dashboard-summary-grid">
                             <div class="summary-item">
                                 <div class="summary-value" id="inquiry-count">0</div>
-                                <div class="summary-label">Inquiry</div>
+                                <div class="summary-label">Quotation</div> <!-- PERUBAHAN: Inquiry menjadi Quotation -->
                             </div>
                             <div class="summary-item">
                                 <div class="summary-value" id="dwg-count">0</div>
@@ -2791,7 +2758,7 @@
                                 <label class="filter-label">Type</label>
                                 <select class="filter-input" id="filter-type">
                                     <option value="">Semua Type</option>
-                                    <option value="Inquiry">Inquiry</option>
+                                    <option value="Quotation">Quotation</option> <!-- PERUBAHAN: Inquiry menjadi Quotation -->
                                     <option value="DWG">DWG</option>
                                     <option value="Hydrolic">Hydrolic</option>
                                     <option value="Dokumen">Dokumen</option>
@@ -2902,8 +2869,8 @@
                     <label>Tipe *</label>
                     <div class="multiple-select-container" id="type-multiple-container">
                         <div class="multiple-select-option">
-                            <input type="checkbox" id="type-inquiry" value="Inquiry">
-                            <label for="type-inquiry">Inquiry</label>
+                            <input type="checkbox" id="type-quotation" value="Quotation"> <!-- PERUBAHAN: type-inquiry menjadi type-quotation -->
+                            <label for="type-quotation">Quotation</label> <!-- PERUBAHAN: Inquiry menjadi Quotation -->
                         </div>
                         <div class="multiple-select-option">
                             <input type="checkbox" id="type-dwg" value="DWG">
@@ -2921,9 +2888,9 @@
                 </div>
                 <div class="form-group">
                     <label for="pic">PIC</label>
-                    <select id="pic" class="filter-input">
+                    <select id="pic" class="filter-input" required>
                         <option value="">Pilih PIC</option>
-                        <option value="Wahyu">Wahyu</option>
+                        <option value="Wahyu">Wahyu</option> <!-- PERUBAHAN: huruf besar di awal kata -->
                         <option value="Dhona">Dhona</option>
                         <option value="Arifah">Arifah</option>
                         <option value="Kartika">Kartika</option>
