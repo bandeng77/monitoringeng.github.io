@@ -490,16 +490,16 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto;
+            table-layout: fixed;
         }
 
         th, td {
             padding: 0.875rem 1rem;
             text-align: center;
-            vertical-align: middle; /* Tambahkan vertical align middle */
+            vertical-align: middle;
             border-bottom: 1px solid var(--border);
             word-wrap: break-word;
-            height: 60px; /* Set tinggi konsisten untuk semua row */
+            height: 60px;
         }
 
         th {
@@ -567,7 +567,6 @@
         }
 
         .status-cell {
-            display: flex;
             justify-content: center;
             align-items: center;
             min-height: 60px;
@@ -1116,7 +1115,7 @@
             }
         }
 
-        // --- Render Projects to Table (with pagination and filter) ---
+        // --- PERBAIKAN: Render Projects to Table dengan PIC yang digabungkan ---
         function renderProjectsTable(data) {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
@@ -1467,12 +1466,12 @@
                                 <label for="edit-pic">PIC</label>
                                 <select id="edit-pic" class="filter-input" required>
                                     <option value="">Pilih PIC</option>
-                                    <option value="wahyu" ${detail.pic === 'wahyu' ? 'selected' : ''}>Wahyu</option>
-                                    <option value="dhona" ${detail.pic === 'dhona' ? 'selected' : ''}>Dhona</option>
-                                    <option value="arifah" ${detail.pic === 'arifah' ? 'selected' : ''}>Arifah</option>
-                                    <option value="kartika" ${detail.pic === 'kartika' ? 'selected' : ''}>Kartika</option>
-                                    <option value="ardi" ${detail.pic === 'ardi' ? 'selected' : ''}>Ardi</option>
-                                    <option value="brian" ${detail.pic === 'brian' ? 'selected' : ''}>Brian</option>
+                                    <option value="wahyu" ${detail.pic === 'Wahyu' ? 'selected' : ''}>Wahyu</option>
+                                    <option value="dhona" ${detail.pic === 'Dhona' ? 'selected' : ''}>Dhona</option>
+                                    <option value="arifah" ${detail.pic === 'Arifah' ? 'selected' : ''}>Arifah</option>
+                                    <option value="kartika" ${detail.pic === 'Kartika' ? 'selected' : ''}>Kartika</option>
+                                    <option value="ardi" ${detail.pic === 'Ardi' ? 'selected' : ''}>Ardi</option>
+                                    <option value="brian" ${detail.pic === 'Brian' ? 'selected' : ''}>Brian</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -1891,7 +1890,7 @@
             pageControls.appendChild(nextBtn);
         }
 
-        // --- PERBAIKAN: Load Projects to Table (Initial Load and Refresh) ---
+        // --- PERBAIKAN: Load Projects to Table dengan PIC yang digabungkan ---
         async function loadProjectsToTable() {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
@@ -1932,7 +1931,7 @@
                     snapshot.forEach(doc => {
                         const project = doc.data();
                         
-                        // PERBAIKAN: Combine PIC from main project and project details
+                        // PERBAIKAN: PIC project utama selalu menjadi yang pertama
                         let combinedPIC = project.pic || '';
                         
                         // Find all project details with the same projectId
@@ -1940,7 +1939,7 @@
                             detail.projectId === project.noUrutDokumen
                         );
                         
-                        // Add unique PICs from project details
+                        // PERBAIKAN: PIC dari project tambahan ditambahkan setelah PIC utama
                         if (relatedDetails.length > 0) {
                             const detailPICs = relatedDetails.map(detail => detail.pic).filter(pic => pic && pic !== project.pic);
                             if (detailPICs.length > 0) {
@@ -1965,6 +1964,9 @@
                     allProjectData = currentAllProjectData;
                     filteredProjectData = [...allProjectData];
                     renderProjectsTable(filteredProjectData);
+                    
+                    // PERBAIKAN: Update dropdown PIC filter
+                    updatePICFilterDropdown(allProjectData);
                 }, (error) => {
                     console.error("Error loading projects: ", error);
                     projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
@@ -1977,11 +1979,51 @@
             }
         }
 
-        // --- PERBAIKAN: Apply Filters Function (dengan multiple filter) ---
+        // --- PERBAIKAN: Update PIC Filter Dropdown ---
+        function updatePICFilterDropdown(projects) {
+            const picFilter = document.getElementById('filter-pic');
+            if (!picFilter) return;
+            
+            // Simpan nilai yang dipilih sebelumnya
+            const currentValue = picFilter.value;
+            
+            // Clear existing options except the first one
+            picFilter.innerHTML = '<option value="">Semua PIC</option>';
+            
+            // Collect all unique PICs from projects
+            const allPICs = new Set();
+            
+            projects.forEach(project => {
+                if (project.PIC) {
+                    // Split combined PICs and add each one
+                    const pics = project.PIC.split(',').map(pic => pic.trim());
+                    pics.forEach(pic => {
+                        if (pic && pic !== '-') {
+                            allPICs.add(pic);
+                        }
+                    });
+                }
+            });
+            
+            // Add PIC options to dropdown
+            Array.from(allPICs).sort().forEach(pic => {
+                const option = document.createElement('option');
+                option.value = pic;
+                option.textContent = pic;
+                picFilter.appendChild(option);
+            });
+            
+            // Restore previous selection if it still exists
+            if (currentValue && Array.from(allPICs).includes(currentValue)) {
+                picFilter.value = currentValue;
+            }
+        }
+
+        // --- PERBAIKAN: Apply Filters Function dengan multiple filter yang benar ---
         function applyFilters() {
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
-            const picFilter = document.getElementById('filter-pic').value; // PERBAIKAN: Tambah filter PIC
+            const picFilter = document.getElementById('filter-pic').value;
             const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
@@ -1997,9 +2039,12 @@
                     matches = false;
                 }
 
-                // PERBAIKAN: PIC filter
-                if (picFilter && picFilter !== '' && !project.PIC.toLowerCase().includes(picFilter.toLowerCase())) {
-                    matches = false;
+                // PERBAIKAN: PIC filter - cek apakah PIC mengandung nilai yang dicari
+                if (picFilter && picFilter !== '') {
+                    const projectPICs = project.PIC ? project.PIC.toLowerCase().split(',').map(pic => pic.trim()) : [];
+                    if (!projectPICs.includes(picFilter.toLowerCase())) {
+                        matches = false;
+                    }
                 }
 
                 // Keyword search (across multiple fields)
@@ -2754,7 +2799,9 @@
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">PIC</label>
-                                <input type="text" class="filter-input" id="filter-pic" placeholder="Cari PIC...">
+                                <select class="filter-input" id="filter-pic">
+                                    <option value="">Semua PIC</option>
+                                </select>
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Cari</label>
@@ -2782,17 +2829,17 @@
                             <table id="project-table">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Sales/Client</th>
-                                        <th>Project Name</th>
-                                        <th>Data In</th>
-                                        <th>No Urut Dokumen</th>
-                                        <th>Type</th>
-                                        <th>PIC</th>
-                                        <th>Start Date</th>
-                                        <th>Status</th>
-                                        <th>Remarks</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 5%">No</th>
+                                        <th style="width: 10%">Sales/Client</th>
+                                        <th style="width: 12%">Project Name</th>
+                                        <th style="width: 8%">Data In</th>
+                                        <th style="width: 12%">No Urut Dokumen</th>
+                                        <th style="width: 10%">Type</th>
+                                        <th style="width: 10%">PIC</th>
+                                        <th style="width: 8%">Start Date</th>
+                                        <th style="width: 8%">Status</th>
+                                        <th style="width: 12%">Remarks</th>
+                                        <th style="width: 5%">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
