@@ -1077,7 +1077,7 @@
         // --- Get type code ---
         function getTypeCode(types) {
             const typeMap = {
-                'Quotation': 'QTN', // PERUBAHAN: Inquiry menjadi Quotation, INQ menjadi QTN
+                'Quotation': 'QTN',
                 'DWG': 'DWG',
                 'Hydrolic': 'HYD',
                 'Dokumen': 'DOK'
@@ -1967,6 +1967,8 @@
                     
                     // PERBAIKAN: Update dropdown PIC filter
                     updatePICFilterDropdown(allProjectData);
+                    // PERBAIKAN: Update dropdown Type filter
+                    updateTypeFilterDropdown(allProjectData);
                 }, (error) => {
                     console.error("Error loading projects: ", error);
                     projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
@@ -2021,6 +2023,51 @@
             }
         }
 
+        // --- PERBAIKAN: Update Type Filter Dropdown ---
+        function updateTypeFilterDropdown(projects) {
+            const typeFilter = document.getElementById('filter-type');
+            if (!typeFilter) return;
+            
+            // Simpan nilai yang dipilih sebelumnya
+            const currentValue = typeFilter.value;
+            
+            // Clear existing options except the first one
+            typeFilter.innerHTML = '<option value="">Semua Type</option>';
+            
+            // Collect all unique Types from projects
+            const allTypes = new Set();
+            
+            projects.forEach(project => {
+                if (project.Type) {
+                    // Handle both array and string types
+                    if (Array.isArray(project.Type)) {
+                        project.Type.forEach(type => {
+                            if (type && type !== '-') {
+                                allTypes.add(type);
+                            }
+                        });
+                    } else {
+                        if (project.Type && project.Type !== '-') {
+                            allTypes.add(project.Type);
+                        }
+                    }
+                }
+            });
+            
+            // Add Type options to dropdown
+            Array.from(allTypes).sort().forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeFilter.appendChild(option);
+            });
+            
+            // Restore previous selection if it still exists
+            if (currentValue && Array.from(allTypes).includes(currentValue)) {
+                typeFilter.value = currentValue;
+            }
+        }
+
         // --- PERBAIKAN: Apply Filters Function dengan multiple filter yang benar ---
         function applyFilters() {
             const statusFilter = document.getElementById('filter-status').value;
@@ -2036,9 +2083,14 @@
                     matches = false;
                 }
 
-                // Type filter
-                if (typeFilter && typeFilter !== '' && project.Type !== typeFilter) {
-                    matches = false;
+                // PERBAIKAN: Type filter - cek apakah Type mengandung nilai yang dicari
+                if (typeFilter && typeFilter !== '') {
+                    const projectTypes = project.Type ? 
+                        (Array.isArray(project.Type) ? project.Type : [project.Type]) : [];
+                    
+                    if (!projectTypes.includes(typeFilter)) {
+                        matches = false;
+                    }
                 }
 
                 // PERBAIKAN: PIC filter - cek apakah PIC mengandung nilai yang dicari
@@ -2060,9 +2112,14 @@
                         project.Status,
                         project.Remarks
                     ];
-                    const keywordMatch = searchableFields.some(field =>
-                        String(field).toLowerCase().includes(searchKeyword)
-                    );
+                    const keywordMatch = searchableFields.some(field => {
+                        if (Array.isArray(field)) {
+                            return field.some(item => 
+                                String(item).toLowerCase().includes(searchKeyword)
+                            );
+                        }
+                        return String(field).toLowerCase().includes(searchKeyword);
+                    });
                     if (!keywordMatch) {
                         matches = false;
                     }
@@ -2105,7 +2162,7 @@
 
         // --- PERBAIKAN: Update dashboard counts hanya dari project utama ---
         function updateDashboardCounts(projects) {
-            let quotationCount = 0; // PERUBAHAN: inquiryCount menjadi quotationCount
+            let quotationCount = 0;
             let dwgCount = 0;
             let hydrolicCount = 0;
             let dokumenCount = 0;
@@ -2123,12 +2180,12 @@
 
                     // Count by type
                     if (Array.isArray(types)) {
-                        if (types.includes('Quotation')) quotationCount++; // PERUBAHAN: Inquiry menjadi Quotation
+                        if (types.includes('Quotation')) quotationCount++;
                         if (types.includes('DWG')) dwgCount++;
                         if (types.includes('Hydrolic')) hydrolicCount++;
                         if (types.includes('Dokumen')) dokumenCount++;
                     } else {
-                        if (types === 'Quotation') quotationCount++; // PERUBAHAN: Inquiry menjadi Quotation
+                        if (types === 'Quotation') quotationCount++;
                         else if (types === 'DWG') dwgCount++;
                         else if (types === 'Hydrolic') hydrolicCount++;
                         else if (types === 'Dokumen') dokumenCount++;
@@ -2143,7 +2200,7 @@
             }
 
             // Update the dashboard summary for types
-            document.getElementById('inquiry-count').textContent = quotationCount; // PERUBAHAN: inquiry-count tetap sama untuk kompatibilitas
+            document.getElementById('inquiry-count').textContent = quotationCount;
             document.getElementById('dwg-count').textContent = dwgCount;
             document.getElementById('hydrolic-count').textContent = hydrolicCount;
             document.getElementById('dokumen-count').textContent = dokumenCount;
@@ -2679,7 +2736,7 @@
                         <div class="dashboard-summary-grid">
                             <div class="summary-item">
                                 <div class="summary-value" id="inquiry-count">0</div>
-                                <div class="summary-label">Quotation</div> <!-- PERUBAHAN: Inquiry menjadi Quotation -->
+                                <div class="summary-label">Quotation</div>
                             </div>
                             <div class="summary-item">
                                 <div class="summary-value" id="dwg-count">0</div>
@@ -2756,10 +2813,6 @@
                                 <label class="filter-label">Type</label>
                                 <select class="filter-input" id="filter-type">
                                     <option value="">Semua Type</option>
-                                    <option value="Quotation">Quotation</option> <!-- PERUBAHAN: Inquiry menjadi Quotation -->
-                                    <option value="DWG">DWG</option>
-                                    <option value="Hydrolic">Hydrolic</option>
-                                    <option value="Dokumen">Dokumen</option>
                                 </select>
                             </div>
                             <div class="filter-group">
@@ -2867,8 +2920,8 @@
                     <label>Tipe *</label>
                     <div class="multiple-select-container" id="type-multiple-container">
                         <div class="multiple-select-option">
-                            <input type="checkbox" id="type-quotation" value="Quotation"> <!-- PERUBAHAN: type-inquiry menjadi type-quotation -->
-                            <label for="type-quotation">Quotation</label> <!-- PERUBAHAN: Inquiry menjadi Quotation -->
+                            <input type="checkbox" id="type-quotation" value="Quotation">
+                            <label for="type-quotation">Quotation</label>
                         </div>
                         <div class="multiple-select-option">
                             <input type="checkbox" id="type-dwg" value="DWG">
@@ -2888,7 +2941,7 @@
                     <label for="pic">PIC</label>
                     <select id="pic" class="filter-input" required>
                         <option value="">Pilih PIC</option>
-                        <option value="Wahyu">Wahyu</option> <!-- PERUBAHAN: huruf besar di awal kata -->
+                        <option value="Wahyu">Wahyu</option>
                         <option value="Dhona">Dhona</option>
                         <option value="Arifah">Arifah</option>
                         <option value="Kartika">Kartika</option>
