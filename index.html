@@ -1245,11 +1245,11 @@
                             details.push({ id: doc.id, ...doc.data() });
                         });
                         
-                        // Sort manually by createdAt descending
+                        // PERBAIKAN: Sort secara ascending berdasarkan createdAt
                         details.sort((a, b) => {
                             const timeA = a.createdAt ? a.createdAt.toDate().getTime() : 0;
                             const timeB = b.createdAt ? b.createdAt.toDate().getTime() : 0;
-                            return timeB - timeA;
+                            return timeA - timeB;
                         });
                     }
                 } catch (error) {
@@ -1891,7 +1891,7 @@
             pageControls.appendChild(nextBtn);
         }
 
-        // --- Load Projects to Table (Initial Load and Refresh) ---
+        // --- PERBAIKAN: Load Projects to Table (Initial Load and Refresh) ---
         async function loadProjectsToTable() {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
@@ -1904,7 +1904,7 @@
                     window.projectUnsubscribe();
                 }
 
-                window.projectUnsubscribe = projectsCol.onSnapshot((snapshot) => {
+                window.projectUnsubscribe = projectsCol.onSnapshot(async (snapshot) => {
                     if (snapshot.empty) {
                         projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project.</td></tr>';
                         allProjectData = [];
@@ -1916,8 +1916,37 @@
                     let rowNum = 1;
                     const currentAllProjectData = [];
 
+                    // Get all project details for combining PIC
+                    let allProjectDetails = [];
+                    try {
+                        const detailsSnapshot = await projectDetailsCol.get();
+                        if (!detailsSnapshot.empty) {
+                            detailsSnapshot.forEach(doc => {
+                                allProjectDetails.push(doc.data());
+                            });
+                        }
+                    } catch (error) {
+                        console.error("Error loading project details:", error);
+                    }
+
                     snapshot.forEach(doc => {
                         const project = doc.data();
+                        
+                        // PERBAIKAN: Combine PIC from main project and project details
+                        let combinedPIC = project.pic || '';
+                        
+                        // Find all project details with the same projectId
+                        const relatedDetails = allProjectDetails.filter(detail => 
+                            detail.projectId === project.noUrutDokumen
+                        );
+                        
+                        // Add unique PICs from project details
+                        if (relatedDetails.length > 0) {
+                            const detailPICs = relatedDetails.map(detail => detail.pic).filter(pic => pic && pic !== project.pic);
+                            if (detailPICs.length > 0) {
+                                combinedPIC += ', ' + detailPICs.join(', ');
+                            }
+                        }
                         
                         currentAllProjectData.push({
                             No: rowNum++,
@@ -1926,7 +1955,7 @@
                             Data_In: project.dataIn || '',
                             No_Urut_Dokumen: project.noUrutDokumen || '',
                             Type: project.type || '',
-                            PIC: project.pic || '',
+                            PIC: combinedPIC, // PERBAIKAN: Gunakan combined PIC
                             Start_Date: project.startDate || '',
                             Status: project.status || '',
                             Remarks: project.remarks || ''
@@ -1948,10 +1977,11 @@
             }
         }
 
-        // --- Apply Filters Function ---
+        // --- PERBAIKAN: Apply Filters Function (dengan multiple filter) ---
         function applyFilters() {
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
+            const picFilter = document.getElementById('filter-pic').value; // PERBAIKAN: Tambah filter PIC
             const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
@@ -1964,6 +1994,11 @@
 
                 // Type filter
                 if (typeFilter && typeFilter !== '' && project.Type !== typeFilter) {
+                    matches = false;
+                }
+
+                // PERBAIKAN: PIC filter
+                if (picFilter && picFilter !== '' && !project.PIC.toLowerCase().includes(picFilter.toLowerCase())) {
                     matches = false;
                 }
 
@@ -2388,6 +2423,7 @@
                 resetFiltersBtn.addEventListener('click', function() {
                     document.getElementById('filter-status').value = '';
                     document.getElementById('filter-type').value = '';
+                    document.getElementById('filter-pic').value = '';
                     document.getElementById('filter-search').value = '';
                     filteredProjectData = [...allProjectData];
                     window.currentPage = 1;
@@ -2715,6 +2751,10 @@
                                     <option value="Hydrolic">Hydrolic</option>
                                     <option value="Dokumen">Dokumen</option>
                                 </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">PIC</label>
+                                <input type="text" class="filter-input" id="filter-pic" placeholder="Cari PIC...">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Cari</label>
