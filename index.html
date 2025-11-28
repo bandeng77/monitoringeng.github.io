@@ -6,6 +6,8 @@
     <title>Engineering Monitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -927,6 +929,20 @@
             margin: 0;
         }
 
+        /* Checkbox styling */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
@@ -1123,7 +1139,7 @@
             projectTableBody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project yang cocok.</td></tr>';
+                projectTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; vertical-align: middle;">Tidak ada data project yang cocok.</td></tr>';
                 renderPagination(0, 0); // Render empty pagination
                 return;
             }
@@ -1146,6 +1162,11 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
+                // PERBAIKAN: Kolom klarifikasi menjadi logo ceklis
+                const clarificationIcon = project.Clarification ? 
+                    '<i class="fas fa-check-circle" style="color: var(--success); font-size: 1.2rem;"></i>' : 
+                    '<i class="fas fa-times-circle" style="color: var(--danger); font-size: 1.2rem;"></i>';
+
                 // PERBAIKAN: Semua data diubah menjadi huruf besar dan menggunakan vertical align middle
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
@@ -1167,6 +1188,7 @@
                             </button>
                         </td>
                         <td>${toUpperCase(project.Remarks) || '-'}</td>
+                        <td style="text-align: center; vertical-align: middle;">${clarificationIcon}</td>
                         <td class="action-cell">
                             <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
                                 <i class="fas fa-edit"></i>
@@ -1260,6 +1282,11 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
+                // PERBAIKAN: Kolom klarifikasi menjadi logo ceklis di modal detail
+                const clarificationIcon = project.Clarification ? 
+                    '<i class="fas fa-check-circle" style="color: var(--success);"></i> Ya' : 
+                    '<i class="fas fa-times-circle" style="color: var(--danger);"></i> Tidak';
+
                 // Create modal content - PERBAIKAN: Tambah toUpperCase untuk data
                 const modalContent = `
                     <div class="modal-content" style="max-width: 900px;">
@@ -1301,6 +1328,10 @@
                                     <strong>Status:</strong><br>
                                     ${project.Status || '-'}
                                 </div>
+                                <div>
+                                    <strong>Klarifikasi:</strong><br>
+                                    ${clarificationIcon}
+                                </div>
                                 <div style="grid-column: 1 / -1;">
                                     <strong>Keterangan:</strong><br>
                                     ${toUpperCase(project.Remarks) || '-'}
@@ -1339,6 +1370,7 @@
                                                 <div><strong>PIC:</strong><br>${toUpperCase(detail.pic) || '-'}</div>
                                                 <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
                                                 <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div><strong>Klarifikasi:</strong><br>${detail.clarification ? '<i class="fas fa-check-circle" style="color: var(--success);"></i> Ya' : '<i class="fas fa-times-circle" style="color: var(--danger);"></i> Tidak'}</div>
                                                 <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${toUpperCase(detail.remarks) || '-'}</div>
                                             </div>
                                         </div>
@@ -1488,6 +1520,13 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="edit-clarification">Klarifikasi</label>
+                                <div class="checkbox-container">
+                                    <input type="checkbox" id="edit-clarification" ${detail.clarification ? 'checked' : ''}>
+                                    <label for="edit-clarification">Ya</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="edit-remarks">Remarks</label>
                                 <textarea id="edit-remarks" class="filter-input" rows="3">${detail.remarks || ''}</textarea>
                             </div>
@@ -1552,6 +1591,7 @@
             const pic = document.getElementById('edit-pic').value;
             const startDate = document.getElementById('edit-start-date').value;
             const status = document.getElementById('edit-status').value;
+            const clarification = document.getElementById('edit-clarification').checked;
             const remarks = document.getElementById('edit-remarks').value;
 
             // Get selected types
@@ -1574,6 +1614,7 @@
                     pic: pic,
                     startDate: startDate,
                     status: status,
+                    clarification: clarification,
                     remarks: remarks,
                     types: selectedTypes,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1672,6 +1713,13 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="add-clarification">Klarifikasi</label>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="add-clarification">
+                                <label for="add-clarification">Ya</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="add-remarks">Remarks</label>
                             <textarea id="add-remarks" class="filter-input" rows="3"></textarea>
                         </div>
@@ -1690,8 +1738,9 @@
             document.body.appendChild(modal);
 
             // Set today's date as default
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('add-data-in').value = today;
+            const today = new Date();
+            const currentDate = today.toISOString().substring(0, 10);
+            document.getElementById('add-data-in').value = currentDate;
 
             // Handle "Other" option in sales client dropdown
             document.getElementById('add-sales-client').addEventListener('change', function() {
@@ -1734,6 +1783,7 @@
             const pic = document.getElementById('add-pic').value;
             const startDate = document.getElementById('add-start-date').value;
             const status = document.getElementById('add-status').value;
+            const clarification = document.getElementById('add-clarification').checked;
             const remarks = document.getElementById('add-remarks').value;
 
             // Get selected types
@@ -1757,6 +1807,7 @@
                     pic: pic,
                     startDate: startDate,
                     status: status,
+                    clarification: clarification,
                     remarks: remarks,
                     types: selectedTypes,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1895,7 +1946,7 @@
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
 
-            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Memuat data...</td></tr>';
+            projectTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; vertical-align: middle;">Memuat data...</td></tr>';
 
             try {
                 // Unsubscribe previous listener if exists
@@ -1905,7 +1956,7 @@
 
                 window.projectUnsubscribe = projectsCol.onSnapshot(async (snapshot) => {
                     if (snapshot.empty) {
-                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project.</td></tr>';
+                        projectTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; vertical-align: middle;">Tidak ada data project.</td></tr>';
                         allProjectData = [];
                         filteredProjectData = [];
                         renderPagination(0, 0);
@@ -1957,6 +2008,7 @@
                             PIC: combinedPIC, // PERBAIKAN: Gunakan combined PIC
                             Start_Date: project.startDate || '',
                             Status: project.status || '',
+                            Clarification: project.clarification || false,
                             Remarks: project.remarks || ''
                         });
                     });
@@ -1971,12 +2023,12 @@
                     updateTypeFilterDropdown(allProjectData);
                 }, (error) => {
                     console.error("Error loading projects: ", error);
-                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                    projectTableBody.innerHTML = `<tr><td colspan="12" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
                     showAlert("Gagal memuat data project: " + error.message, 'error');
                 });
             } catch (error) {
                 console.error("Error setting up project listener: ", error);
-                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                projectTableBody.innerHTML = `<tr><td colspan="12" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
                 showAlert("Gagal memuat data project: " + error.message, 'error');
             }
         }
@@ -2073,6 +2125,7 @@
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
             const picFilter = document.getElementById('filter-pic').value;
+            const monthFilter = document.getElementById('filter-month').value;
             const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
@@ -2097,6 +2150,14 @@
                 if (picFilter && picFilter !== '') {
                     const projectPICs = project.PIC ? project.PIC.toLowerCase().split(',').map(pic => pic.trim()) : [];
                     if (!projectPICs.includes(picFilter.toLowerCase())) {
+                        matches = false;
+                    }
+                }
+
+                // Month filter (bulan dan tahun saja)
+                if (monthFilter && monthFilter !== '') {
+                    const projectMonth = project.Data_In ? project.Data_In.substring(0, 7) : '';
+                    if (projectMonth !== monthFilter) {
                         matches = false;
                     }
                 }
@@ -2289,7 +2350,7 @@
             // Fill form with project data
             document.getElementById('sales-client').value = project.salesClient;
             document.getElementById('project-name').value = project.projectName;
-            document.getElementById('data-in').value = project.dataIn;
+            document.getElementById('data-in').value = project.dataIn || '';
             document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
             
             // Set multiple types
@@ -2309,8 +2370,9 @@
             }
             
             document.getElementById('pic').value = project.pic;
-            document.getElementById('start-date').value = project.startDate;
+            document.getElementById('start-date').value = project.startDate || '';
             document.getElementById('status').value = project.status;
+            document.getElementById('clarification').checked = project.clarification || false;
             document.getElementById('remarks').value = project.remarks;
 
             // Make data-in and no-urut-dokumen readonly
@@ -2334,6 +2396,54 @@
             currentEditingProjectId = projectId;
             document.getElementById('status-select').value = currentStatus;
             document.getElementById('status-modal').style.display = 'flex';
+        }
+
+        // --- Export to PDF Function ---
+        function exportToPDF() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Add title
+                doc.setFontSize(16);
+                doc.text('LAPORAN PROJECT ENGINEERING', 105, 15, { align: 'center' });
+                
+                // Add date
+                const currentDate = new Date().toLocaleDateString('id-ID');
+                doc.setFontSize(10);
+                doc.text(`Dibuat pada: ${currentDate}`, 105, 22, { align: 'center' });
+
+                // Prepare table data
+                const tableData = filteredProjectData.map(project => [
+                    project.No,
+                    project.Sales_Client || '-',
+                    project.Project_Name || '-',
+                    project.Data_In || '-',
+                    project.No_Urut_Dokumen || '-',
+                    Array.isArray(project.Type) ? project.Type.join(', ') : project.Type || '-',
+                    project.PIC || '-',
+                    project.Start_Date || '-',
+                    project.Status || '-',
+                    project.Remarks || '-',
+                    project.Clarification ? 'Ya' : 'Tidak'
+                ]);
+
+                // Add table
+                doc.autoTable({
+                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Remarks', 'Klarifikasi']],
+                    body: tableData,
+                    startY: 30,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [37, 99, 235] }
+                });
+
+                // Save the PDF
+                doc.save(`Laporan_Project_${currentDate.replace(/\//g, '-')}.pdf`);
+                showAlert('PDF berhasil diexport!', 'success');
+            } catch (error) {
+                console.error("Error exporting to PDF:", error);
+                showAlert('Gagal mengexport PDF', 'error');
+            }
         }
 
         // --- Improved Login Functionality ---
@@ -2491,6 +2601,7 @@
                     document.getElementById('filter-status').value = '';
                     document.getElementById('filter-type').value = '';
                     document.getElementById('filter-pic').value = '';
+                    document.getElementById('filter-month').value = '';
                     document.getElementById('filter-search').value = '';
                     filteredProjectData = [...allProjectData];
                     window.currentPage = 1;
@@ -2516,14 +2627,26 @@
                         checkbox.checked = false;
                     });
                     
+                    // Reset clarification checkbox
+                    document.getElementById('clarification').checked = false;
+                    
                     currentEditingProjectId = null;
                     
-                    // Set today's date as default for data-in
-                    const today = new Date().toISOString().split('T')[0];
-                    document.getElementById('data-in').value = today;
+                    // Set current date as default for data-in
+                    const today = new Date();
+                    const currentDate = today.toISOString().substring(0, 10);
+                    document.getElementById('data-in').value = currentDate;
                     
                     // Show modal
                     document.getElementById('project-modal').style.display = 'flex';
+                });
+            }
+
+            // Export to PDF button
+            const exportPdfBtn = document.getElementById('export-pdf-btn');
+            if (exportPdfBtn) {
+                exportPdfBtn.addEventListener('click', function() {
+                    exportToPDF();
                 });
             }
 
@@ -2566,6 +2689,7 @@
                         pic: document.getElementById('pic').value,
                         startDate: document.getElementById('start-date').value,
                         status: document.getElementById('status').value,
+                        clarification: document.getElementById('clarification').checked,
                         remarks: document.getElementById('remarks').value
                     };
 
@@ -2790,6 +2914,9 @@
                         <button class="btn btn-primary" id="add-project-btn">
                             <i class="fas fa-plus btn-icon"></i> Tambah Project
                         </button>
+                        <button class="btn btn-outline" id="export-pdf-btn">
+                            <i class="fas fa-file-pdf btn-icon"></i> Export PDF
+                        </button>
                     </div>
                 </div>
 
@@ -2820,6 +2947,10 @@
                                 <select class="filter-input" id="filter-pic">
                                     <option value="">Semua PIC</option>
                                 </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Bulan/Tahun</label>
+                                <input type="month" class="filter-input" id="filter-month">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Cari</label>
@@ -2856,7 +2987,8 @@
                                         <th style="width: 10%">PIC</th>
                                         <th style="width: 8%">Start Date</th>
                                         <th style="width: 8%">Status</th>
-                                        <th style="width: 12%">Remarks</th>
+                                        <th style="width: 10%">Remarks</th>
+                                        <th style="width: 5%">Klarifikasi</th>
                                         <th style="width: 5%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -2961,6 +3093,13 @@
                         <option value="Done">Done</option>
                         <option value="Hold">Hold</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="clarification">Klarifikasi</label>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="clarification">
+                        <label for="clarification">Ya</label>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="remarks">Remarks</label>
