@@ -6,6 +6,8 @@
     <title>Engineering Monitor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -927,6 +929,20 @@
             margin: 0;
         }
 
+        /* Checkbox styling */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
         /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
@@ -1146,8 +1162,10 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
-                // Format klarifikasi untuk display
-                const displayClarification = project.Clarification ? 'Ya' : 'Tidak';
+                // PERBAIKAN: Kolom klarifikasi menjadi logo ceklis
+                const clarificationIcon = project.Clarification ? 
+                    '<i class="fas fa-check-circle" style="color: var(--success); font-size: 1.2rem;"></i>' : 
+                    '<i class="fas fa-times-circle" style="color: var(--danger); font-size: 1.2rem;"></i>';
 
                 // PERBAIKAN: Semua data diubah menjadi huruf besar dan menggunakan vertical align middle
                 rowsHtml.push(`
@@ -1170,7 +1188,7 @@
                             </button>
                         </td>
                         <td>${toUpperCase(project.Remarks) || '-'}</td>
-                        <td>${displayClarification}</td>
+                        <td style="text-align: center; vertical-align: middle;">${clarificationIcon}</td>
                         <td class="action-cell">
                             <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
                                 <i class="fas fa-edit"></i>
@@ -1264,8 +1282,10 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
-                // Format klarifikasi untuk display
-                const displayClarification = project.Clarification ? 'Ya' : 'Tidak';
+                // PERBAIKAN: Kolom klarifikasi menjadi logo ceklis di modal detail
+                const clarificationIcon = project.Clarification ? 
+                    '<i class="fas fa-check-circle" style="color: var(--success);"></i> Ya' : 
+                    '<i class="fas fa-times-circle" style="color: var(--danger);"></i> Tidak';
 
                 // Create modal content - PERBAIKAN: Tambah toUpperCase untuk data
                 const modalContent = `
@@ -1310,7 +1330,7 @@
                                 </div>
                                 <div>
                                     <strong>Klarifikasi:</strong><br>
-                                    ${displayClarification}
+                                    ${clarificationIcon}
                                 </div>
                                 <div style="grid-column: 1 / -1;">
                                     <strong>Keterangan:</strong><br>
@@ -1350,7 +1370,7 @@
                                                 <div><strong>PIC:</strong><br>${toUpperCase(detail.pic) || '-'}</div>
                                                 <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
                                                 <div><strong>Status:</strong><br>${detail.status || '-'}</div>
-                                                <div><strong>Klarifikasi:</strong><br>${detail.clarification ? 'Ya' : 'Tidak'}</div>
+                                                <div><strong>Klarifikasi:</strong><br>${detail.clarification ? '<i class="fas fa-check-circle" style="color: var(--success);"></i> Ya' : '<i class="fas fa-times-circle" style="color: var(--danger);"></i> Tidak'}</div>
                                                 <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${toUpperCase(detail.remarks) || '-'}</div>
                                             </div>
                                         </div>
@@ -1447,7 +1467,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="edit-data-in">Data In</label>
-                                <input type="date" id="edit-data-in" class="filter-input" value="${detail.dataIn || ''}" required>
+                                <input type="month" id="edit-data-in" class="filter-input" value="${detail.dataIn ? detail.dataIn.substring(0, 7) : ''}" required>
                             </div>
                             <div class="form-group">
                                 <label for="edit-no-urut-dokumen">No Urut Dokumen</label>
@@ -1488,7 +1508,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="edit-start-date">Start Date</label>
-                                <input type="date" id="edit-start-date" class="filter-input" value="${detail.startDate || ''}">
+                                <input type="month" id="edit-start-date" class="filter-input" value="${detail.startDate ? detail.startDate.substring(0, 7) : ''}">
                             </div>
                             <div class="form-group">
                                 <label for="edit-status">Status</label>
@@ -1501,7 +1521,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="edit-clarification">Klarifikasi</label>
-                                <div class="multiple-select-option">
+                                <div class="checkbox-container">
                                     <input type="checkbox" id="edit-clarification" ${detail.clarification ? 'checked' : ''}>
                                     <label for="edit-clarification">Ya</label>
                                 </div>
@@ -1567,9 +1587,9 @@
             const otherSales = document.getElementById('edit-other-sales').value;
             const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
             const projectName = document.getElementById('edit-project-name').value;
-            const dataIn = document.getElementById('edit-data-in').value;
+            const dataIn = document.getElementById('edit-data-in').value + '-01'; // Tambah hari untuk format lengkap
             const pic = document.getElementById('edit-pic').value;
-            const startDate = document.getElementById('edit-start-date').value;
+            const startDate = document.getElementById('edit-start-date').value + '-01'; // Tambah hari untuk format lengkap
             const status = document.getElementById('edit-status').value;
             const clarification = document.getElementById('edit-clarification').checked;
             const remarks = document.getElementById('edit-remarks').value;
@@ -1640,7 +1660,7 @@
                         </div>
                         <div class="form-group">
                             <label for="add-data-in">Data In</label>
-                            <input type="date" id="add-data-in" class="filter-input" required>
+                            <input type="month" id="add-data-in" class="filter-input" required>
                         </div>
                         <div class="form-group">
                             <label for="add-no-urut-dokumen">No Urut Dokumen</label>
@@ -1681,7 +1701,7 @@
                         </div>
                         <div class="form-group">
                             <label for="add-start-date">Start Date</label>
-                            <input type="date" id="add-start-date" class="filter-input">
+                            <input type="month" id="add-start-date" class="filter-input">
                         </div>
                         <div class="form-group">
                             <label for="add-status">Status</label>
@@ -1694,7 +1714,7 @@
                         </div>
                         <div class="form-group">
                             <label for="add-clarification">Klarifikasi</label>
-                            <div class="multiple-select-option">
+                            <div class="checkbox-container">
                                 <input type="checkbox" id="add-clarification">
                                 <label for="add-clarification">Ya</label>
                             </div>
@@ -1718,8 +1738,9 @@
             document.body.appendChild(modal);
 
             // Set today's date as default
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('add-data-in').value = today;
+            const today = new Date();
+            const currentMonth = today.toISOString().substring(0, 7);
+            document.getElementById('add-data-in').value = currentMonth;
 
             // Handle "Other" option in sales client dropdown
             document.getElementById('add-sales-client').addEventListener('change', function() {
@@ -1758,9 +1779,9 @@
             const otherSales = document.getElementById('add-other-sales').value;
             const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
             const projectName = document.getElementById('add-project-name').value;
-            const dataIn = document.getElementById('add-data-in').value;
+            const dataIn = document.getElementById('add-data-in').value + '-01'; // Tambah hari untuk format lengkap
             const pic = document.getElementById('add-pic').value;
-            const startDate = document.getElementById('add-start-date').value;
+            const startDate = document.getElementById('add-start-date').value + '-01'; // Tambah hari untuk format lengkap
             const status = document.getElementById('add-status').value;
             const clarification = document.getElementById('add-clarification').checked;
             const remarks = document.getElementById('add-remarks').value;
@@ -2104,7 +2125,7 @@
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
             const picFilter = document.getElementById('filter-pic').value;
-            const dateFilter = document.getElementById('filter-date').value;
+            const monthFilter = document.getElementById('filter-month').value;
             const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
@@ -2133,9 +2154,10 @@
                     }
                 }
 
-                // Date filter
-                if (dateFilter && dateFilter !== '') {
-                    if (project.Data_In !== dateFilter) {
+                // Month filter (bulan dan tahun saja)
+                if (monthFilter && monthFilter !== '') {
+                    const projectMonth = project.Data_In ? project.Data_In.substring(0, 7) : '';
+                    if (projectMonth !== monthFilter) {
                         matches = false;
                     }
                 }
@@ -2328,7 +2350,7 @@
             // Fill form with project data
             document.getElementById('sales-client').value = project.salesClient;
             document.getElementById('project-name').value = project.projectName;
-            document.getElementById('data-in').value = project.dataIn;
+            document.getElementById('data-in').value = project.dataIn ? project.dataIn.substring(0, 7) : '';
             document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
             
             // Set multiple types
@@ -2348,7 +2370,7 @@
             }
             
             document.getElementById('pic').value = project.pic;
-            document.getElementById('start-date').value = project.startDate;
+            document.getElementById('start-date').value = project.startDate ? project.startDate.substring(0, 7) : '';
             document.getElementById('status').value = project.status;
             document.getElementById('clarification').checked = project.clarification || false;
             document.getElementById('remarks').value = project.remarks;
@@ -2374,6 +2396,54 @@
             currentEditingProjectId = projectId;
             document.getElementById('status-select').value = currentStatus;
             document.getElementById('status-modal').style.display = 'flex';
+        }
+
+        // --- Export to PDF Function ---
+        function exportToPDF() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                // Add title
+                doc.setFontSize(16);
+                doc.text('LAPORAN PROJECT ENGINEERING', 105, 15, { align: 'center' });
+                
+                // Add date
+                const currentDate = new Date().toLocaleDateString('id-ID');
+                doc.setFontSize(10);
+                doc.text(`Dibuat pada: ${currentDate}`, 105, 22, { align: 'center' });
+
+                // Prepare table data
+                const tableData = filteredProjectData.map(project => [
+                    project.No,
+                    project.Sales_Client || '-',
+                    project.Project_Name || '-',
+                    project.Data_In || '-',
+                    project.No_Urut_Dokumen || '-',
+                    Array.isArray(project.Type) ? project.Type.join(', ') : project.Type || '-',
+                    project.PIC || '-',
+                    project.Start_Date || '-',
+                    project.Status || '-',
+                    project.Remarks || '-',
+                    project.Clarification ? 'Ya' : 'Tidak'
+                ]);
+
+                // Add table
+                doc.autoTable({
+                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Remarks', 'Klarifikasi']],
+                    body: tableData,
+                    startY: 30,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [37, 99, 235] }
+                });
+
+                // Save the PDF
+                doc.save(`Laporan_Project_${currentDate.replace(/\//g, '-')}.pdf`);
+                showAlert('PDF berhasil diexport!', 'success');
+            } catch (error) {
+                console.error("Error exporting to PDF:", error);
+                showAlert('Gagal mengexport PDF', 'error');
+            }
         }
 
         // --- Improved Login Functionality ---
@@ -2531,7 +2601,7 @@
                     document.getElementById('filter-status').value = '';
                     document.getElementById('filter-type').value = '';
                     document.getElementById('filter-pic').value = '';
-                    document.getElementById('filter-date').value = '';
+                    document.getElementById('filter-month').value = '';
                     document.getElementById('filter-search').value = '';
                     filteredProjectData = [...allProjectData];
                     window.currentPage = 1;
@@ -2562,12 +2632,21 @@
                     
                     currentEditingProjectId = null;
                     
-                    // Set today's date as default for data-in
-                    const today = new Date().toISOString().split('T')[0];
-                    document.getElementById('data-in').value = today;
+                    // Set current month as default for data-in
+                    const today = new Date();
+                    const currentMonth = today.toISOString().substring(0, 7);
+                    document.getElementById('data-in').value = currentMonth;
                     
                     // Show modal
                     document.getElementById('project-modal').style.display = 'flex';
+                });
+            }
+
+            // Export to PDF button
+            const exportPdfBtn = document.getElementById('export-pdf-btn');
+            if (exportPdfBtn) {
+                exportPdfBtn.addEventListener('click', function() {
+                    exportToPDF();
                 });
             }
 
@@ -2605,10 +2684,10 @@
                     const projectData = {
                         salesClient: finalSalesClient,
                         projectName: document.getElementById('project-name').value,
-                        dataIn: document.getElementById('data-in').value,
+                        dataIn: document.getElementById('data-in').value + '-01', // Tambah hari untuk format lengkap
                         type: selectedTypes,
                         pic: document.getElementById('pic').value,
-                        startDate: document.getElementById('start-date').value,
+                        startDate: document.getElementById('start-date').value + '-01', // Tambah hari untuk format lengkap
                         status: document.getElementById('status').value,
                         clarification: document.getElementById('clarification').checked,
                         remarks: document.getElementById('remarks').value
@@ -2835,6 +2914,9 @@
                         <button class="btn btn-primary" id="add-project-btn">
                             <i class="fas fa-plus btn-icon"></i> Tambah Project
                         </button>
+                        <button class="btn btn-outline" id="export-pdf-btn">
+                            <i class="fas fa-file-pdf btn-icon"></i> Export PDF
+                        </button>
                     </div>
                 </div>
 
@@ -2867,8 +2949,8 @@
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label class="filter-label">Tanggal</label>
-                                <input type="date" class="filter-input" id="filter-date">
+                                <label class="filter-label">Bulan/Tahun</label>
+                                <input type="month" class="filter-input" id="filter-month">
                             </div>
                             <div class="filter-group">
                                 <label class="filter-label">Cari</label>
@@ -2960,7 +3042,7 @@
                 </div>
                 <div class="form-group">
                     <label for="data-in">Data In</label>
-                    <input type="date" id="data-in" class="filter-input" required>
+                    <input type="month" id="data-in" class="filter-input" required>
                 </div>
                 <div class="form-group">
                     <label for="no-urut-dokumen">No Urut Dokumen</label>
@@ -3001,7 +3083,7 @@
                 </div>
                 <div class="form-group">
                     <label for="start-date">Start Date</label>
-                    <input type="date" id="start-date" class="filter-input">
+                    <input type="month" id="start-date" class="filter-input">
                 </div>
                 <div class="form-group">
                     <label for="status">Status</label>
@@ -3014,7 +3096,7 @@
                 </div>
                 <div class="form-group">
                     <label for="clarification">Klarifikasi</label>
-                    <div class="multiple-select-option">
+                    <div class="checkbox-container">
                         <input type="checkbox" id="clarification">
                         <label for="clarification">Ya</label>
                     </div>
