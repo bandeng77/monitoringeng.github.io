@@ -2121,670 +2121,612 @@
         }
 
         // --- PERBAIKAN: Apply Filters Function dengan multiple filter yang benar ---
-        function applyFilters() {
-            const statusFilter = document.getElementById('filter-status').value;
-            const typeFilter = document.getElementById('filter-type').value;
-            const picFilter = document.getElementById('filter-pic').value;
-            const monthFilter = document.getElementById('filter-month').value;
-            const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
+        // --- PERBAIKAN: Apply Filters Function dengan multiple filter yang benar ---
+function applyFilters() {
+    const statusFilter = document.getElementById('filter-status').value;
+    const typeFilter = document.getElementById('filter-type').value;
+    const picFilter = document.getElementById('filter-pic').value;
+    const monthFilter = document.getElementById('filter-month').value;
+    const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
-            filteredProjectData = allProjectData.filter(project => {
-                let matches = true;
+    filteredProjectData = allProjectData.filter(project => {
+        let matches = true;
 
-                // Status filter
-                if (statusFilter && statusFilter !== '' && project.Status !== statusFilter) {
-                    matches = false;
+        // Status filter
+        if (statusFilter && statusFilter !== '' && project.Status !== statusFilter) {
+            matches = false;
+        }
+
+        // PERBAIKAN: Type filter - cek apakah Type mengandung nilai yang dicari
+        if (typeFilter && typeFilter !== '') {
+            const projectTypes = project.Type ? 
+                (Array.isArray(project.Type) ? project.Type : [project.Type]) : [];
+            
+            if (!projectTypes.includes(typeFilter)) {
+                matches = false;
+            }
+        }
+
+        // PERBAIKAN: PIC filter - cek apakah PIC mengandung nilai yang dicari
+        if (picFilter && picFilter !== '') {
+            const projectPICs = project.PIC ? project.PIC.toLowerCase().split(',').map(pic => pic.trim()) : [];
+            if (!projectPICs.includes(picFilter.toLowerCase())) {
+                matches = false;
+            }
+        }
+
+        // Month filter (bulan dan tahun saja)
+        if (monthFilter && monthFilter !== '') {
+            const projectMonth = project.Data_In ? project.Data_In.substring(0, 7) : '';
+            if (projectMonth !== monthFilter) {
+                matches = false;
+            }
+        }
+
+        // Keyword search (across multiple fields)
+        if (searchKeyword) {
+            const searchableFields = [
+                project.Sales_Client,
+                project.Project_Name,
+                project.No_Urut_Dokumen,
+                project.Type,
+                project.PIC,
+                project.Status,
+                project.Remarks
+            ];
+            const keywordMatch = searchableFields.some(field => {
+                if (Array.isArray(field)) {
+                    return field.some(item => 
+                        String(item).toLowerCase().includes(searchKeyword)
+                    );
                 }
-
-                // PERBAIKAN: Type filter - cek apakah Type mengandung nilai yang dicari
-                if (typeFilter && typeFilter !== '') {
-                    const projectTypes = project.Type ? 
-                        (Array.isArray(project.Type) ? project.Type : [project.Type]) : [];
-                    
-                    if (!projectTypes.includes(typeFilter)) {
-                        matches = false;
-                    }
-                }
-
-                // PERBAIKAN: PIC filter - cek apakah PIC mengandung nilai yang dicari
-                if (picFilter && picFilter !== '') {
-                    const projectPICs = project.PIC ? project.PIC.toLowerCase().split(',').map(pic => pic.trim()) : [];
-                    if (!projectPICs.includes(picFilter.toLowerCase())) {
-                        matches = false;
-                    }
-                }
-
-                // Month filter (bulan dan tahun saja)
-                if (monthFilter && monthFilter !== '') {
-                    const projectMonth = project.Data_In ? project.Data_In.substring(0, 7) : '';
-                    if (projectMonth !== monthFilter) {
-                        matches = false;
-                    }
-                }
-
-                // Keyword search (across multiple fields)
-                if (searchKeyword) {
-                    const searchableFields = [
-                        project.Sales_Client,
-                        project.Project_Name,
-                        project.No_Urut_Dokumen,
-                        project.Type,
-                        project.PIC,
-                        project.Status,
-                        project.Remarks
-                    ];
-                    const keywordMatch = searchableFields.some(field => {
-                        if (Array.isArray(field)) {
-                            return field.some(item => 
-                                String(item).toLowerCase().includes(searchKeyword)
-                            );
-                        }
-                        return String(field).toLowerCase().includes(searchKeyword);
-                    });
-                    if (!keywordMatch) {
-                        matches = false;
-                    }
-                }
-
-                return matches;
+                return String(field).toLowerCase().includes(searchKeyword);
             });
-
-            window.currentPage = 1; // Reset to first page after applying filters
-            renderProjectsTable(filteredProjectData);
-        }
-
-        // --- PERBAIKAN: Load Dashboard Data (hanya dari project utama) ---
-        async function loadDashboardData() {
-            try {
-                // Unsubscribe previous listener if exists
-                if (window.dashboardUnsubscribe) {
-                    window.dashboardUnsubscribe();
-                }
-
-                // Listen only to projects collection (project utama)
-                window.dashboardUnsubscribe = projectsCol.onSnapshot((snapshot) => {
-                    if (snapshot.empty) {
-                        updateDashboardCounts([]);
-                        return;
-                    }
-
-                    const currentProjects = [];
-                    snapshot.forEach(doc => {
-                        currentProjects.push(doc.data());
-                    });
-                    updateDashboardCounts(currentProjects);
-                });
-
-            } catch (error) {
-                console.error("Error setting up dashboard listener: ", error);
-                showAlert("Gagal memuat data dashboard: " + error.message, 'error');
+            if (!keywordMatch) {
+                matches = false;
             }
         }
 
-        // --- PERBAIKAN: Update dashboard counts hanya dari project utama ---
-        function updateDashboardCounts(projects) {
-            let quotationCount = 0;
-            let dwgCount = 0;
-            let hydrolicCount = 0;
-            let dokumenCount = 0;
+        return matches;
+    });
+
+    window.currentPage = 1; // Reset to first page after applying filters
+    renderProjectsTable(filteredProjectData);
+}
+
+// --- Show Edit Detail Modal ---
+async function showEditDetailModal(detailId, projectId) {
+    try {
+        const detailDoc = await projectDetailsCol.doc(detailId).get();
+        if (!detailDoc.exists) {
+            showAlert('Detail project tidak ditemukan', 'error');
+            return;
+        }
+
+        const detail = detailDoc.data();
+        const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
+
+        const modalContent = `
+            <div class="modal-content" style="max-width: 800px;">
+                <span class="modal-close-btn">&times;</span>
+                <h2 class="card-title" style="margin-bottom: 1.5rem;">Edit Project Tambahan - ${projectId}</h2>
+                <form id="edit-detail-form">
+                    <div class="form-group">
+                        <label for="edit-sales-client">Sales/Client</label>
+                        <select id="edit-sales-client" class="filter-input" required>
+                            <option value="">Pilih Sales/Client</option>
+                            <option value="Rangga" ${detail.salesClient === 'Rangga' ? 'selected' : ''}>Rangga</option>
+                            <option value="Dhea" ${detail.salesClient === 'Dhea' ? 'selected' : ''}>Dhea</option>
+                            <option value="Rory" ${detail.salesClient === 'Rory' ? 'selected' : ''}>Rory</option>
+                            <option value="Pamungkas" ${detail.salesClient === 'Pamungkas' ? 'selected' : ''}>Pamungkas</option>
+                            <option value="Other" ${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? 'selected' : ''}>Other</option>
+                        </select>
+                    </div>
+                    <div id="edit-other-sales-container" class="form-group" style="display: ${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? 'block' : 'none'};">
+                        <label for="edit-other-sales">Keterangan Sales/Client Lainnya</label>
+                        <input type="text" id="edit-other-sales" class="filter-input" value="${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? detail.salesClient : ''}" placeholder="Masukkan nama sales/client">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-project-name">Project Name</label>
+                        <input type="text" id="edit-project-name" class="filter-input" value="${detail.projectName || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-data-in">Data In</label>
+                        <input type="date" id="edit-data-in" class="filter-input" value="${detail.dataIn || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-no-urut-dokumen">No Urut Dokumen</label>
+                        <input type="text" id="edit-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipe *</label>
+                        <div class="multiple-select-container">
+                            <div class="multiple-select-option">
+                                <input type="checkbox" id="edit-type-quotation" value="Quotation" ${detail.types && detail.types.includes('Quotation') ? 'checked' : ''}>
+                                <label for="edit-type-quotation">Quotation</label>
+                            </div>
+                            <div class="multiple-select-option">
+                                <input type="checkbox" id="edit-type-dwg" value="DWG" ${detail.types && detail.types.includes('DWG') ? 'checked' : ''}>
+                                <label for="edit-type-dwg">DWG</label>
+                            </div>
+                            <div class="multiple-select-option">
+                                <input type="checkbox" id="edit-type-hydrolic" value="Hydrolic" ${detail.types && detail.types.includes('Hydrolic') ? 'checked' : ''}>
+                                <label for="edit-type-hydrolic">Hydrolic</label>
+                            </div>
+                            <div class="multiple-select-option">
+                                <input type="checkbox" id="edit-type-dokumen" value="Dokumen" ${detail.types && detail.types.includes('Dokumen') ? 'checked' : ''}>
+                                <label for="edit-type-dokumen">Dokumen</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-pic">PIC</label>
+                        <select id="edit-pic" class="filter-input">
+                            <option value="">Pilih PIC</option>
+                            <option value="Wahyu" ${detail.pic === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                            <option value="Dhona" ${detail.pic === 'dhona' ? 'selected' : ''}>Dhona</option>
+                            <option value="Arifah" ${detail.pic === 'arifah' ? 'selected' : ''}>Arifah</option>
+                            <option value="Kartika" ${detail.pic === 'kartika' ? 'selected' : ''}>Kartika</option>
+                            <option value="Ardi" ${detail.pic === 'ardi' ? 'selected' : ''}>Ardi</option>
+                            <option value="Brian" ${detail.pic === 'brian' ? 'selected' : ''}>Brian</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-start-date">Start Date</label>
+                        <input type="date" id="edit-start-date" class="filter-input" value="${detail.startDate || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-status">Status</label>
+                        <select id="edit-status" class="filter-input" required>
+                            <option value="">Pilih Status</option>
+                            <option value="On Progress" ${detail.status === 'On Progress' ? 'selected' : ''}>On Progress</option>
+                            <option value="Done" ${detail.status === 'Done' ? 'selected' : ''}>Done</option>
+                            <option value="Hold" ${detail.status === 'Hold' ? 'selected' : ''}>Hold</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-clarification">Klarifikasi</label>
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="edit-clarification" ${detail.clarification ? 'checked' : ''}>
+                            <label for="edit-clarification">Ya</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-remarks">Remarks</label>
+                        <textarea id="edit-remarks" class="filter-input" rows="3">${detail.remarks || ''}</textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancel-edit-detail">Batal</button>
+                        <button type="submit" class="btn btn-primary">Update Project</button>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = modalContent;
+        document.body.appendChild(modal);
+
+        // Handle "Other" option in sales client dropdown
+        document.getElementById('edit-sales-client').addEventListener('change', function() {
+            if (this.value === 'Other') {
+                document.getElementById('edit-other-sales-container').style.display = 'block';
+            } else {
+                document.getElementById('edit-other-sales-container').style.display = 'none';
+            }
+        });
+
+        // Add event listeners
+        modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+            modal.remove();
+        });
+
+        modal.querySelector('#cancel-edit-detail').addEventListener('click', function() {
+            modal.remove();
+        });
+
+        modal.querySelector('#edit-detail-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await updateProjectDetail(detailId, projectId);
+            modal.remove();
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+    } catch (error) {
+        console.error("Error showing edit detail modal:", error);
+        showAlert('Gagal memuat form edit', 'error');
+    }
+}
+
+// --- Update Project Detail ---
+async function updateProjectDetail(detailId, projectId) {
+    const salesClient = document.getElementById('edit-sales-client').value;
+    const otherSales = document.getElementById('edit-other-sales').value;
+    const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+    const projectName = document.getElementById('edit-project-name').value;
+    const dataIn = document.getElementById('edit-data-in').value;
+    const pic = document.getElementById('edit-pic').value;
+    const startDate = document.getElementById('edit-start-date').value;
+    const status = document.getElementById('edit-status').value;
+    const clarification = document.getElementById('edit-clarification').checked;
+    const remarks = document.getElementById('edit-remarks').value;
+
+    // Get selected types
+    const selectedTypes = [];
+    if (document.getElementById('edit-type-quotation').checked) selectedTypes.push('Quotation');
+    if (document.getElementById('edit-type-dwg').checked) selectedTypes.push('DWG');
+    if (document.getElementById('edit-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+    if (document.getElementById('edit-type-dokumen').checked) selectedTypes.push('Dokumen');
+
+    if (selectedTypes.length === 0) {
+        showAlert('Pilih minimal satu tipe', 'error');
+        return;
+    }
+
+    try {
+        const projectData = {
+            salesClient: finalSalesClient,
+            projectName: projectName,
+            dataIn: dataIn,
+            pic: pic,
+            startDate: startDate,
+            status: status,
+            clarification: clarification,
+            remarks: remarks,
+            types: selectedTypes,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await projectDetailsCol.doc(detailId).update(projectData);
+        showAlert('Project berhasil diperbarui', 'success');
+        
+        // Refresh the details modal
+        showProjectDetailsModal(projectId);
+        
+    } catch (error) {
+        console.error("Error updating project detail:", error);
+        showAlert('Gagal memperbarui project', 'error');
+    }
+}
+
+// --- Show Add Project Modal (untuk menambah project baru dengan nomor urut sama) ---
+function showAddProjectModal(projectId, baseProject) {
+    const modalContent = `
+        <div class="modal-content" style="max-width: 800px;">
+            <span class="modal-close-btn">&times;</span>
+            <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Project Baru - ${projectId}</h2>
+            <form id="add-project-form">
+                <div class="form-group">
+                    <label for="add-sales-client">Sales/Client</label>
+                    <select id="add-sales-client" class="filter-input" required>
+                        <option value="">Pilih Sales/Client</option>
+                        <option value="Rangga" ${baseProject.Sales_Client === 'Rangga' ? 'selected' : ''}>Rangga</option>
+                        <option value="Dhea" ${baseProject.Sales_Client === 'Dhea' ? 'selected' : ''}>Dhea</option>
+                        <option value="Rory" ${baseProject.Sales_Client === 'Rory' ? 'selected' : ''}>Rory</option>
+                        <option value="Pamungkas" ${baseProject.Sales_Client === 'Pamungkas' ? 'selected' : ''}>Pamungkas</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div id="add-other-sales-container" class="form-group" style="display: none;">
+                    <label for="add-other-sales">Keterangan Sales/Client Lainnya</label>
+                    <input type="text" id="add-other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
+                </div>
+                <div class="form-group">
+                    <label for="add-project-name">Project Name</label>
+                    <input type="text" id="add-project-name" class="filter-input" value="${baseProject.Project_Name || ''}" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-data-in">Data In</label>
+                    <input type="date" id="add-data-in" class="filter-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="add-no-urut-dokumen">No Urut Dokumen</label>
+                    <input type="text" id="add-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Tipe *</label>
+                    <div class="multiple-select-container">
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="add-type-quotation" value="Quotation">
+                            <label for="add-type-quotation">Quotation</label>
+                        </div>
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="add-type-dwg" value="DWG">
+                            <label for="add-type-dwg">DWG</label>
+                        </div>
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="add-type-hydrolic" value="Hydrolic">
+                            <label for="add-type-hydrolic">Hydrolic</label>
+                        </div>
+                        <div class="multiple-select-option">
+                            <input type="checkbox" id="add-type-dokumen" value="Dokumen">
+                            <label for="add-type-dokumen">Dokumen</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="add-pic">PIC</label>
+                    <select id="add-pic" class="filter-input">
+                        <option value="">Pilih PIC</option>
+                        <option value="Wahyu" ${baseProject.PIC === 'wahyu' ? 'selected' : ''}>Wahyu</option>
+                        <option value="Dhona" ${baseProject.PIC === 'dhona' ? 'selected' : ''}>Dhona</option>
+                        <option value="Arifah" ${baseProject.PIC === 'arifah' ? 'selected' : ''}>Arifah</option>
+                        <option value="Kartika" ${baseProject.PIC === 'kartika' ? 'selected' : ''}>Kartika</option>
+                        <option value="Ardi" ${baseProject.PIC === 'ardi' ? 'selected' : ''}>Ardi</option>
+                        <option value="Brian" ${baseProject.PIC === 'brian' ? 'selected' : ''}>Brian</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="add-start-date">Start Date</label>
+                    <input type="date" id="add-start-date" class="filter-input">
+                </div>
+                <div class="form-group">
+                    <label for="add-status">Status</label>
+                    <select id="add-status" class="filter-input" required>
+                        <option value="">Pilih Status</option>
+                        <option value="On Progress">On Progress</option>
+                        <option value="Done">Done</option>
+                        <option value="Hold">Hold</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="add-clarification">Klarifikasi</label>
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="add-clarification">
+                        <label for="add-clarification">Ya</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="add-remarks">Remarks</label>
+                    <textarea id="add-remarks" class="filter-input" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancel-add-project">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Project</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'flex';
+    modal.innerHTML = modalContent;
+    document.body.appendChild(modal);
+
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('add-data-in').value = today;
+
+    // Handle "Other" option in sales client dropdown
+    document.getElementById('add-sales-client').addEventListener('change', function() {
+        if (this.value === 'Other') {
+            document.getElementById('add-other-sales-container').style.display = 'block';
+        } else {
+            document.getElementById('add-other-sales-container').style.display = 'none';
+        }
+    });
+
+    // Add event listeners
+    modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+        modal.remove();
+    });
+
+    modal.querySelector('#cancel-add-project').addEventListener('click', function() {
+        modal.remove();
+    });
+
+    modal.querySelector('#add-project-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        await addNewProjectToDetails(projectId, baseProject, modal);
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// --- PERBAIKAN: Add New Project to Details (dengan parameter modal) ---
+async function addNewProjectToDetails(projectId, baseProject, modal) {
+    const salesClient = document.getElementById('add-sales-client').value;
+    const otherSales = document.getElementById('add-other-sales').value;
+    const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+    const projectName = document.getElementById('add-project-name').value;
+    const dataIn = document.getElementById('add-data-in').value;
+    const pic = document.getElementById('add-pic').value;
+    const startDate = document.getElementById('add-start-date').value;
+    const status = document.getElementById('add-status').value;
+    const clarification = document.getElementById('add-clarification').checked;
+    const remarks = document.getElementById('add-remarks').value;
+
+    // Get selected types
+    const selectedTypes = [];
+    if (document.getElementById('add-type-quotation').checked) selectedTypes.push('Quotation');
+    if (document.getElementById('add-type-dwg').checked) selectedTypes.push('DWG');
+    if (document.getElementById('add-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+    if (document.getElementById('add-type-dokumen').checked) selectedTypes.push('Dokumen');
+
+    if (selectedTypes.length === 0) {
+        showAlert('Pilih minimal satu tipe', 'error');
+        return;
+    }
+
+    try {
+        const projectData = {
+            projectId: projectId,
+            salesClient: finalSalesClient,
+            projectName: projectName,
+            dataIn: dataIn,
+            pic: pic,
+            startDate: startDate,
+            status: status,
+            clarification: clarification,
+            remarks: remarks,
+            types: selectedTypes,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        await projectDetailsCol.add(projectData);
+        showAlert('Project berhasil ditambahkan', 'success');
+        
+        // PERBAIKAN: Hanya sekali close modal
+        if (modal) modal.remove();
+        showProjectDetailsModal(projectId);
+        
+    } catch (error) {
+        console.error("Error adding project detail:", error);
+        showAlert('Gagal menambahkan project', 'error');
+    }
+}
+
+// --- Show Edit Project Modal ---
+async function showEditProjectModal(projectId) {
+    const project = await getProject(projectId);
+    if (!project) return;
+
+    currentEditingProjectId = projectId;
+
+    // Fill form with project data
+    document.getElementById('sales-client').value = project.salesClient;
+    document.getElementById('project-name').value = project.projectName;
+    document.getElementById('data-in').value = project.dataIn;
+    document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
+    
+    // Set multiple types
+    const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]');
+    typeCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    if (Array.isArray(project.type)) {
+        project.type.forEach(type => {
+            const checkbox = document.querySelector(`#type-multiple-container input[value="${type}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+    } else if (project.type) {
+        const checkbox = document.querySelector(`#type-multiple-container input[value="${project.type}"]`);
+        if (checkbox) checkbox.checked = true;
+    }
+    
+    document.getElementById('pic').value = project.pic;
+    document.getElementById('start-date').value = project.startDate;
+    document.getElementById('status').value = project.status;
+    document.getElementById('clarification').checked = project.clarification || false;
+    document.getElementById('remarks').value = project.remarks;
+
+    // Make data-in and no-urut-dokumen readonly
+    document.getElementById('data-in').disabled = true;
+    document.getElementById('no-urut-dokumen').disabled = true;
+    document.getElementById('data-in').classList.add('readonly-field');
+    document.getElementById('no-urut-dokumen').classList.add('readonly-field');
+
+    // Show modal
+    document.getElementById('project-modal').style.display = 'flex';
+}
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    // ... kode yang sudah ada ...
+
+    // Add project button (untuk project utama)
+    const addProjectBtn = document.getElementById('add-project-btn');
+    if (addProjectBtn) {
+        addProjectBtn.addEventListener('click', function() {
+            // Reset form and enable all fields
+            document.getElementById('project-form').reset();
+            document.getElementById('data-in').disabled = false;
+            document.getElementById('no-urut-dokumen').disabled = true;
+            document.getElementById('data-in').classList.remove('readonly-field');
+            document.getElementById('no-urut-dokumen').classList.add('readonly-field');
+            document.getElementById('other-sales-container').style.display = 'none';
             
-            let onProgressCount = 0;
-            let doneCount = 0;
-            let holdCount = 0;
-            let totalProjects = 0;
-
-            // Count from main projects only
-            if (projects && projects.length > 0) {
-                projects.forEach(project => {
-                    const types = project.type || [];
-                    const status = project.status || '';
-
-                    // Count by type
-                    if (Array.isArray(types)) {
-                        if (types.includes('Quotation')) quotationCount++;
-                        if (types.includes('DWG')) dwgCount++;
-                        if (types.includes('Hydrolic')) hydrolicCount++;
-                        if (types.includes('Dokumen')) dokumenCount++;
-                    } else {
-                        if (types === 'Quotation') quotationCount++;
-                        else if (types === 'DWG') dwgCount++;
-                        else if (types === 'Hydrolic') hydrolicCount++;
-                        else if (types === 'Dokumen') dokumenCount++;
-                    }
-
-                    // Count by status
-                    if (status === 'On Progress') onProgressCount++;
-                    else if (status === 'Done') doneCount++;
-                    else if (status === 'Hold') holdCount++;
-                });
-                totalProjects = projects.length; // PERUBAHAN: Hanya menghitung project utama
-            }
-
-            // Update the dashboard summary for types
-            document.getElementById('inquiry-count').textContent = quotationCount;
-            document.getElementById('dwg-count').textContent = dwgCount;
-            document.getElementById('hydrolic-count').textContent = hydrolicCount;
-            document.getElementById('dokumen-count').textContent = dokumenCount;
-
-            // Update the dashboard summary for status
-            document.getElementById('on-progress-count').textContent = onProgressCount;
-            document.getElementById('done-count').textContent = doneCount;
-            document.getElementById('hold-count').textContent = holdCount;
-            document.getElementById('total-projects-count').textContent = totalProjects;
-        }
-
-        // --- Add Project Function (untuk project utama) ---
-        async function addProject(projectData) {
-            try {
-                // Generate project number
-                const projectNumber = await generateProjectNumber(
-                    projectData.dataIn, 
-                    projectData.type, 
-                    projectData.projectName
-                );
-
-                const completeProjectData = {
-                    ...projectData,
-                    noUrutDokumen: projectNumber
-                };
-
-                await projectsCol.doc(projectNumber).set(completeProjectData);
-                showAlert("Project berhasil ditambahkan!", 'success');
-                return true;
-            } catch (error) {
-                console.error("Error adding project: ", error);
-                showAlert("Gagal menambahkan project: " + error.message, 'error');
-                return false;
-            }
-        }
-
-        // --- Update Project Function ---
-        async function updateProject(projectId, updatedData) {
-            try {
-                await projectsCol.doc(projectId).update(updatedData);
-                showAlert("Project berhasil diperbarui!", 'success');
-                return true;
-            } catch (error) {
-                console.error("Error updating project: ", error);
-                showAlert("Gagal memperbarui project: " + error.message, 'error');
-                return false;
-            }
-        }
-
-        // --- Delete Project Function ---
-        async function deleteProject(projectId) {
-            try {
-                await projectsCol.doc(projectId).delete();
-                showAlert("Project berhasil dihapus!", 'success');
-                return true;
-            } catch (error) {
-                console.error("Error deleting project: ", error);
-                showAlert("Gagal menghapus project: " + error.message, 'error');
-                return false;
-            }
-        }
-
-        // --- Get Project Data Function ---
-        async function getProject(projectId) {
-            try {
-                const doc = await projectsCol.doc(projectId).get();
-                if (doc.exists) {
-                    return doc.data();
-                } else {
-                    throw new Error("Project tidak ditemukan.");
-                }
-            } catch (error) {
-                console.error("Error getting project: ", error);
-                showAlert("Gagal mengambil data project: " + error.message, 'error');
-                return null;
-            }
-        }
-
-        // --- Show Edit Project Modal ---
-        async function showEditProjectModal(projectId) {
-            const project = await getProject(projectId);
-            if (!project) return;
-
-            currentEditingProjectId = projectId;
-
-            // Fill form with project data
-            document.getElementById('sales-client').value = project.salesClient;
-            document.getElementById('project-name').value = project.projectName;
-            document.getElementById('data-in').value = project.dataIn ? project.dataIn.substring(0, 7) : '';
-            document.getElementById('no-urut-dokumen').value = project.noUrutDokumen;
-            
-            // Set multiple types
+            // Reset type checkboxes
             const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]');
             typeCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
             });
             
-            if (Array.isArray(project.type)) {
-                project.type.forEach(type => {
-                    const checkbox = document.querySelector(`#type-multiple-container input[value="${type}"]`);
-                    if (checkbox) checkbox.checked = true;
-                });
-            } else if (project.type) {
-                const checkbox = document.querySelector(`#type-multiple-container input[value="${project.type}"]`);
-                if (checkbox) checkbox.checked = true;
-            }
+            // Reset clarification checkbox
+            document.getElementById('clarification').checked = false;
             
-            document.getElementById('pic').value = project.pic;
-            document.getElementById('start-date').value = project.startDate ? project.startDate.substring(0, 7) : '';
-            document.getElementById('status').value = project.status;
-            document.getElementById('clarification').checked = project.clarification || false;
-            document.getElementById('remarks').value = project.remarks;
-
-            // Make data-in and no-urut-dokumen readonly
-            document.getElementById('data-in').disabled = true;
-            document.getElementById('no-urut-dokumen').disabled = true;
-            document.getElementById('data-in').classList.add('readonly-field');
-            document.getElementById('no-urut-dokumen').classList.add('readonly-field');
-
+            currentEditingProjectId = null;
+            
+            // Set today's date as default for data-in
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('data-in').value = today;
+            
             // Show modal
             document.getElementById('project-modal').style.display = 'flex';
-        }
+        });
+    }
 
-        // --- Show Delete Confirmation Modal ---
-        function showDeleteConfirmationModal(projectId) {
-            currentEditingProjectId = projectId;
-            document.getElementById('delete-modal').style.display = 'flex';
-        }
-
-        // --- Show Status Change Modal ---
-        function showStatusChangeModal(projectId, currentStatus) {
-            currentEditingProjectId = projectId;
-            document.getElementById('status-select').value = currentStatus;
-            document.getElementById('status-modal').style.display = 'flex';
-        }
-
-        // --- Export to PDF Function ---
-        function exportToPDF() {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-
-                // Add title
-                doc.setFontSize(16);
-                doc.text('LAPORAN PROJECT ENGINEERING', 105, 15, { align: 'center' });
-                
-                // Add date
-                const currentDate = new Date().toLocaleDateString('id-ID');
-                doc.setFontSize(10);
-                doc.text(`Dibuat pada: ${currentDate}`, 105, 22, { align: 'center' });
-
-                // Prepare table data
-                const tableData = filteredProjectData.map(project => [
-                    project.No,
-                    project.Sales_Client || '-',
-                    project.Project_Name || '-',
-                    project.Data_In || '-',
-                    project.No_Urut_Dokumen || '-',
-                    Array.isArray(project.Type) ? project.Type.join(', ') : project.Type || '-',
-                    project.PIC || '-',
-                    project.Start_Date || '-',
-                    project.Status || '-',
-                    project.Remarks || '-',
-                    project.Clarification ? 'Ya' : 'Tidak'
-                ]);
-
-                // Add table
-                doc.autoTable({
-                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Remarks', 'Klarifikasi']],
-                    body: tableData,
-                    startY: 30,
-                    styles: { fontSize: 8 },
-                    headStyles: { fillColor: [37, 99, 235] }
-                });
-
-                // Save the PDF
-                doc.save(`Laporan_Project_${currentDate.replace(/\//g, '-')}.pdf`);
-                showAlert('PDF berhasil diexport!', 'success');
-            } catch (error) {
-                console.error("Error exporting to PDF:", error);
-                showAlert('Gagal mengexport PDF', 'error');
-            }
-        }
-
-        // --- Improved Login Functionality ---
-        function initLogin() {
-            const loginForm = document.getElementById('login-form');
-            const loginBtn = document.getElementById('login-btn');
-            const loginError = document.getElementById('login-error');
-
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    handleLogin();
-                });
-            }
-
-            // Check if user is already logged in
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    // User is signed in, hide login and show main content
-                    document.getElementById('auth-container').style.display = 'none';
-                    document.getElementById('main-container').style.display = 'flex';
-                    // Load initial data dan tampilkan dashboard
-                    loadDashboardData();
-                    showSection('dashboard-section');
-                } else {
-                    // User is signed out, show login
-                    document.getElementById('auth-container').style.display = 'flex';
-                    document.getElementById('main-container').style.display = 'none';
-                }
-            });
-        }
-
-        function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('login-btn');
-            const loginError = document.getElementById('login-error');
-
-            // Show loading state
-            loginBtn.classList.add('loading');
-            loginError.style.display = 'none';
-
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Login successful
-                    loginBtn.classList.remove('loading');
-                    showAlert('Login berhasil!', 'success');
-                })
-                .catch((error) => {
-                    // Login failed
-                    loginBtn.classList.remove('loading');
-                    let errorMessage = 'Email atau password salah.';
-                    
-                    if (error.code === 'auth/wrong-password') {
-                        errorMessage = 'Password yang Anda masukkan salah.';
-                    } else if (error.code === 'auth/user-not-found') {
-                        errorMessage = 'Email tidak ditemukan.';
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorMessage = 'Format email tidak valid.';
-                    } else if (error.code === 'auth/too-many-requests') {
-                        errorMessage = 'Terlalu banyak percobaan login. Coba lagi nanti.';
-                    }
-                    
-                    loginError.textContent = errorMessage;
-                    loginError.style.display = 'block';
-                    console.error("Login error:", error);
-                });
-        }
-
-        function logout() {
-            auth.signOut().then(() => {
-                showAlert('Logout berhasil!', 'success');
-            }).catch((error) => {
-                console.error("Logout error:", error);
-            });
-        }
-
-        // --- Fungsi Navigasi Sidebar ---
-        function showSection(targetId) {
-            const contentSections = document.querySelectorAll('.content-section');
-            const navItems = document.querySelectorAll('.nav-item');
+    // Project form submission (untuk project utama)
+    const projectForm = document.getElementById('project-form');
+    if (projectForm) {
+        projectForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            contentSections.forEach(section => {
-                section.style.display = 'none';
-            });
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-            }
-
-            navItems.forEach(item => item.classList.remove('active'));
-            const activeNavItem = document.querySelector(`.nav-item[data-target="${targetId}"]`);
-            if (activeNavItem) {
-                activeNavItem.classList.add('active');
-            }
-
-            if (targetId === 'dashboard-section') {
-                loadDashboardData();
-            } else if (targetId === 'project-list-section') {
-                loadProjectsToTable();
-            }
-        }
-        window.showSection = showSection;
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            initLogin();
+            const salesClient = document.getElementById('sales-client').value;
+            const otherSales = document.getElementById('other-sales').value;
+            const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
             
-            // Setup event listeners untuk navigasi setelah login
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.nav-item')) {
-                    const navItem = e.target.closest('.nav-item');
-                    const targetId = navItem.dataset.target;
-                    if (targetId) {
-                        e.preventDefault();
-                        showSection(targetId);
-                    } else if (navItem.id === 'logout-btn') {
-                        e.preventDefault();
-                        logout();
-                    }
-                }
+            // Get selected types
+            const selectedTypes = [];
+            const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]:checked');
+            typeCheckboxes.forEach(checkbox => {
+                selectedTypes.push(checkbox.value);
             });
-
-            // Setup sidebar toggle
-            const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
-            const sidebar = document.querySelector('.sidebar');
             
-            if (sidebarToggleBtn && sidebar) {
-                sidebarToggleBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('collapsed');
-                    const isCollapsed = sidebar.classList.contains('collapsed');
-                    localStorage.setItem('sidebarCollapsed', isCollapsed);
-                });
-
-                // Load saved sidebar state
-                const savedSidebarState = localStorage.getItem('sidebarCollapsed');
-                if (savedSidebarState === 'true') {
-                    sidebar.classList.add('collapsed');
-                }
-            }
-
-            // Filter form handler
-            const filterForm = document.querySelector('#filter-form');
-            if (filterForm) {
-                filterForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    applyFilters();
-                });
-            }
-
-            // Reset filters button
-            const resetFiltersBtn = document.getElementById('reset-filters-btn');
-            if (resetFiltersBtn) {
-                resetFiltersBtn.addEventListener('click', function() {
-                    document.getElementById('filter-status').value = '';
-                    document.getElementById('filter-type').value = '';
-                    document.getElementById('filter-pic').value = '';
-                    document.getElementById('filter-month').value = '';
-                    document.getElementById('filter-search').value = '';
-                    filteredProjectData = [...allProjectData];
-                    window.currentPage = 1;
-                    renderProjectsTable(filteredProjectData);
-                });
-            }
-
-            // Add project button (untuk project utama)
-            const addProjectBtn = document.getElementById('add-project-btn');
-            if (addProjectBtn) {
-                addProjectBtn.addEventListener('click', function() {
-                    // Reset form and enable all fields
-                    document.getElementById('project-form').reset();
-                    document.getElementById('data-in').disabled = false;
-                    document.getElementById('no-urut-dokumen').disabled = true;
-                    document.getElementById('data-in').classList.remove('readonly-field');
-                    document.getElementById('no-urut-dokumen').classList.add('readonly-field');
-                    document.getElementById('other-sales-container').style.display = 'none';
-                    
-                    // Reset type checkboxes
-                    const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]');
-                    typeCheckboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                    
-                    // Reset clarification checkbox
-                    document.getElementById('clarification').checked = false;
-                    
-                    currentEditingProjectId = null;
-                    
-                    // Set current month as default for data-in
-                    const today = new Date();
-                    const currentMonth = today.toISOString().substring(0, 7);
-                    document.getElementById('data-in').value = currentMonth;
-                    
-                    // Show modal
-                    document.getElementById('project-modal').style.display = 'flex';
-                });
-            }
-
-            // Export to PDF button
-            const exportPdfBtn = document.getElementById('export-pdf-btn');
-            if (exportPdfBtn) {
-                exportPdfBtn.addEventListener('click', function() {
-                    exportToPDF();
-                });
-            }
-
-            // Sales dropdown handler for "Other" option
-            document.addEventListener('change', function(e) {
-                if (e.target.id === 'sales-client' && e.target.value === 'Other') {
-                    document.getElementById('other-sales-container').style.display = 'block';
-                } else if (e.target.id === 'sales-client') {
-                    document.getElementById('other-sales-container').style.display = 'none';
-                }
-            });
-
-            // Project form submission (untuk project utama)
-            const projectForm = document.getElementById('project-form');
-            if (projectForm) {
-                projectForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const salesClient = document.getElementById('sales-client').value;
-                    const otherSales = document.getElementById('other-sales').value;
-                    const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
-                    
-                    // Get selected types
-                    const selectedTypes = [];
-                    const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]:checked');
-                    typeCheckboxes.forEach(checkbox => {
-                        selectedTypes.push(checkbox.value);
-                    });
-                    
-                    if (selectedTypes.length === 0) {
-                        showAlert('Pilih minimal satu tipe', 'error');
-                        return;
-                    }
-                    
-                    const projectData = {
-                        salesClient: finalSalesClient,
-                        projectName: document.getElementById('project-name').value,
-                        dataIn: document.getElementById('data-in').value + '-01', // Tambah hari untuk format lengkap
-                        type: selectedTypes,
-                        pic: document.getElementById('pic').value,
-                        startDate: document.getElementById('start-date').value + '-01', // Tambah hari untuk format lengkap
-                        status: document.getElementById('status').value,
-                        clarification: document.getElementById('clarification').checked,
-                        remarks: document.getElementById('remarks').value
-                    };
-
-                    let success = false;
-                    if (currentEditingProjectId) {
-                        // Update existing project - exclude dataIn and noUrutDokumen from update
-                        const { dataIn, noUrutDokumen, ...updateData } = projectData;
-                        success = await updateProject(currentEditingProjectId, updateData);
-                    } else {
-                        // Add new project
-                        success = await addProject(projectData);
-                    }
-
-                    if (success) {
-                        // PERBAIKAN: Hanya sekali close modal
-                        document.getElementById('project-modal').style.display = 'none';
-                        document.getElementById('data-in').disabled = false;
-                        document.getElementById('no-urut-dokumen').disabled = false;
-                        document.getElementById('data-in').classList.remove('readonly-field');
-                        document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
-                        currentEditingProjectId = null;
-                    }
-                });
-            }
-
-            // Status form submission
-            const statusForm = document.getElementById('status-form');
-            if (statusForm) {
-                statusForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const newStatus = document.getElementById('status-select').value;
-                    const success = await updateProject(currentEditingProjectId, { status: newStatus });
-                    
-                    if (success) {
-                        document.getElementById('status-modal').style.display = 'none';
-                        currentEditingProjectId = null;
-                    }
-                });
-            }
-
-            // Delete confirmation handlers
-            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-            
-            if (confirmDeleteBtn) {
-                confirmDeleteBtn.addEventListener('click', async function() {
-                    const success = await deleteProject(currentEditingProjectId);
-                    if (success) {
-                        document.getElementById('delete-modal').style.display = 'none';
-                        currentEditingProjectId = null;
-                    }
-                });
+            if (selectedTypes.length === 0) {
+                showAlert('Pilih minimal satu tipe', 'error');
+                return;
             }
             
-            if (cancelDeleteBtn) {
-                cancelDeleteBtn.addEventListener('click', function() {
-                    document.getElementById('delete-modal').style.display = 'none';
-                    currentEditingProjectId = null;
-                });
+            const projectData = {
+                salesClient: finalSalesClient,
+                projectName: document.getElementById('project-name').value,
+                dataIn: document.getElementById('data-in').value,
+                type: selectedTypes,
+                pic: document.getElementById('pic').value,
+                startDate: document.getElementById('start-date').value,
+                status: document.getElementById('status').value,
+                clarification: document.getElementById('clarification').checked,
+                remarks: document.getElementById('remarks').value
+            };
+
+            let success = false;
+            if (currentEditingProjectId) {
+                // Update existing project - exclude dataIn and noUrutDokumen from update
+                const { dataIn, noUrutDokumen, ...updateData } = projectData;
+                success = await updateProject(currentEditingProjectId, updateData);
+            } else {
+                // Add new project
+                success = await addProject(projectData);
             }
 
-            // Modal close buttons - FIXED: Properly handle modal closing
-            const closeButtons = document.querySelectorAll('.modal-close-btn');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const modal = this.closest('.modal');
-                    if (modal) {
-                        modal.style.display = 'none';
-                        // Reset form fields only for project modal
-                        if (modal.id === 'project-modal') {
-                            document.getElementById('data-in').disabled = false;
-                            document.getElementById('no-urut-dokumen').disabled = false;
-                            document.getElementById('data-in').classList.remove('readonly-field');
-                            document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
-                            currentEditingProjectId = null;
-                        }
-                    }
-                });
-            });
-
-            // Close modal when clicking outside - FIXED: Properly handle modal closing
-            window.addEventListener('click', function(e) {
-                if (e.target.classList.contains('modal')) {
-                    e.target.style.display = 'none';
-                    // Reset form fields only for project modal
-                    if (e.target.id === 'project-modal') {
-                        document.getElementById('data-in').disabled = false;
-                        document.getElementById('no-urut-dokumen').disabled = false;
-                        document.getElementById('data-in').classList.remove('readonly-field');
-                        document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
-                        currentEditingProjectId = null;
-                    }
-                }
-            });
+            if (success) {
+                // PERBAIKAN: Hanya sekali close modal
+                document.getElementById('project-modal').style.display = 'none';
+                document.getElementById('data-in').disabled = false;
+                document.getElementById('no-urut-dokumen').disabled = false;
+                document.getElementById('data-in').classList.remove('readonly-field');
+                document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
+                currentEditingProjectId = null;
+            }
+            }
+        });
         });
 
     </script>
@@ -3042,7 +2984,7 @@
                 </div>
                 <div class="form-group">
                     <label for="data-in">Data In</label>
-                    <input type="month" id="data-in" class="filter-input" required>
+                    <input type="date" id="data-in" class="filter-input" required>
                 </div>
                 <div class="form-group">
                     <label for="no-urut-dokumen">No Urut Dokumen</label>
@@ -3083,7 +3025,7 @@
                 </div>
                 <div class="form-group">
                     <label for="start-date">Start Date</label>
-                    <input type="month" id="start-date" class="filter-input">
+                    <input type="date" id="start-date" class="filter-input">
                 </div>
                 <div class="form-group">
                     <label for="status">Status</label>
