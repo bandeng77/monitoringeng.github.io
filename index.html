@@ -1123,7 +1123,7 @@
             projectTableBody.innerHTML = ''; // Clear existing rows
 
             if (data.length === 0) {
-                projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project yang cocok.</td></tr>';
+                projectTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; vertical-align: middle;">Tidak ada data project yang cocok.</td></tr>';
                 renderPagination(0, 0); // Render empty pagination
                 return;
             }
@@ -1146,6 +1146,9 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
+                // Format klarifikasi untuk display
+                const displayClarification = project.Clarification ? 'Ya' : 'Tidak';
+
                 // PERBAIKAN: Semua data diubah menjadi huruf besar dan menggunakan vertical align middle
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
@@ -1167,6 +1170,7 @@
                             </button>
                         </td>
                         <td>${toUpperCase(project.Remarks) || '-'}</td>
+                        <td>${displayClarification}</td>
                         <td class="action-cell">
                             <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
                                 <i class="fas fa-edit"></i>
@@ -1260,6 +1264,9 @@
                     project.Type.map(type => toUpperCase(type)).join(', ') : 
                     toUpperCase(project.Type);
 
+                // Format klarifikasi untuk display
+                const displayClarification = project.Clarification ? 'Ya' : 'Tidak';
+
                 // Create modal content - PERBAIKAN: Tambah toUpperCase untuk data
                 const modalContent = `
                     <div class="modal-content" style="max-width: 900px;">
@@ -1301,6 +1308,10 @@
                                     <strong>Status:</strong><br>
                                     ${project.Status || '-'}
                                 </div>
+                                <div>
+                                    <strong>Klarifikasi:</strong><br>
+                                    ${displayClarification}
+                                </div>
                                 <div style="grid-column: 1 / -1;">
                                     <strong>Keterangan:</strong><br>
                                     ${toUpperCase(project.Remarks) || '-'}
@@ -1339,6 +1350,7 @@
                                                 <div><strong>PIC:</strong><br>${toUpperCase(detail.pic) || '-'}</div>
                                                 <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
                                                 <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                                <div><strong>Klarifikasi:</strong><br>${detail.clarification ? 'Ya' : 'Tidak'}</div>
                                                 <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${toUpperCase(detail.remarks) || '-'}</div>
                                             </div>
                                         </div>
@@ -1488,6 +1500,13 @@
                                 </select>
                             </div>
                             <div class="form-group">
+                                <label for="edit-clarification">Klarifikasi</label>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="edit-clarification" ${detail.clarification ? 'checked' : ''}>
+                                    <label for="edit-clarification">Ya</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="edit-remarks">Remarks</label>
                                 <textarea id="edit-remarks" class="filter-input" rows="3">${detail.remarks || ''}</textarea>
                             </div>
@@ -1552,6 +1571,7 @@
             const pic = document.getElementById('edit-pic').value;
             const startDate = document.getElementById('edit-start-date').value;
             const status = document.getElementById('edit-status').value;
+            const clarification = document.getElementById('edit-clarification').checked;
             const remarks = document.getElementById('edit-remarks').value;
 
             // Get selected types
@@ -1574,6 +1594,7 @@
                     pic: pic,
                     startDate: startDate,
                     status: status,
+                    clarification: clarification,
                     remarks: remarks,
                     types: selectedTypes,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1672,6 +1693,13 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="add-clarification">Klarifikasi</label>
+                            <div class="multiple-select-option">
+                                <input type="checkbox" id="add-clarification">
+                                <label for="add-clarification">Ya</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="add-remarks">Remarks</label>
                             <textarea id="add-remarks" class="filter-input" rows="3"></textarea>
                         </div>
@@ -1734,6 +1762,7 @@
             const pic = document.getElementById('add-pic').value;
             const startDate = document.getElementById('add-start-date').value;
             const status = document.getElementById('add-status').value;
+            const clarification = document.getElementById('add-clarification').checked;
             const remarks = document.getElementById('add-remarks').value;
 
             // Get selected types
@@ -1757,6 +1786,7 @@
                     pic: pic,
                     startDate: startDate,
                     status: status,
+                    clarification: clarification,
                     remarks: remarks,
                     types: selectedTypes,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1895,7 +1925,7 @@
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
 
-            projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Memuat data...</td></tr>';
+            projectTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; vertical-align: middle;">Memuat data...</td></tr>';
 
             try {
                 // Unsubscribe previous listener if exists
@@ -1905,7 +1935,7 @@
 
                 window.projectUnsubscribe = projectsCol.onSnapshot(async (snapshot) => {
                     if (snapshot.empty) {
-                        projectTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center; vertical-align: middle;">Tidak ada data project.</td></tr>';
+                        projectTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center; vertical-align: middle;">Tidak ada data project.</td></tr>';
                         allProjectData = [];
                         filteredProjectData = [];
                         renderPagination(0, 0);
@@ -1957,6 +1987,7 @@
                             PIC: combinedPIC, // PERBAIKAN: Gunakan combined PIC
                             Start_Date: project.startDate || '',
                             Status: project.status || '',
+                            Clarification: project.clarification || false,
                             Remarks: project.remarks || ''
                         });
                     });
@@ -1971,12 +2002,12 @@
                     updateTypeFilterDropdown(allProjectData);
                 }, (error) => {
                     console.error("Error loading projects: ", error);
-                    projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                    projectTableBody.innerHTML = `<tr><td colspan="12" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
                     showAlert("Gagal memuat data project: " + error.message, 'error');
                 });
             } catch (error) {
                 console.error("Error setting up project listener: ", error);
-                projectTableBody.innerHTML = `<tr><td colspan="11" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
+                projectTableBody.innerHTML = `<tr><td colspan="12" style="text-align: center; vertical-align: middle; color: var(--danger);">Gagal memuat data: ${error.message}</td></tr>`;
                 showAlert("Gagal memuat data project: " + error.message, 'error');
             }
         }
@@ -2073,6 +2104,7 @@
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
             const picFilter = document.getElementById('filter-pic').value;
+            const dateFilter = document.getElementById('filter-date').value;
             const searchKeyword = document.getElementById('filter-search').value.toLowerCase();
 
             filteredProjectData = allProjectData.filter(project => {
@@ -2097,6 +2129,13 @@
                 if (picFilter && picFilter !== '') {
                     const projectPICs = project.PIC ? project.PIC.toLowerCase().split(',').map(pic => pic.trim()) : [];
                     if (!projectPICs.includes(picFilter.toLowerCase())) {
+                        matches = false;
+                    }
+                }
+
+                // Date filter
+                if (dateFilter && dateFilter !== '') {
+                    if (project.Data_In !== dateFilter) {
                         matches = false;
                     }
                 }
@@ -2311,6 +2350,7 @@
             document.getElementById('pic').value = project.pic;
             document.getElementById('start-date').value = project.startDate;
             document.getElementById('status').value = project.status;
+            document.getElementById('clarification').checked = project.clarification || false;
             document.getElementById('remarks').value = project.remarks;
 
             // Make data-in and no-urut-dokumen readonly
@@ -2491,6 +2531,7 @@
                     document.getElementById('filter-status').value = '';
                     document.getElementById('filter-type').value = '';
                     document.getElementById('filter-pic').value = '';
+                    document.getElementById('filter-date').value = '';
                     document.getElementById('filter-search').value = '';
                     filteredProjectData = [...allProjectData];
                     window.currentPage = 1;
@@ -2515,6 +2556,9 @@
                     typeCheckboxes.forEach(checkbox => {
                         checkbox.checked = false;
                     });
+                    
+                    // Reset clarification checkbox
+                    document.getElementById('clarification').checked = false;
                     
                     currentEditingProjectId = null;
                     
@@ -2566,6 +2610,7 @@
                         pic: document.getElementById('pic').value,
                         startDate: document.getElementById('start-date').value,
                         status: document.getElementById('status').value,
+                        clarification: document.getElementById('clarification').checked,
                         remarks: document.getElementById('remarks').value
                     };
 
@@ -2822,6 +2867,10 @@
                                 </select>
                             </div>
                             <div class="filter-group">
+                                <label class="filter-label">Tanggal</label>
+                                <input type="date" class="filter-input" id="filter-date">
+                            </div>
+                            <div class="filter-group">
                                 <label class="filter-label">Cari</label>
                                 <input type="text" class="filter-input" id="filter-search" placeholder="Cari project...">
                             </div>
@@ -2856,7 +2905,8 @@
                                         <th style="width: 10%">PIC</th>
                                         <th style="width: 8%">Start Date</th>
                                         <th style="width: 8%">Status</th>
-                                        <th style="width: 12%">Remarks</th>
+                                        <th style="width: 10%">Remarks</th>
+                                        <th style="width: 5%">Klarifikasi</th>
                                         <th style="width: 5%">Aksi</th>
                                     </tr>
                                 </thead>
@@ -2961,6 +3011,13 @@
                         <option value="Done">Done</option>
                         <option value="Hold">Hold</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="clarification">Klarifikasi</label>
+                    <div class="multiple-select-option">
+                        <input type="checkbox" id="clarification">
+                        <label for="clarification">Ya</label>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="remarks">Remarks</label>
