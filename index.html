@@ -691,7 +691,7 @@
             font-size: 12px;
         }
 
-        /* Status Button */
+        /* Status Button - PERBAIKAN: Dipindahkan ke kolom status */
         .status-button {
             display: inline-flex;
             align-items: center;
@@ -730,7 +730,7 @@
             color: white;
         }
 
-        /* PERBAIKAN: Kolom aksi di tengah */
+        /* PERBAIKAN: Kolom aksi di tengah dengan tombol edit/hapus */
         .action-cell {
             display: flex;
             justify-content: center;
@@ -743,7 +743,7 @@
         }
 
         .action-btn {
-            padding: 0.4rem;
+            padding: 0.4rem 0.6rem;
             border-radius: 0.375rem;
             cursor: pointer;
             border: none;
@@ -753,8 +753,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             flex-shrink: 0;
         }
 
@@ -764,10 +764,29 @@
             transform: scale(1.1);
         }
 
-        /* PERBAIKAN: Pastikan icon edit/delete tidak keluar dari kolom aksi */
-        .action-cell .action-btn {
+        /* PERBAIKAN: Tombol edit dan hapus dalam kolom aksi */
+        .edit-project-btn, .delete-project-btn {
             margin: 0;
             padding: 0.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .edit-project-btn {
+            color: var(--primary);
+        }
+
+        .edit-project-btn:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .delete-project-btn {
+            color: var(--danger);
+        }
+
+        .delete-project-btn:hover {
+            background-color: rgba(220, 53, 69, 0.1);
         }
 
         /* Document Number Link */
@@ -1799,7 +1818,7 @@
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
-                // PERBAIKAN: Struktur HTML dengan penyesuaian posisi
+                // PERBAIKAN: Hanya ada tombol status di kolom Status, edit/hapus di kolom Aksi
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
