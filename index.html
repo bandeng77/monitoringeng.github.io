@@ -29,6 +29,13 @@
             --hover: #f1f5f9;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            /* WARNA TERANG UNTUK ANALYTICS/DASHBOARD */
+            --analytic-orange: #FF9800; /* Orange cerah */
+            --analytic-green: #28a745; /* Hijau cerah */
+            --analytic-red: #dc3545; /* Merah cerah */
+            --analytic-blue: #1565c0; /* Biru laut cerah */
+            --analytic-purple: #8a2be2; /* Ungu cerah */
         }
 
         * {
@@ -358,7 +365,7 @@
         }
 
         .nav-item.active {
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
             color: white;
             box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
         }
@@ -390,7 +397,7 @@
             position: absolute;
             top: 1.5rem;
             right: -12px;
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
             color: white;
             border: none;
             border-radius: 50%;
@@ -439,7 +446,7 @@
             font-size: 1.75rem;
             font-weight: 600;
             color: var(--dark);
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -497,7 +504,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
             color: white;
         }
 
@@ -664,6 +671,12 @@
         th:nth-child(11), td:nth-child(11) { width: 80px; min-width: 80px; max-width: 80px; } /* Klarifikasi */
         th:nth-child(12), td:nth-child(12) { width: 100px; min-width: 100px; max-width: 100px; } /* Aksi */
 
+        /* PERBAIKAN: Pastikan kolom aksi dan klarifikasi tidak tumpang tindih */
+        td:nth-child(11), td:nth-child(12) {
+            position: relative;
+            z-index: 1;
+        }
+
         /* Cell Content Styling - Improved for readability */
         .cell-content {
             overflow: hidden;
@@ -703,17 +716,17 @@
         }
 
         .status-on-progress {
-            background: linear-gradient(135deg, #ff9800, #ffb74d); /* Orange */
+            background: linear-gradient(135deg, var(--analytic-orange), #ffb347); /* Orange cerah */
             color: white;
         }
 
         .status-done {
-            background: linear-gradient(135deg, #28a745, #4caf50); /* Hijau */
+            background: linear-gradient(135deg, var(--analytic-green), #4caf50); /* Hijau cerah */
             color: white;
         }
 
         .status-hold {
-            background: linear-gradient(135deg, #dc3545, #f44336); /* Merah */
+            background: linear-gradient(135deg, var(--analytic-red), #f44336); /* Merah cerah */
             color: white;
         }
 
@@ -725,6 +738,8 @@
             align-items: center;
             min-height: 60px;
             padding: 0.5rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
 
         .action-btn {
@@ -747,6 +762,12 @@
             background-color: var(--hover);
             color: var(--primary);
             transform: scale(1.1);
+        }
+
+        /* PERBAIKAN: Pastikan icon edit/delete tidak keluar dari kolom aksi */
+        .action-cell .action-btn {
+            margin: 0;
+            padding: 0.35rem;
         }
 
         /* Document Number Link */
@@ -788,11 +809,11 @@
         }
 
         .klarifikasi-icon .fa-check-circle {
-            color: var(--success);
+            color: var(--analytic-green);
         }
 
         .klarifikasi-icon .fa-times-circle {
-            color: var(--danger);
+            color: var(--analytic-red);
         }
 
         /* Pagination */
@@ -833,7 +854,7 @@
         }
 
         .page-btn.active {
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
             color: white;
             border-color: transparent;
         }
@@ -982,15 +1003,15 @@
         }
 
         .custom-alert.success {
-            background: linear-gradient(135deg, #28a745, #20c997);
+            background: linear-gradient(135deg, var(--analytic-green), #20c997);
         }
 
         .custom-alert.error {
-            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            background: linear-gradient(135deg, var(--analytic-red), #e83e8c);
         }
 
         .custom-alert.info {
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
         }
 
         /* Dashboard Summary Grid */
@@ -1021,7 +1042,7 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary), #8a2be2);
+            background: linear-gradient(90deg, var(--primary), var(--analytic-purple));
             transform: scaleX(0);
             transition: transform 0.3s ease;
             transform-origin: left;
@@ -1048,26 +1069,22 @@
             color: var(--secondary);
         }
 
-        /* Specific colors for summary items */
+        /* Specific colors for summary items - WARNA LEBIH TERANG */
         .summary-item:nth-child(1) .summary-value { 
-            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-orange);
+            text-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
         }
         .summary-item:nth-child(2) .summary-value { 
-            background: linear-gradient(135deg, #4ecdc4, #44a08d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-blue);
+            text-shadow: 0 2px 4px rgba(21, 101, 192, 0.2);
         }
         .summary-item:nth-child(3) .summary-value { 
-            background: linear-gradient(135deg, #ffd166, #ffb347);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-purple);
+            text-shadow: 0 2px 4px rgba(138, 43, 226, 0.2);
         }
         .summary-item:nth-child(4) .summary-value { 
-            background: linear-gradient(135deg, #118ab2, #06d6a0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-green);
+            text-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
         }
 
         /* Status Summary Grid */
@@ -1105,41 +1122,37 @@
             color: var(--secondary);
         }
 
-        /* Specific colors for status summary items */
+        /* Specific colors for status summary items - WARNA LEBIH TERANG */
         .status-on-progress-summary {
-            border-left-color: #ff9800; /* Orange */
+            border-left-color: var(--analytic-orange);
         }
         .status-on-progress-summary .status-summary-value {
-            background: linear-gradient(135deg, #ff9800, #ffb74d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-orange);
+            text-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
         }
 
         .status-done-summary {
-            border-left-color: #28a745; /* Hijau */
+            border-left-color: var(--analytic-green);
         }
         .status-done-summary .status-summary-value {
-            background: linear-gradient(135deg, #28a745, #4caf50);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-green);
+            text-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
         }
 
         .status-hold-summary {
-            border-left-color: #dc3545; /* Merah */
+            border-left-color: var(--analytic-red);
         }
         .status-hold-summary .status-summary-value {
-            background: linear-gradient(135deg, #dc3545, #f44336);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--analytic-red);
+            text-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
         }
 
         .status-total-summary {
             border-left-color: var(--primary);
         }
         .status-total-summary .status-summary-value {
-            background: linear-gradient(135deg, var(--primary), #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
+            text-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
         }
 
         /* Analytics Chart Containers */
@@ -1241,11 +1254,23 @@
             white-space: nowrap;
         }
 
-        /* WARNA UNTUK ANALYTICS SESUAI PERMINTAAN */
-        .on-progress-stat .stat-value { color: #ff9800; } /* Orange */
-        .done-stat .stat-value { color: #28a745; } /* Hijau */
-        .hold-stat .stat-value { color: #dc3545; } /* Merah */
-        .clarification-stat .stat-value { color: #1565c0; } /* Biru Laut */
+        /* WARNA UNTUK ANALYTICS SESUAI PERMINTAAN - LEBIH TERANG */
+        .on-progress-stat .stat-value { 
+            color: var(--analytic-orange);
+            text-shadow: 0 1px 2px rgba(255, 152, 0, 0.2);
+        }
+        .done-stat .stat-value { 
+            color: var(--analytic-green);
+            text-shadow: 0 1px 2px rgba(40, 167, 69, 0.2);
+        }
+        .hold-stat .stat-value { 
+            color: var(--analytic-red);
+            text-shadow: 0 1px 2px rgba(220, 53, 69, 0.2);
+        }
+        .clarification-stat .stat-value { 
+            color: var(--analytic-blue);
+            text-shadow: 0 1px 2px rgba(21, 101, 192, 0.2);
+        }
 
         /* Multiple Select Styles */
         .multiple-select-container {
@@ -2266,16 +2291,16 @@
                         }).length
                     ],
                     backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)'
+                        'rgba(255, 152, 0, 0.8)', // Orange cerah
+                        'rgba(21, 101, 192, 0.8)', // Biru laut cerah
+                        'rgba(138, 43, 226, 0.8)', // Ungu cerah
+                        'rgba(40, 167, 69, 0.8)'  // Hijau cerah
                     ],
                     borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)'
+                        'rgba(255, 152, 0, 1)',
+                        'rgba(21, 101, 192, 1)',
+                        'rgba(138, 43, 226, 1)',
+                        'rgba(40, 167, 69, 1)'
                     ],
                     borderWidth: 2
                 }]
@@ -2290,14 +2315,14 @@
                         projects.filter(p => p.status === 'Hold').length
                     ],
                     backgroundColor: [
-                        'rgba(255, 152, 0, 0.7)', // Orange
-                        'rgba(40, 167, 69, 0.7)', // Hijau
-                        'rgba(220, 53, 69, 0.7)'  // Merah
+                        'rgba(255, 152, 0, 0.8)', // Orange cerah
+                        'rgba(40, 167, 69, 0.8)', // Hijau cerah
+                        'rgba(220, 53, 69, 0.8)'  // Merah cerah
                     ],
                     borderColor: [
-                        'rgba(255, 152, 0, 1)',   // Orange
-                        'rgba(40, 167, 69, 1)',   // Hijau
-                        'rgba(220, 53, 69, 1)'    // Merah
+                        'rgba(255, 152, 0, 1)',
+                        'rgba(40, 167, 69, 1)',
+                        'rgba(220, 53, 69, 1)'
                     ],
                     borderWidth: 2
                 }]
@@ -2496,28 +2521,28 @@
                         {
                             label: 'On Progress',
                             data: onProgressData,
-                            backgroundColor: 'rgba(255, 152, 0, 0.7)', // Orange
+                            backgroundColor: 'rgba(255, 152, 0, 0.8)', // Orange cerah
                             borderColor: 'rgba(255, 152, 0, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Done',
                             data: doneData,
-                            backgroundColor: 'rgba(40, 167, 69, 0.7)', // Hijau
+                            backgroundColor: 'rgba(40, 167, 69, 0.8)', // Hijau cerah
                             borderColor: 'rgba(40, 167, 69, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Hold',
                             data: holdData,
-                            backgroundColor: 'rgba(220, 53, 69, 0.7)', // Merah
+                            backgroundColor: 'rgba(220, 53, 69, 0.8)', // Merah cerah
                             borderColor: 'rgba(220, 53, 69, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Klarifikasi',
                             data: clarificationData,
-                            backgroundColor: 'rgba(21, 101, 192, 0.7)', // Biru Laut
+                            backgroundColor: 'rgba(21, 101, 192, 0.8)', // Biru Laut cerah
                             borderColor: 'rgba(21, 101, 192, 1)',
                             borderWidth: 1
                         }
@@ -2593,28 +2618,28 @@
 
                     <div class="type-stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center;">
                         <div class="stat-box" style="background: rgba(255, 152, 0, 0.1); padding: 1rem; border-radius: 10px; border: 2px solid rgba(255, 152, 0, 0.3);">
-                            <div style="font-size: 1.8rem; font-weight: bold; color: #ff9800;">${typeData.onProgress}</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--analytic-orange);">${typeData.onProgress}</div>
                             <div style="color: var(--secondary); font-size: 0.9rem;">On Progress</div>
                             <div style="font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem;">
                                 ${total > 0 ? Math.round((typeData.onProgress / total) * 100) : 0}%
                             </div>
                         </div>
                         <div class="stat-box" style="background: rgba(40, 167, 69, 0.1); padding: 1rem; border-radius: 10px; border: 2px solid rgba(40, 167, 69, 0.3);">
-                            <div style="font-size: 1.8rem; font-weight: bold; color: #28a745;">${typeData.done}</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--analytic-green);">${typeData.done}</div>
                             <div style="color: var(--secondary); font-size: 0.9rem;">Done</div>
                             <div style="font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem;">
                                 ${total > 0 ? Math.round((typeData.done / total) * 100) : 0}%
                             </div>
                         </div>
                         <div class="stat-box" style="background: rgba(220, 53, 69, 0.1); padding: 1rem; border-radius: 10px; border: 2px solid rgba(220, 53, 69, 0.3);">
-                            <div style="font-size: 1.8rem; font-weight: bold; color: #dc3545;">${typeData.hold}</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--analytic-red);">${typeData.hold}</div>
                             <div style="color: var(--secondary); font-size: 0.9rem;">Hold</div>
                             <div style="font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem;">
                                 ${total > 0 ? Math.round((typeData.hold / total) * 100) : 0}%
                             </div>
                         </div>
                         <div class="stat-box" style="background: rgba(21, 101, 192, 0.1); padding: 1rem; border-radius: 10px; border: 2px solid rgba(21, 101, 192, 0.3);">
-                            <div style="font-size: 1.8rem; font-weight: bold; color: #1565c0;">${typeData.clarification}</div>
+                            <div style="font-size: 1.8rem; font-weight: bold; color: var(--analytic-blue);">${typeData.clarification}</div>
                             <div style="color: var(--secondary); font-size: 0.9rem;">Klarifikasi</div>
                             <div style="font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem;">
                                 ${total > 0 ? Math.round((typeData.clarification / total) * 100) : 0}%
@@ -2653,10 +2678,10 @@
                             datasets: [{
                                 data: [typeData.onProgress, typeData.done, typeData.hold, typeData.clarification],
                                 backgroundColor: [
-                                    'rgba(255, 152, 0, 0.7)', // Orange
-                                    'rgba(40, 167, 69, 0.7)', // Hijau
-                                    'rgba(220, 53, 69, 0.7)', // Merah
-                                    'rgba(21, 101, 192, 0.7)' // Biru Laut
+                                    'rgba(255, 152, 0, 0.8)', // Orange
+                                    'rgba(40, 167, 69, 0.8)', // Hijau
+                                    'rgba(220, 53, 69, 0.8)', // Merah
+                                    'rgba(21, 101, 192, 0.8)' // Biru Laut
                                 ],
                                 borderColor: [
                                     'rgba(255, 152, 0, 1)',
@@ -2887,7 +2912,7 @@
                             </div>
                             <div>
                                 <strong>Klarifikasi:</strong><br>
-                                ${project.Clarification ? '<i class="fas fa-check-circle" style="color: var(--success);"></i> Ya' : '<i class="fas fa-times-circle" style="color: var(--danger);"></i> Tidak'}
+                                ${project.Clarification ? '<i class="fas fa-check-circle" style="color: var(--analytic-green);"></i> Ya' : '<i class="fas fa-times-circle" style="color: var(--analytic-red);"></i> Tidak'}
                             </div>
                         </div>
 
