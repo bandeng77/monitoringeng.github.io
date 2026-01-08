@@ -31,11 +31,11 @@
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             
             /* WARNA TERANG UNTUK ANALYTICS/DASHBOARD */
-            --analytic-orange: #FF9800; /* Orange cerah */
-            --analytic-green: #28a745; /* Hijau cerah */
-            --analytic-red: #dc3545; /* Merah cerah */
-            --analytic-blue: #1565c0; /* Biru laut cerah */
-            --analytic-purple: #8a2be2; /* Ungu cerah */
+            --analytic-orange: #FF9800;
+            --analytic-green: #28a745;
+            --analytic-red: #dc3545;
+            --analytic-blue: #1565c0;
+            --analytic-purple: #8a2be2;
         }
 
         * {
@@ -620,6 +620,7 @@
             text-align: center;
             vertical-align: middle;
             border-bottom: 1px solid var(--border);
+            border-right: 1px solid var(--border);
             word-wrap: break-word;
             height: 60px;
             font-size: 13px;
@@ -636,15 +637,14 @@
             white-space: nowrap;
             font-size: 12px;
             padding: 0.75rem 0.5rem;
-            border-right: 1px solid var(--border);
         }
 
         td {
             color: var(--secondary);
             font-size: 12px;
-            border-right: 1px solid #f0f0f0;
         }
 
+        /* PERBAIKAN: Hilangkan border kanan untuk kolom terakhir */
         th:last-child, td:last-child {
             border-right: none;
         }
@@ -671,7 +671,7 @@
         th:nth-child(11), td:nth-child(11) { width: 80px; min-width: 80px; max-width: 80px; } /* Klarifikasi */
         th:nth-child(12), td:nth-child(12) { width: 100px; min-width: 100px; max-width: 100px; } /* Aksi */
 
-        /* PERBAIKAN: Pastikan kolom aksi dan klarifikasi tidak tumpang tindih */
+        /* PERBAIKAN: Pastikan kolom aksi dan klarifikasi di tengah */
         td:nth-child(11), td:nth-child(12) {
             position: relative;
             z-index: 1;
@@ -716,25 +716,26 @@
         }
 
         .status-on-progress {
-            background: linear-gradient(135deg, var(--analytic-orange), #ffb347); /* Orange cerah */
+            background: linear-gradient(135deg, var(--analytic-orange), #ffb347);
             color: white;
         }
 
         .status-done {
-            background: linear-gradient(135deg, var(--analytic-green), #4caf50); /* Hijau cerah */
+            background: linear-gradient(135deg, var(--analytic-green), #4caf50);
             color: white;
         }
 
         .status-hold {
-            background: linear-gradient(135deg, var(--analytic-red), #f44336); /* Merah cerah */
+            background: linear-gradient(135deg, var(--analytic-red), #f44336);
             color: white;
         }
 
-        /* Action Buttons - PERBAIKAN LAYOUT */
+        /* PERBAIKAN: Kolom aksi di tengah */
         .action-cell {
-            gap: 0.5rem;
+            display: flex;
             justify-content: center;
             align-items: center;
+            gap: 0.5rem;
             min-height: 60px;
             padding: 0.5rem;
             flex-wrap: nowrap;
@@ -789,13 +790,14 @@
             color: var(--primary-dark);
         }
 
-        /* Klarifikasi Icon - PERBAIKAN POSISI */
+        /* PERBAIKAN: Klarifikasi Icon - posisi tengah dan sejajar */
         .klarifikasi-cell {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 60px;
             padding: 0.5rem;
+            text-align: center;
         }
 
         .klarifikasi-icon {
@@ -1797,7 +1799,7 @@
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
-                // PERBAIKAN: Pastikan struktur HTML untuk kolom aksi benar
+                // PERBAIKAN: Struktur HTML dengan penyesuaian posisi
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
