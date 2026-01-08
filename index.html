@@ -612,7 +612,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            min-width: 1300px;
+            min-width: 1200px; /* Diperkecil karena kolom aksi dihapus */
         }
 
         th, td {
@@ -657,7 +657,7 @@
             background-color: var(--hover);
         }
 
-        /* Table Column Widths - PERBAIKAN LEBAR KOLOM */
+        /* Table Column Widths - PERBAIKAN LEBAR KOLOM (tanpa kolom aksi) */
         th:nth-child(1), td:nth-child(1) { width: 60px; min-width: 60px; max-width: 60px; } /* No */
         th:nth-child(2), td:nth-child(2) { width: 110px; min-width: 110px; max-width: 110px; } /* Sales/Client */
         th:nth-child(3), td:nth-child(3) { width: 140px; min-width: 140px; max-width: 140px; } /* Project Name */
@@ -669,13 +669,6 @@
         th:nth-child(9), td:nth-child(9) { width: 110px; min-width: 110px; max-width: 110px; } /* Status */
         th:nth-child(10), td:nth-child(10) { width: 130px; min-width: 130px; max-width: 130px; } /* Remarks */
         th:nth-child(11), td:nth-child(11) { width: 80px; min-width: 80px; max-width: 80px; } /* Klarifikasi */
-        th:nth-child(12), td:nth-child(12) { width: 100px; min-width: 100px; max-width: 100px; } /* Aksi */
-
-        /* PERBAIKAN: Pastikan kolom aksi dan klarifikasi di tengah */
-        td:nth-child(11), td:nth-child(12) {
-            position: relative;
-            z-index: 1;
-        }
 
         /* Cell Content Styling - Improved for readability */
         .cell-content {
@@ -728,65 +721,6 @@
         .status-hold {
             background: linear-gradient(135deg, var(--analytic-red), #f44336);
             color: white;
-        }
-
-        /* PERBAIKAN: Kolom aksi di tengah dengan tombol edit/hapus */
-        .action-cell {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            min-height: 60px;
-            padding: 0.5rem;
-            flex-wrap: nowrap;
-            white-space: nowrap;
-        }
-
-        .action-btn {
-            padding: 0.4rem 0.6rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            border: none;
-            background: transparent;
-            color: var(--secondary);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            flex-shrink: 0;
-        }
-
-        .action-btn:hover {
-            background-color: var(--hover);
-            color: var(--primary);
-            transform: scale(1.1);
-        }
-
-        /* PERBAIKAN: Tombol edit dan hapus dalam kolom aksi */
-        .edit-project-btn, .delete-project-btn {
-            margin: 0;
-            padding: 0.35rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .edit-project-btn {
-            color: var(--primary);
-        }
-
-        .edit-project-btn:hover {
-            background-color: rgba(67, 97, 238, 0.1);
-        }
-
-        .delete-project-btn {
-            color: var(--danger);
-        }
-
-        .delete-project-btn:hover {
-            background-color: rgba(220, 53, 69, 0.1);
         }
 
         /* Document Number Link */
@@ -1453,7 +1387,7 @@
             }
 
             table {
-                min-width: 1200px;
+                min-width: 1100px; /* Diperkecil untuk mobile */
             }
         }
 
@@ -1503,7 +1437,7 @@
             }
 
             table {
-                min-width: 1100px;
+                min-width: 1000px;
             }
         }
 
@@ -1543,17 +1477,7 @@
             }
 
             table {
-                min-width: 1000px;
-            }
-
-            .action-cell {
-                flex-direction: column;
-                gap: 0.25rem;
-            }
-
-            .action-btn {
-                width: 26px;
-                height: 26px;
+                min-width: 900px; /* Diperkecil untuk mobile kecil */
             }
         }
 
@@ -1584,6 +1508,31 @@
         .tooltip:hover .tooltip-text {
             visibility: visible;
             opacity: 1;
+        }
+
+        /* Tombol Edit dan Hapus di modal detail */
+        .detail-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .detail-edit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
+            color: white;
+        }
+
+        .detail-delete-btn {
+            background: linear-gradient(135deg, var(--analytic-red), #f44336);
+            color: white;
+        }
+
+        .detail-edit-btn:hover, .detail-delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
@@ -1755,7 +1704,7 @@
             if (data.length === 0) {
                 projectTableBody.innerHTML = `
                     <tr>
-                        <td colspan="12" class="empty-state">
+                        <td colspan="11" class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <h3>Tidak ada data project</h3>
                             <p>Tidak ditemukan project yang cocok dengan filter yang diterapkan</p>
@@ -1784,7 +1733,7 @@
             if (filteredByYear.length === 0) {
                 projectTableBody.innerHTML = `
                     <tr>
-                        <td colspan="12" class="empty-state">
+                        <td colspan="11" class="empty-state">
                             <i class="fas fa-calendar-times"></i>
                             <h3>Tidak ada data untuk tahun ${year}</h3>
                             <p>Tidak ditemukan project pada tahun yang dipilih</p>
@@ -1818,7 +1767,7 @@
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
-                // PERBAIKAN: Hanya ada tombol status di kolom Status, edit/hapus di kolom Aksi
+                // TANPA KOLOM AKSI - tombol edit/hapus dipindahkan ke modal detail
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
@@ -1844,14 +1793,6 @@
                                 ${clarificationIcon}
                             </div>
                         </td>
-                        <td class="action-cell">
-                            <button class="action-btn edit-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Edit Project">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn delete-project-btn" data-project-id="${project.No_Urut_Dokumen}" title="Hapus Project">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
                     </tr>
                 `);
             });
@@ -1863,22 +1804,6 @@
 
         // --- Attach event listeners to table buttons ---
         function attachTableEventListeners() {
-            // Edit buttons
-            document.querySelectorAll('.edit-project-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const projectId = this.getAttribute('data-project-id');
-                    showEditProjectModal(projectId);
-                });
-            });
-
-            // Delete buttons
-            document.querySelectorAll('.delete-project-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const projectId = this.getAttribute('data-project-id');
-                    showDeleteConfirmationModal(projectId);
-                });
-            });
-
             // Status buttons
             document.querySelectorAll('.status-button').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1896,6 +1821,19 @@
                     showProjectDetailsModal(projectId);
                 });
             });
+
+            // Klik pada baris tabel untuk membuka detail (opsional)
+            document.querySelectorAll('#project-table tbody tr').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    // Hanya jika klik bukan pada link atau tombol
+                    if (!e.target.closest('a') && !e.target.closest('button')) {
+                        const projectId = this.getAttribute('data-project-id');
+                        if (projectId) {
+                            showProjectDetailsModal(projectId);
+                        }
+                    }
+                });
+            });
         }
 
         // --- Load Projects to Table with Year Filter ---
@@ -1905,7 +1843,7 @@
 
             projectTableBody.innerHTML = `
                 <tr>
-                    <td colspan="12" class="loading-state">
+                    <td colspan="11" class="loading-state">
                         <div class="loading-spinner"></div>
                         <div class="loading-text">Memuat data project...</div>
                     </td>
@@ -1982,7 +1920,7 @@
                 console.error("Error loading projects: ", error);
                 projectTableBody.innerHTML = `
                     <tr>
-                        <td colspan="12" class="empty-state">
+                        <td colspan="11" class="empty-state">
                             <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
                             <h3>Gagal memuat data</h3>
                             <p>${error.message}</p>
@@ -2943,6 +2881,16 @@
                                 ${project.Remarks || '-'}
                             </div>
                         </div>
+
+                        <!-- Tombol Edit dan Hapus dipindahkan ke sini -->
+                        <div class="detail-actions">
+                            <button type="button" class="btn detail-edit-btn" id="detail-edit-btn" data-project-id="${projectId}">
+                                <i class="fas fa-edit"></i> Edit Project
+                            </button>
+                            <button type="button" class="btn detail-delete-btn" id="detail-delete-btn" data-project-id="${projectId}">
+                                <i class="fas fa-trash"></i> Hapus Project
+                            </button>
+                        </div>
                     </div>
                 `;
 
@@ -2951,6 +2899,19 @@
                 modal.style.display = 'flex';
                 modal.innerHTML = modalContent;
                 document.body.appendChild(modal);
+
+                // Add event listeners for edit and delete buttons
+                modal.querySelector('#detail-edit-btn').addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    modal.remove();
+                    showEditProjectModal(projectId);
+                });
+
+                modal.querySelector('#detail-delete-btn').addEventListener('click', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    modal.remove();
+                    showDeleteConfirmationModal(projectId);
+                });
 
                 modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                     modal.remove();
@@ -3856,7 +3817,6 @@
                                         <th>Status</th>
                                         <th>Remarks</th>
                                         <th>Klarifikasi</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
