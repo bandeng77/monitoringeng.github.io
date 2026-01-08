@@ -1534,6 +1534,35 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
+
+        /* Styling untuk project tambahan dalam modal detail */
+        .project-additional-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .project-additional-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .project-additional-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .project-additional-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -2815,7 +2844,7 @@
             document.getElementById('status-modal').style.display = 'flex';
         }
 
-        // --- Show Project Details Modal ---
+        // --- Show Project Details Modal (DITAMBAHKAN: dengan project tambahan) ---
         async function showProjectDetailsModal(projectId) {
             try {
                 const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
@@ -2824,8 +2853,35 @@
                     return;
                 }
 
+                // Get project details (tambahan) dari collection projectDetails
+                let projectDetails = [];
+                try {
+                    const detailsSnapshot = await projectDetailsCol
+                        .where('projectId', '==', projectId)
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                    
+                    if (!detailsSnapshot.empty) {
+                        detailsSnapshot.forEach(doc => {
+                            projectDetails.push({ id: doc.id, ...doc.data() });
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error loading project details:", error);
+                }
+
+                // Format types untuk display
+                const displayTypes = Array.isArray(project.Type) ? 
+                    project.Type.map(type => formatTextForDisplay(type, 15)).join(', ') : 
+                    formatTextForDisplay(project.Type, 15);
+
+                // Klarifikasi icon
+                const clarificationIcon = project.Clarification ? 
+                    '<i class="fas fa-check-circle" style="color: var(--analytic-green);"></i> Ya' : 
+                    '<i class="fas fa-times-circle" style="color: var(--analytic-red);"></i> Tidak';
+
                 const modalContent = `
-                    <div class="modal-content" style="max-width: 800px;">
+                    <div class="modal-content" style="max-width: 1000px;">
                         <span class="modal-close-btn">&times;</span>
                         <h2 class="card-title" style="margin-bottom: 1.5rem;">Detail Project</h2>
                         
@@ -2853,7 +2909,7 @@
                             </div>
                             <div>
                                 <strong>Tipe:</strong><br>
-                                ${Array.isArray(project.Type) ? project.Type.join(', ') : project.Type || '-'}
+                                ${displayTypes}
                             </div>
                             <div>
                                 <strong>PIC:</strong><br>
@@ -2871,7 +2927,7 @@
                             </div>
                             <div>
                                 <strong>Klarifikasi:</strong><br>
-                                ${project.Clarification ? '<i class="fas fa-check-circle" style="color: var(--analytic-green);"></i> Ya' : '<i class="fas fa-times-circle" style="color: var(--analytic-red);"></i> Tidak'}
+                                ${clarificationIcon}
                             </div>
                         </div>
 
@@ -2882,13 +2938,53 @@
                             </div>
                         </div>
 
+                        <!-- SECTION PROJECT TAMBAHAN -->
+                        <div style="margin-top: 2.5rem; border-top: 2px solid var(--border); padding-top: 1.5rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3 style="color: var(--dark);">Project Tambahan</h3>
+                                <button class="btn btn-primary" id="add-project-detail-btn">
+                                    <i class="fas fa-plus btn-icon"></i> Tambah Project
+                                </button>
+                            </div>
+                            
+                            ${projectDetails.length > 0 ? 
+                                projectDetails.map((detail, index) => `
+                                    <div class="project-additional-card">
+                                        <div class="project-additional-header">
+                                            <h4 style="color: var(--primary);">Project Tambahan ${index + 1}</h4>
+                                            <div class="project-additional-actions">
+                                                <button class="action-btn edit-detail-btn" data-detail-id="${detail.id}" title="Edit Project">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Project">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+                                            <div><strong>Sales/Client:</strong><br>${detail.salesClient || '-'}</div>
+                                            <div><strong>Nama Project:</strong><br>${detail.projectName || '-'}</div>
+                                            <div><strong>Tanggal Masuk:</strong><br>${detail.dataIn || '-'}</div>
+                                            <div><strong>Tipe:</strong><br>${Array.isArray(detail.types) ? detail.types.join(', ') : detail.types || '-'}</div>
+                                            <div><strong>PIC:</strong><br>${detail.pic || '-'}</div>
+                                            <div><strong>Tanggal Mulai:</strong><br>${detail.startDate || '-'}</div>
+                                            <div><strong>Status:</strong><br>${detail.status || '-'}</div>
+                                            <div><strong>Klarifikasi:</strong><br>${detail.clarification ? '<i class="fas fa-check-circle" style="color: var(--analytic-green);"></i> Ya' : '<i class="fas fa-times-circle" style="color: var(--analytic-red);"></i> Tidak'}</div>
+                                            <div style="grid-column: 1 / -1;"><strong>Keterangan:</strong><br>${detail.remarks || '-'}</div>
+                                        </div>
+                                    </div>
+                                `).join('') : 
+                                '<p style="text-align: center; color: var(--secondary); padding: 2rem; background: var(--light); border-radius: 8px;">Belum ada project tambahan</p>'
+                            }
+                        </div>
+
                         <!-- Tombol Edit dan Hapus dipindahkan ke sini -->
                         <div class="detail-actions">
                             <button type="button" class="btn detail-edit-btn" id="detail-edit-btn" data-project-id="${projectId}">
-                                <i class="fas fa-edit"></i> Edit Project
+                                <i class="fas fa-edit"></i> Edit Project Utama
                             </button>
                             <button type="button" class="btn detail-delete-btn" id="detail-delete-btn" data-project-id="${projectId}">
-                                <i class="fas fa-trash"></i> Hapus Project
+                                <i class="fas fa-trash"></i> Hapus Project Utama
                             </button>
                         </div>
                     </div>
@@ -2913,6 +3009,31 @@
                     showDeleteConfirmationModal(projectId);
                 });
 
+                // Add event listener for add project detail button
+                modal.querySelector('#add-project-detail-btn').addEventListener('click', function() {
+                    modal.remove();
+                    showAddProjectDetailModal(projectId, project);
+                });
+
+                // Add event listeners for edit detail buttons
+                modal.querySelectorAll('.edit-detail-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const detailId = this.getAttribute('data-detail-id');
+                        modal.remove();
+                        showEditProjectDetailModal(detailId, projectId);
+                    });
+                });
+
+                // Add event listeners for delete detail buttons
+                modal.querySelectorAll('.delete-detail-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const detailId = this.getAttribute('data-detail-id');
+                        if (confirm('Apakah Anda yakin ingin menghapus project tambahan ini?')) {
+                            deleteProjectDetail(detailId, projectId);
+                        }
+                    });
+                });
+
                 modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                     modal.remove();
                 });
@@ -2926,6 +3047,419 @@
             } catch (error) {
                 console.error("Error showing project details:", error);
                 showAlert('Gagal memuat detail project', 'error');
+            }
+        }
+
+        // --- Show Add Project Detail Modal ---
+        function showAddProjectDetailModal(projectId, baseProject) {
+            const modalContent = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <span class="modal-close-btn">&times;</span>
+                    <h2 class="card-title" style="margin-bottom: 1.5rem;">Tambah Project Tambahan</h2>
+                    <p style="color: var(--secondary); margin-bottom: 1.5rem;">Untuk project utama: <strong>${projectId}</strong></p>
+                    <form id="add-project-detail-form">
+                        <div class="form-group">
+                            <label for="add-detail-sales-client">Sales/Client</label>
+                            <select id="add-detail-sales-client" class="filter-input" required>
+                                <option value="">Pilih Sales/Client</option>
+                                <option value="Rangga">Rangga</option>
+                                <option value="Dhea">Dhea</option>
+                                <option value="Rory">Rory</option>
+                                <option value="Pamungkas">Pamungkas</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div id="add-detail-other-sales-container" class="form-group" style="display: none;">
+                            <label for="add-detail-other-sales">Keterangan Sales/Client Lainnya</label>
+                            <input type="text" id="add-detail-other-sales" class="filter-input" placeholder="Masukkan nama sales/client">
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-project-name">Project Name</label>
+                            <input type="text" id="add-detail-project-name" class="filter-input" value="${baseProject.Project_Name || ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-data-in">Data In</label>
+                            <input type="date" id="add-detail-data-in" class="filter-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-no-urut-dokumen">No Urut Dokumen (Project Utama)</label>
+                            <input type="text" id="add-detail-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipe *</label>
+                            <div class="multiple-select-container" id="add-detail-type-multiple-container">
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-detail-type-quotation" value="Quotation">
+                                    <label for="add-detail-type-quotation">Quotation</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-detail-type-dwg" value="DWG">
+                                    <label for="add-detail-type-dwg">DWG</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-detail-type-hydrolic" value="Hydrolic">
+                                    <label for="add-detail-type-hydrolic">Hydrolic</label>
+                                </div>
+                                <div class="multiple-select-option">
+                                    <input type="checkbox" id="add-detail-type-dokumen" value="Dokumen">
+                                    <label for="add-detail-type-dokumen">Dokumen</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-pic">PIC</label>
+                            <select id="add-detail-pic" class="filter-input">
+                                <option value="">Pilih PIC</option>
+                                <option value="Wahyu">Wahyu</option>
+                                <option value="Dhona">Dhona</option>
+                                <option value="Arifa">Arifa</option>
+                                <option value="Kartika">Kartika</option>
+                                <option value="Ardi">Ardi</option>
+                                <option value="Brian">Brian</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-start-date">Start Date</label>
+                            <input type="date" id="add-detail-start-date" class="filter-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-status">Status</label>
+                            <select id="add-detail-status" class="filter-input" required>
+                                <option value="">Pilih Status</option>
+                                <option value="On Progress">On Progress</option>
+                                <option value="Done">Done</option>
+                                <option value="Hold">Hold</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-clarification">Klarifikasi</label>
+                            <div class="checkbox-container">
+                                <input type="checkbox" id="add-detail-clarification">
+                                <label for="add-detail-clarification">Ya</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-detail-remarks">Remarks</label>
+                            <textarea id="add-detail-remarks" class="filter-input" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" id="cancel-add-detail">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Project</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = modalContent;
+            document.body.appendChild(modal);
+
+            // Set today's date as default
+            const today = new Date();
+            const currentDate = today.toISOString().substring(0, 10);
+            document.getElementById('add-detail-data-in').value = currentDate;
+
+            // Handle "Other" option in sales client dropdown
+            document.getElementById('add-detail-sales-client').addEventListener('change', function() {
+                if (this.value === 'Other') {
+                    document.getElementById('add-detail-other-sales-container').style.display = 'block';
+                } else {
+                    document.getElementById('add-detail-other-sales-container').style.display = 'none';
+                }
+            });
+
+            // Add event listeners
+            modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+                modal.remove();
+            });
+
+            modal.querySelector('#cancel-add-detail').addEventListener('click', function() {
+                modal.remove();
+            });
+
+            modal.querySelector('#add-project-detail-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await addProjectDetail(projectId, modal);
+            });
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // --- Show Edit Project Detail Modal ---
+        async function showEditProjectDetailModal(detailId, projectId) {
+            try {
+                const detailDoc = await projectDetailsCol.doc(detailId).get();
+                if (!detailDoc.exists) {
+                    showAlert('Detail project tidak ditemukan', 'error');
+                    return;
+                }
+
+                const detail = detailDoc.data();
+
+                const modalContent = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <span class="modal-close-btn">&times;</span>
+                        <h2 class="card-title" style="margin-bottom: 1.5rem;">Edit Project Tambahan</h2>
+                        <form id="edit-project-detail-form">
+                            <div class="form-group">
+                                <label for="edit-detail-sales-client">Sales/Client</label>
+                                <select id="edit-detail-sales-client" class="filter-input" required>
+                                    <option value="">Pilih Sales/Client</option>
+                                    <option value="Rangga" ${detail.salesClient === 'Rangga' ? 'selected' : ''}>Rangga</option>
+                                    <option value="Dhea" ${detail.salesClient === 'Dhea' ? 'selected' : ''}>Dhea</option>
+                                    <option value="Rory" ${detail.salesClient === 'Rory' ? 'selected' : ''}>Rory</option>
+                                    <option value="Pamungkas" ${detail.salesClient === 'Pamungkas' ? 'selected' : ''}>Pamungkas</option>
+                                    <option value="Other" ${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? 'selected' : ''}>Other</option>
+                                </select>
+                            </div>
+                            <div id="edit-detail-other-sales-container" class="form-group" style="display: ${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? 'block' : 'none'};">
+                                <label for="edit-detail-other-sales">Keterangan Sales/Client Lainnya</label>
+                                <input type="text" id="edit-detail-other-sales" class="filter-input" value="${!['Rangga','Dhea','Rory','Pamungkas'].includes(detail.salesClient) ? detail.salesClient : ''}" placeholder="Masukkan nama sales/client">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-project-name">Project Name</label>
+                                <input type="text" id="edit-detail-project-name" class="filter-input" value="${detail.projectName || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-data-in">Data In</label>
+                                <input type="date" id="edit-detail-data-in" class="filter-input" value="${detail.dataIn || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-no-urut-dokumen">No Urut Dokumen (Project Utama)</label>
+                                <input type="text" id="edit-detail-no-urut-dokumen" class="filter-input readonly-field" value="${projectId}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipe *</label>
+                                <div class="multiple-select-container" id="edit-detail-type-multiple-container">
+                                    <div class="multiple-select-option">
+                                        <input type="checkbox" id="edit-detail-type-quotation" value="Quotation" ${detail.types && detail.types.includes('Quotation') ? 'checked' : ''}>
+                                        <label for="edit-detail-type-quotation">Quotation</label>
+                                    </div>
+                                    <div class="multiple-select-option">
+                                        <input type="checkbox" id="edit-detail-type-dwg" value="DWG" ${detail.types && detail.types.includes('DWG') ? 'checked' : ''}>
+                                        <label for="edit-detail-type-dwg">DWG</label>
+                                    </div>
+                                    <div class="multiple-select-option">
+                                        <input type="checkbox" id="edit-detail-type-hydrolic" value="Hydrolic" ${detail.types && detail.types.includes('Hydrolic') ? 'checked' : ''}>
+                                        <label for="edit-detail-type-hydrolic">Hydrolic</label>
+                                    </div>
+                                    <div class="multiple-select-option">
+                                        <input type="checkbox" id="edit-detail-type-dokumen" value="Dokumen" ${detail.types && detail.types.includes('Dokumen') ? 'checked' : ''}>
+                                        <label for="edit-detail-type-dokumen">Dokumen</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-pic">PIC</label>
+                                <select id="edit-detail-pic" class="filter-input">
+                                    <option value="">Pilih PIC</option>
+                                    <option value="Wahyu" ${detail.pic === 'Wahyu' ? 'selected' : ''}>Wahyu</option>
+                                    <option value="Dhona" ${detail.pic === 'Dhona' ? 'selected' : ''}>Dhona</option>
+                                    <option value="Arifa" ${detail.pic === 'Arifa' ? 'selected' : ''}>Arifa</option>
+                                    <option value="Kartika" ${detail.pic === 'Kartika' ? 'selected' : ''}>Kartika</option>
+                                    <option value="Ardi" ${detail.pic === 'Ardi' ? 'selected' : ''}>Ardi</option>
+                                    <option value="Brian" ${detail.pic === 'Brian' ? 'selected' : ''}>Brian</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-start-date">Start Date</label>
+                                <input type="date" id="edit-detail-start-date" class="filter-input" value="${detail.startDate || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-status">Status</label>
+                                <select id="edit-detail-status" class="filter-input" required>
+                                    <option value="">Pilih Status</option>
+                                    <option value="On Progress" ${detail.status === 'On Progress' ? 'selected' : ''}>On Progress</option>
+                                    <option value="Done" ${detail.status === 'Done' ? 'selected' : ''}>Done</option>
+                                    <option value="Hold" ${detail.status === 'Hold' ? 'selected' : ''}>Hold</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-clarification">Klarifikasi</label>
+                                <div class="checkbox-container">
+                                    <input type="checkbox" id="edit-detail-clarification" ${detail.clarification ? 'checked' : ''}>
+                                    <label for="edit-detail-clarification">Ya</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-detail-remarks">Remarks</label>
+                                <textarea id="edit-detail-remarks" class="filter-input" rows="3">${detail.remarks || ''}</textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline" id="cancel-edit-detail">Batal</button>
+                                <button type="submit" class="btn btn-primary">Update Project</button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'flex';
+                modal.innerHTML = modalContent;
+                document.body.appendChild(modal);
+
+                // Handle "Other" option in sales client dropdown
+                document.getElementById('edit-detail-sales-client').addEventListener('change', function() {
+                    if (this.value === 'Other') {
+                        document.getElementById('edit-detail-other-sales-container').style.display = 'block';
+                    } else {
+                        document.getElementById('edit-detail-other-sales-container').style.display = 'none';
+                    }
+                });
+
+                // Add event listeners
+                modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+                    modal.remove();
+                });
+
+                modal.querySelector('#cancel-edit-detail').addEventListener('click', function() {
+                    modal.remove();
+                });
+
+                modal.querySelector('#edit-project-detail-form').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    await updateProjectDetail(detailId, projectId);
+                    modal.remove();
+                });
+
+                // Close modal when clicking outside
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error showing edit detail modal:", error);
+                showAlert('Gagal memuat form edit', 'error');
+            }
+        }
+
+        // --- Add Project Detail Function ---
+        async function addProjectDetail(projectId, modal) {
+            const salesClient = document.getElementById('add-detail-sales-client').value;
+            const otherSales = document.getElementById('add-detail-other-sales').value;
+            const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+            const projectName = document.getElementById('add-detail-project-name').value;
+            const dataIn = document.getElementById('add-detail-data-in').value;
+            const pic = document.getElementById('add-detail-pic').value;
+            const startDate = document.getElementById('add-detail-start-date').value;
+            const status = document.getElementById('add-detail-status').value;
+            const clarification = document.getElementById('add-detail-clarification').checked;
+            const remarks = document.getElementById('add-detail-remarks').value;
+
+            // Get selected types
+            const selectedTypes = [];
+            if (document.getElementById('add-detail-type-quotation').checked) selectedTypes.push('Quotation');
+            if (document.getElementById('add-detail-type-dwg').checked) selectedTypes.push('DWG');
+            if (document.getElementById('add-detail-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+            if (document.getElementById('add-detail-type-dokumen').checked) selectedTypes.push('Dokumen');
+
+            if (selectedTypes.length === 0) {
+                showAlert('Pilih minimal satu tipe', 'error');
+                return;
+            }
+
+            try {
+                const projectData = {
+                    projectId: projectId,
+                    salesClient: finalSalesClient,
+                    projectName: projectName,
+                    dataIn: dataIn,
+                    pic: pic,
+                    startDate: startDate,
+                    status: status,
+                    clarification: clarification,
+                    remarks: remarks,
+                    types: selectedTypes,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await projectDetailsCol.add(projectData);
+                showAlert('Project tambahan berhasil ditambahkan!', 'success');
+                
+                modal.remove();
+                // Refresh the details modal
+                showProjectDetailsModal(projectId);
+                
+            } catch (error) {
+                console.error("Error adding project detail:", error);
+                showAlert('Gagal menambahkan project tambahan: ' + error.message, 'error');
+            }
+        }
+
+        // --- Update Project Detail Function ---
+        async function updateProjectDetail(detailId, projectId) {
+            const salesClient = document.getElementById('edit-detail-sales-client').value;
+            const otherSales = document.getElementById('edit-detail-other-sales').value;
+            const finalSalesClient = salesClient === 'Other' ? otherSales : salesClient;
+            const projectName = document.getElementById('edit-detail-project-name').value;
+            const dataIn = document.getElementById('edit-detail-data-in').value;
+            const pic = document.getElementById('edit-detail-pic').value;
+            const startDate = document.getElementById('edit-detail-start-date').value;
+            const status = document.getElementById('edit-detail-status').value;
+            const clarification = document.getElementById('edit-detail-clarification').checked;
+            const remarks = document.getElementById('edit-detail-remarks').value;
+
+            // Get selected types
+            const selectedTypes = [];
+            if (document.getElementById('edit-detail-type-quotation').checked) selectedTypes.push('Quotation');
+            if (document.getElementById('edit-detail-type-dwg').checked) selectedTypes.push('DWG');
+            if (document.getElementById('edit-detail-type-hydrolic').checked) selectedTypes.push('Hydrolic');
+            if (document.getElementById('edit-detail-type-dokumen').checked) selectedTypes.push('Dokumen');
+
+            if (selectedTypes.length === 0) {
+                showAlert('Pilih minimal satu tipe', 'error');
+                return;
+            }
+
+            try {
+                const projectData = {
+                    salesClient: finalSalesClient,
+                    projectName: projectName,
+                    dataIn: dataIn,
+                    pic: pic,
+                    startDate: startDate,
+                    status: status,
+                    clarification: clarification,
+                    remarks: remarks,
+                    types: selectedTypes,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await projectDetailsCol.doc(detailId).update(projectData);
+                showAlert('Project tambahan berhasil diperbarui!', 'success');
+                
+                // Refresh the details modal
+                showProjectDetailsModal(projectId);
+                
+            } catch (error) {
+                console.error("Error updating project detail:", error);
+                showAlert('Gagal memperbarui project tambahan: ' + error.message, 'error');
+            }
+        }
+
+        // --- Delete Project Detail Function ---
+        async function deleteProjectDetail(detailId, projectId) {
+            try {
+                await projectDetailsCol.doc(detailId).delete();
+                showAlert('Project tambahan berhasil dihapus!', 'success');
+                
+                // Refresh the details modal
+                showProjectDetailsModal(projectId);
+                
+            } catch (error) {
+                console.error("Error deleting project detail:", error);
+                showAlert('Gagal menghapus project tambahan: ' + error.message, 'error');
             }
         }
 
@@ -3878,7 +4412,7 @@
     </div>
 
     <!-- Modals -->
-    <!-- Modal Tambah/Edit Project -->
+    <!-- Modal Tambah/Edit Project Utama -->
     <div id="project-modal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <span class="modal-close-btn">&times;</span>
