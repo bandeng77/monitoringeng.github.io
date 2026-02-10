@@ -1677,7 +1677,7 @@
         
         // Selected years and months
         let selectedYearDashboard = new Date().getFullYear();
-        let selectedMonthDashboard = new Date().getMonth() + 1;
+        let selectedMonthDashboard = 0; // 0 = Semua Bulan
         let selectedYearProject = new Date().getFullYear();
         let selectedMonthProject = new Date().getMonth() + 1;
         let selectedYearAnalytics = new Date().getFullYear();
@@ -1797,6 +1797,7 @@
 
         // --- Format month number to month name ---
         function formatMonthName(monthNumber) {
+            if (monthNumber === 0) return 'Semua Bulan';
             const months = [
                 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
@@ -1806,6 +1807,7 @@
 
         // --- Get month number from month name ---
         function getMonthNumber(monthName) {
+            if (monthName === 'Semua Bulan') return 0;
             const months = {
                 'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4,
                 'Mei': 5, 'Juni': 6, 'Juli': 7, 'Agustus': 8,
@@ -1851,16 +1853,31 @@
                         const types = Array.isArray(project.type) ? project.type : [project.type];
                         const matchesType = types.includes(typeName);
                         
-                        // Check if project matches selected year and month
+                        // Check if project matches selected year
                         let matchesDate = true;
-                        if (selectedYearDashboard && selectedMonthDashboard) {
+                        if (selectedYearDashboard) {
                             const projectDate = project.dataIn || project.startDate;
                             if (projectDate) {
                                 try {
                                     const dateObj = new Date(projectDate);
                                     const projectYear = dateObj.getFullYear();
+                                    matchesDate = (projectYear === selectedYearDashboard);
+                                } catch (error) {
+                                    matchesDate = false;
+                                }
+                            } else {
+                                matchesDate = false;
+                            }
+                        }
+                        
+                        // Check if project matches selected month (if not "Semua Bulan")
+                        if (selectedMonthDashboard !== 0) {
+                            const projectDate = project.dataIn || project.startDate;
+                            if (projectDate) {
+                                try {
+                                    const dateObj = new Date(projectDate);
                                     const projectMonth = dateObj.getMonth() + 1;
-                                    matchesDate = (projectYear === selectedYearDashboard && projectMonth === selectedMonthDashboard);
+                                    matchesDate = matchesDate && (projectMonth === selectedMonthDashboard);
                                 } catch (error) {
                                     matchesDate = false;
                                 }
@@ -1872,23 +1889,42 @@
                         return matchesType && matchesDate;
                     });
                     
-                    filterDescription = `Type: ${typeName} | Bulan: ${formatMonthName(selectedMonthDashboard)} ${selectedYearDashboard}`;
+                    const monthFilterText = selectedMonthDashboard === 0 ? 
+                        'Semua Bulan' : 
+                        formatMonthName(selectedMonthDashboard);
+                    
+                    filterDescription = `Type: ${typeName} | Tahun: ${selectedYearDashboard} | Bulan: ${monthFilterText}`;
                     
                 } else if (category === 'status') {
                     filteredProjects = projects.filter(project => {
                         // Check if project matches the status
                         const matchesStatus = project.status === title;
                         
-                        // Check if project matches selected year and month
+                        // Check if project matches selected year
                         let matchesDate = true;
-                        if (selectedYearDashboard && selectedMonthDashboard) {
+                        if (selectedYearDashboard) {
                             const projectDate = project.dataIn || project.startDate;
                             if (projectDate) {
                                 try {
                                     const dateObj = new Date(projectDate);
                                     const projectYear = dateObj.getFullYear();
+                                    matchesDate = (projectYear === selectedYearDashboard);
+                                } catch (error) {
+                                    matchesDate = false;
+                                }
+                            } else {
+                                matchesDate = false;
+                            }
+                        }
+                        
+                        // Check if project matches selected month (if not "Semua Bulan")
+                        if (selectedMonthDashboard !== 0) {
+                            const projectDate = project.dataIn || project.startDate;
+                            if (projectDate) {
+                                try {
+                                    const dateObj = new Date(projectDate);
                                     const projectMonth = dateObj.getMonth() + 1;
-                                    matchesDate = (projectYear === selectedYearDashboard && projectMonth === selectedMonthDashboard);
+                                    matchesDate = matchesDate && (projectMonth === selectedMonthDashboard);
                                 } catch (error) {
                                     matchesDate = false;
                                 }
@@ -1900,11 +1936,18 @@
                         return matchesStatus && matchesDate;
                     });
                     
-                    filterDescription = `Status: ${title} | Bulan: ${formatMonthName(selectedMonthDashboard)} ${selectedYearDashboard}`;
+                    const monthFilterText = selectedMonthDashboard === 0 ? 
+                        'Semua Bulan' : 
+                        formatMonthName(selectedMonthDashboard);
+                    
+                    filterDescription = `Status: ${title} | Tahun: ${selectedYearDashboard} | Bulan: ${monthFilterText}`;
                 }
 
                 if (filteredProjects.length === 0) {
-                    showAlert(`Tidak ada data untuk ${title} pada ${formatMonthName(selectedMonthDashboard)} ${selectedYearDashboard}`, 'info');
+                    const monthFilterText = selectedMonthDashboard === 0 ? 
+                        'Semua Bulan' : 
+                        formatMonthName(selectedMonthDashboard);
+                    showAlert(`Tidak ada data untuk ${title} pada ${monthFilterText} ${selectedYearDashboard}`, 'info');
                     return;
                 }
 
@@ -1966,7 +2009,6 @@
                         
                         <div class="form-actions">
                             <button type="button" class="btn btn-primary" id="export-dashboard-pdf">Export PDF</button>
-                            <button type="button" class="btn btn-outline modal-close-btn">Tutup</button>
                         </div>
                     </div>
                 `;
@@ -2009,9 +2051,9 @@
                 doc.text(`LAPORAN PROJECT - ${title.toUpperCase()}`, 148, 15, { align: 'center' });
                 
                 // Add filter info
-                const monthName = formatMonthName(selectedMonthDashboard);
+                const monthName = selectedMonthDashboard === 0 ? 'Semua Bulan' : formatMonthName(selectedMonthDashboard);
                 doc.setFontSize(10);
-                doc.text(`Periode: ${monthName} ${selectedYearDashboard} | Jumlah: ${projects.length} project`, 148, 22, { align: 'center' });
+                doc.text(`Tahun: ${selectedYearDashboard} | Bulan: ${monthName} | Jumlah: ${projects.length} project`, 148, 22, { align: 'center' });
 
                 if (projects.length === 0) {
                     showAlert('Tidak ada data untuk diexport', 'warning');
@@ -2063,7 +2105,8 @@
 
                 // Save the PDF
                 const currentDate = new Date().toLocaleDateString('id-ID');
-                doc.save(`${title}_${monthName}_${selectedYearDashboard}_${currentDate.replace(/\//g, '-')}.pdf`);
+                const monthText = selectedMonthDashboard === 0 ? 'Semua-Bulan' : formatMonthName(selectedMonthDashboard);
+                doc.save(`${title}_${selectedYearDashboard}_${monthText}_${currentDate.replace(/\//g, '-')}.pdf`);
                 showAlert(`PDF berhasil diexport! (${projects.length} data)`, 'success');
             } catch (error) {
                 console.error("Error exporting dashboard to PDF:", error);
@@ -2501,15 +2544,13 @@
                 const currentProjects = [];
                 snapshot.forEach(doc => {
                     const project = doc.data();
-                    // Filter by year and month from startDate or dataIn
+                    // Filter by year
                     let projectYear = null;
-                    let projectMonth = null;
                     
                     if (project.startDate) {
                         try {
                             const date = new Date(project.startDate);
                             projectYear = date.getFullYear();
-                            projectMonth = date.getMonth() + 1;
                         } catch (error) {
                             console.error("Error parsing startDate:", error);
                         }
@@ -2519,14 +2560,36 @@
                         try {
                             const date = new Date(project.dataIn);
                             projectYear = date.getFullYear();
-                            projectMonth = date.getMonth() + 1;
                         } catch (error) {
                             console.error("Error parsing dataIn:", error);
                         }
                     }
                     
-                    if (projectYear === year && projectMonth === month) {
-                        currentProjects.push(project);
+                    // Filter by month (if not "Semua Bulan")
+                    let projectMonth = null;
+                    if (projectYear === year) {
+                        if (project.startDate) {
+                            try {
+                                const date = new Date(project.startDate);
+                                projectMonth = date.getMonth() + 1;
+                            } catch (error) {
+                                console.error("Error parsing startDate for month:", error);
+                            }
+                        } 
+                        
+                        if (!projectMonth && project.dataIn) {
+                            try {
+                                const date = new Date(project.dataIn);
+                                projectMonth = date.getMonth() + 1;
+                            } catch (error) {
+                                console.error("Error parsing dataIn for month:", error);
+                            }
+                        }
+                        
+                        // Add project if month matches or if "Semua Bulan" is selected
+                        if (month === 0 || projectMonth === month) {
+                            currentProjects.push(project);
+                        }
                     }
                 });
                 
@@ -4013,9 +4076,10 @@
         function initializeYearMonthSelectors() {
             const years = [2025, 2026];
             const months = [
+                { value: 0, name: 'Semua Bulan' },
                 { value: 1, name: 'Januari' },
                 { value: 2, name: 'Februari' },
-                { value: 3, name: 'Januari' },
+                { value: 3, name: 'Maret' },
                 { value: 4, name: 'April' },
                 { value: 5, name: 'Mei' },
                 { value: 6, name: 'Juni' },
