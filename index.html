@@ -472,7 +472,7 @@
             color: var(--dark);
         }
 
-        .year-select {
+        .year-select, .month-select {
             padding: 0.5rem 1rem;
             border-radius: 8px;
             border: 1px solid var(--border);
@@ -483,7 +483,7 @@
             font-size: 0.9rem;
         }
 
-        .year-select:focus {
+        .year-select:focus, .month-select:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
@@ -1607,6 +1607,7 @@
         
         // Selected years
         let selectedYearDashboard = 2026;
+        let selectedMonthDashboard = '';
         let selectedYearProject = 2026;
         let selectedYearAnalytics = 2026;
 
@@ -1724,7 +1725,7 @@
         }
 
         // --- Render Projects to Table with Year Filter ---
-        function renderProjectsTable(data, year) {
+        function renderProjectsTable(data, year, month = '', typeFilter = '') {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
 
@@ -1745,8 +1746,10 @@
             }
 
             // Filter by selected year
-            const filteredByYear = year ? 
-                data.filter(project => {
+            let filteredData = data;
+            
+            if (year) {
+                filteredData = filteredData.filter(project => {
                     if (project.Data_In) {
                         try {
                             const projectYear = new Date(project.Data_In).getFullYear();
@@ -1756,16 +1759,42 @@
                         }
                     }
                     return false;
-                }) : 
-                data;
+                });
+            }
 
-            if (filteredByYear.length === 0) {
+            // Filter by month if provided
+            if (month) {
+                filteredData = filteredData.filter(project => {
+                    if (project.Data_In) {
+                        try {
+                            const projectMonth = project.Data_In.substring(0, 7); // YYYY-MM format
+                            return projectMonth === month;
+                        } catch (error) {
+                            return false;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            // Filter by type if provided
+            if (typeFilter) {
+                filteredData = filteredData.filter(project => {
+                    if (project.Type) {
+                        const projectTypes = Array.isArray(project.Type) ? project.Type : [project.Type];
+                        return projectTypes.includes(typeFilter);
+                    }
+                    return false;
+                });
+            }
+
+            if (filteredData.length === 0) {
                 projectTableBody.innerHTML = `
                     <tr>
                         <td colspan="11" class="empty-state">
                             <i class="fas fa-calendar-times"></i>
-                            <h3>Tidak ada data untuk tahun ${year}</h3>
-                            <p>Tidak ditemukan project pada tahun yang dipilih</p>
+                            <h3>Tidak ada data untuk filter yang dipilih</h3>
+                            <p>Tidak ditemukan project dengan kriteria yang dipilih</p>
                         </td>
                     </tr>
                 `;
@@ -1775,7 +1804,7 @@
 
             const startIndex = (window.currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            const paginatedData = filteredByYear.slice(startIndex, endIndex);
+            const paginatedData = filteredData.slice(startIndex, endIndex);
 
             let rowNum = startIndex + 1;
             const rowsHtml = [];
@@ -1796,7 +1825,6 @@
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
-                // TANPA KOLOM AKSI - tombol edit/hapus dipindahkan ke modal detail
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
@@ -1827,7 +1855,7 @@
             });
             
             projectTableBody.innerHTML = rowsHtml.join('');
-            renderPagination(filteredByYear.length, window.currentPage);
+            renderPagination(filteredData.length, window.currentPage);
             attachTableEventListeners();
         }
 
@@ -1866,7 +1894,7 @@
         }
 
         // --- Load Projects to Table with Year Filter ---
-        async function loadProjectsToTable(year = selectedYearProject) {
+        async function loadProjectsToTable(year = selectedYearProject, month = '', typeFilter = '') {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
 
@@ -1885,7 +1913,7 @@
                 if (snapshot.empty) {
                     allProjectData = [];
                     filteredProjectData = [];
-                    renderProjectsTable(filteredProjectData, year);
+                    renderProjectsTable(filteredProjectData, year, month, typeFilter);
                     return;
                 }
 
@@ -1939,7 +1967,7 @@
                 
                 allProjectData = currentAllProjectData;
                 filteredProjectData = [...allProjectData];
-                renderProjectsTable(filteredProjectData, year);
+                renderProjectsTable(filteredProjectData, year, month, typeFilter);
                 
                 // Update dropdown filters
                 updatePICFilterDropdown(allProjectData);
@@ -2127,7 +2155,7 @@
         }
 
         // --- Load Dashboard Data ---
-        async function loadDashboardData(year = selectedYearDashboard) {
+        async function loadDashboardData(year = selectedYearDashboard, month = selectedMonthDashboard) {
             try {
                 const dashboardContainer = document.getElementById('dashboard-section');
                 if (dashboardContainer) {
@@ -2145,7 +2173,7 @@
                 const snapshot = await projectsCol.get();
                 
                 if (snapshot.empty) {
-                    updateDashboardCounts([], year);
+                    updateDashboardCounts([], year, month);
                     updateAnalyticsData([], year);
                     const loadingDiv = document.getElementById('dashboard-loading');
                     if (loadingDiv) loadingDiv.remove();
@@ -2157,10 +2185,13 @@
                     const project = doc.data();
                     // Filter by year from startDate or dataIn
                     let projectYear = null;
+                    let projectMonth = null;
                     
                     if (project.startDate) {
                         try {
-                            projectYear = new Date(project.startDate).getFullYear();
+                            const date = new Date(project.startDate);
+                            projectYear = date.getFullYear();
+                            projectMonth = date.toISOString().substring(0, 7);
                         } catch (error) {
                             console.error("Error parsing startDate:", error);
                         }
@@ -2168,18 +2199,28 @@
                     
                     if (!projectYear && project.dataIn) {
                         try {
-                            projectYear = new Date(project.dataIn).getFullYear();
+                            const date = new Date(project.dataIn);
+                            projectYear = date.getFullYear();
+                            projectMonth = date.toISOString().substring(0, 7);
                         } catch (error) {
                             console.error("Error parsing dataIn:", error);
                         }
                     }
                     
-                    if (projectYear === year) {
+                    // Filter by year
+                    let include = projectYear === year;
+                    
+                    // Filter by month if selected
+                    if (include && month) {
+                        include = projectMonth === month;
+                    }
+                    
+                    if (include) {
                         currentProjects.push(project);
                     }
                 });
                 
-                updateDashboardCounts(currentProjects, year);
+                updateDashboardCounts(currentProjects, year, month);
                 updateAnalyticsData(currentProjects, year);
                 
                 const loadingDiv = document.getElementById('dashboard-loading');
@@ -2195,7 +2236,7 @@
         }
 
         // --- Update Dashboard Counts ---
-        function updateDashboardCounts(projects, year) {
+        function updateDashboardCounts(projects, year, month) {
             let quotationCount = 0;
             let dwgCount = 0;
             let hydrolicCount = 0;
@@ -2244,11 +2285,11 @@
             document.getElementById('total-projects-count').textContent = totalProjects;
 
             // Update charts
-            updateDashboardCharts(projects, year);
+            updateDashboardCharts(projects, year, month);
         }
 
         // --- Update Dashboard Charts ---
-        function updateDashboardCharts(projects, year) {
+        function updateDashboardCharts(projects, year, month) {
             // Destroy existing charts if they exist
             if (typeChartInstance) {
                 typeChartInstance.destroy();
@@ -2339,7 +2380,7 @@
                             },
                             title: {
                                 display: true,
-                                text: `Distribusi Project Tahun ${year}`,
+                                text: `Distribusi Project ${month ? `Bulan ${month}` : `Tahun ${year}`}`,
                                 font: {
                                     size: 14,
                                     weight: 'bold'
@@ -2370,7 +2411,7 @@
                             },
                             title: {
                                 display: true,
-                                text: `Status Project Tahun ${year}`,
+                                text: `Status Project ${month ? `Bulan ${month}` : `Tahun ${year}`}`,
                                 font: {
                                     size: 14,
                                     weight: 'bold'
@@ -2814,6 +2855,7 @@
                 if (checkbox) checkbox.checked = true;
             }
             
+            // Set PIC dengan huruf kapital yang benar
             document.getElementById('pic').value = project.pic || '';
             document.getElementById('start-date').value = project.startDate || '';
             document.getElementById('status').value = project.status || '';
@@ -3111,11 +3153,11 @@
                             <select id="add-detail-pic" class="filter-input">
                                 <option value="">Pilih PIC</option>
                                 <option value="Wahyu">Wahyu</option>
-                                <option value="Dhona">Dhona</option>
                                 <option value="Arifa">Arifa</option>
                                 <option value="Kartika">Kartika</option>
-                                <option value="Ardi">Ardi</option>
                                 <option value="Brian">Brian</option>
+                                <option value="Dhona">Dhona</option>
+                                <option value="Ardi">Ardi</option>
                                 <option value="Fauzi">Fauzi</option>
                             </select>
                         </div>
@@ -3262,11 +3304,11 @@
                                 <select id="edit-detail-pic" class="filter-input">
                                     <option value="">Pilih PIC</option>
                                     <option value="Wahyu" ${detail.pic === 'Wahyu' ? 'selected' : ''}>Wahyu</option>
-                                    <option value="Dhona" ${detail.pic === 'Dhona' ? 'selected' : ''}>Dhona</option>
                                     <option value="Arifa" ${detail.pic === 'Arifa' ? 'selected' : ''}>Arifa</option>
                                     <option value="Kartika" ${detail.pic === 'Kartika' ? 'selected' : ''}>Kartika</option>
-                                    <option value="Ardi" ${detail.pic === 'Ardi' ? 'selected' : ''}>Ardi</option>
                                     <option value="Brian" ${detail.pic === 'Brian' ? 'selected' : ''}>Brian</option>
+                                    <option value="Dhona" ${detail.pic === 'Dhona' ? 'selected' : ''}>Dhona</option>
+                                    <option value="Ardi" ${detail.pic === 'Ardi' ? 'selected' : ''}>Ardi</option>
                                     <option value="Fauzi" ${detail.pic === 'Fauzi' ? 'selected' : ''}>Fauzi</option>
                                 </select>
                             </div>
@@ -3653,9 +3695,38 @@
         // --- Initialize Year Selectors ---
         function initializeYearSelectors() {
             const years = [2025, 2026];
+            const months = [
+                {value: '', text: 'Semua Bulan'},
+                {value: '2025-01', text: 'Januari 2025'},
+                {value: '2025-02', text: 'Februari 2025'},
+                {value: '2025-03', text: 'Maret 2025'},
+                {value: '2025-04', text: 'April 2025'},
+                {value: '2025-05', text: 'Mei 2025'},
+                {value: '2025-06', text: 'Juni 2025'},
+                {value: '2025-07', text: 'Juli 2025'},
+                {value: '2025-08', text: 'Agustus 2025'},
+                {value: '2025-09', text: 'September 2025'},
+                {value: '2025-10', text: 'Oktober 2025'},
+                {value: '2025-11', text: 'November 2025'},
+                {value: '2025-12', text: 'Desember 2025'},
+                {value: '2026-01', text: 'Januari 2026'},
+                {value: '2026-02', text: 'Februari 2026'},
+                {value: '2026-03', text: 'Maret 2026'},
+                {value: '2026-04', text: 'April 2026'},
+                {value: '2026-05', text: 'Mei 2026'},
+                {value: '2026-06', text: 'Juni 2026'},
+                {value: '2026-07', text: 'Juli 2026'},
+                {value: '2026-08', text: 'Agustus 2026'},
+                {value: '2026-09', text: 'September 2026'},
+                {value: '2026-10', text: 'Oktober 2026'},
+                {value: '2026-11', text: 'November 2026'},
+                {value: '2026-12', text: 'Desember 2026'}
+            ];
             
             // Dashboard year selector
             const dashboardYearSelect = document.getElementById('year-filter-dashboard');
+            const dashboardMonthSelect = document.getElementById('month-filter-dashboard');
+            
             if (dashboardYearSelect) {
                 years.forEach(year => {
                     const option = document.createElement('option');
@@ -3666,7 +3737,25 @@
                 dashboardYearSelect.value = selectedYearDashboard;
                 dashboardYearSelect.addEventListener('change', function() {
                     selectedYearDashboard = parseInt(this.value);
-                    loadDashboardData(selectedYearDashboard);
+                    selectedMonthDashboard = '';
+                    if (dashboardMonthSelect) {
+                        dashboardMonthSelect.value = '';
+                    }
+                    loadDashboardData(selectedYearDashboard, '');
+                });
+            }
+
+            if (dashboardMonthSelect) {
+                months.forEach(month => {
+                    const option = document.createElement('option');
+                    option.value = month.value;
+                    option.textContent = month.text;
+                    dashboardMonthSelect.appendChild(option);
+                });
+                dashboardMonthSelect.value = selectedMonthDashboard;
+                dashboardMonthSelect.addEventListener('change', function() {
+                    selectedMonthDashboard = this.value;
+                    loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
                 });
             }
 
@@ -3795,7 +3884,7 @@
             }
 
             if (targetId === 'dashboard-section') {
-                loadDashboardData(selectedYearDashboard);
+                loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
             } else if (targetId === 'project-list-section') {
                 loadProjectsToTable(selectedYearProject);
             } else if (targetId === 'analytics-section') {
@@ -4081,24 +4170,82 @@
                 }
             });
 
-            // Summary item click handlers for dashboard
+            // Summary item click handlers for dashboard - MODIFIKASI: Buka daftar project dengan filter
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.summary-item')) {
                     const summaryItem = e.target.closest('.summary-item');
                     const type = summaryItem.dataset.type;
                     
-                    // Show analytics section
-                    showSection('analytics-section');
+                    // Tentukan jenis filter berdasarkan type
+                    let typeFilter = '';
+                    switch(type) {
+                        case 'quotation':
+                            typeFilter = 'Quotation';
+                            break;
+                        case 'dwg':
+                            typeFilter = 'DWG';
+                            break;
+                        case 'hydrolic':
+                            typeFilter = 'Hydrolic';
+                            break;
+                        case 'dokumen':
+                            typeFilter = 'Dokumen';
+                            break;
+                    }
                     
-                    // Scroll to type details
+                    // Show project list section
+                    showSection('project-list-section');
+                    
+                    // Set filter dan refresh data
                     setTimeout(() => {
-                        const typeCard = document.querySelector(`.type-detail-card[data-type="${type}"]`);
-                        if (typeCard) {
-                            typeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            typeCard.classList.add('active');
-                            setTimeout(() => {
-                                typeCard.classList.remove('active');
-                            }, 2000);
+                        if (typeFilter) {
+                            document.getElementById('filter-type').value = typeFilter;
+                        }
+                        applyFilters();
+                        
+                        // Scroll to top of table
+                        const tableContainer = document.querySelector('.table-container');
+                        if (tableContainer) {
+                            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }, 100);
+                }
+            });
+
+            // Status summary click handlers - MODIFIKASI: Buka daftar project dengan filter status
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.status-summary-item')) {
+                    const statusItem = e.target.closest('.status-summary-item');
+                    const statusClass = statusItem.className;
+                    
+                    // Tentukan status filter berdasarkan class
+                    let statusFilter = '';
+                    if (statusClass.includes('status-on-progress-summary')) {
+                        statusFilter = 'On Progress';
+                    } else if (statusClass.includes('status-done-summary')) {
+                        statusFilter = 'Done';
+                    } else if (statusClass.includes('status-hold-summary')) {
+                        statusFilter = 'Hold';
+                    } else if (statusClass.includes('status-total-summary')) {
+                        statusFilter = ''; // Semua status
+                    }
+                    
+                    // Show project list section
+                    showSection('project-list-section');
+                    
+                    // Set filter dan refresh data
+                    setTimeout(() => {
+                        if (statusFilter) {
+                            document.getElementById('filter-status').value = statusFilter;
+                        } else {
+                            document.getElementById('filter-status').value = '';
+                        }
+                        applyFilters();
+                        
+                        // Scroll to top of table
+                        const tableContainer = document.querySelector('.table-container');
+                        if (tableContainer) {
+                            tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     }, 100);
                 }
@@ -4176,6 +4323,10 @@
                     <div class="year-filter-container">
                         <span class="year-filter-label">Tahun:</span>
                         <select id="year-filter-dashboard" class="year-select">
+                            <!-- Options will be populated by JavaScript -->
+                        </select>
+                        <span class="year-filter-label">Bulan:</span>
+                        <select id="month-filter-dashboard" class="month-select">
                             <!-- Options will be populated by JavaScript -->
                         </select>
                     </div>
@@ -4473,11 +4624,11 @@
                     <select id="pic" class="filter-input">
                         <option value="">Pilih PIC</option>
                         <option value="Wahyu">Wahyu</option>
-                        <option value="Dhona">Dhona</option>
                         <option value="Arifa">Arifa</option>
                         <option value="Kartika">Kartika</option>
-                        <option value="Ardi">Ardi</option>
                         <option value="Brian">Brian</option>
+                        <option value="Dhona">Dhona</option>
+                        <option value="Ardi">Ardi</option>
                         <option value="Fauzi">Fauzi</option>
                     </select>
                 </div>
