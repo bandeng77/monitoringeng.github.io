@@ -489,6 +489,39 @@
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
+        /* Month Filter Container */
+        .month-filter-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .month-filter-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .month-select {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .month-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
         .btn {
             padding: 0.6rem 1.25rem;
             border-radius: 10px;
@@ -612,7 +645,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            min-width: 1200px; /* Diperkecil karena kolom aksi dihapus */
+            min-width: 1200px;
         }
 
         th, td {
@@ -657,7 +690,7 @@
             background-color: var(--hover);
         }
 
-        /* Table Column Widths - PERBAIKAN LEBAR KOLOM (tanpa kolom aksi) */
+        /* Table Column Widths - PERBAIKAN LEBAR KOLOM */
         th:nth-child(1), td:nth-child(1) { width: 60px; min-width: 60px; max-width: 60px; } /* No */
         th:nth-child(2), td:nth-child(2) { width: 110px; min-width: 110px; max-width: 110px; } /* Sales/Client */
         th:nth-child(3), td:nth-child(3) { width: 140px; min-width: 140px; max-width: 140px; } /* Project Name */
@@ -836,7 +869,7 @@
             border-radius: 15px;
             box-shadow: var(--shadow-lg);
             width: 95%;
-            max-width: 900px;
+            max-width: 1200px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
@@ -1387,7 +1420,7 @@
             }
 
             table {
-                min-width: 1100px; /* Diperkecil untuk mobile */
+                min-width: 1100px;
             }
         }
 
@@ -1431,7 +1464,8 @@
                 margin: 1rem;
             }
 
-            .year-filter-container {
+            .year-filter-container,
+            .month-filter-container {
                 width: 100%;
                 justify-content: space-between;
             }
@@ -1477,7 +1511,7 @@
             }
 
             table {
-                min-width: 900px; /* Diperkecil untuk mobile kecil */
+                min-width: 900px;
             }
         }
 
@@ -1563,6 +1597,42 @@
             display: flex;
             gap: 0.5rem;
         }
+
+        /* Dashboard Table in Modal */
+        .dashboard-modal-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            margin: 1rem 0;
+        }
+
+        .dashboard-modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .dashboard-modal-table th,
+        .dashboard-modal-table td {
+            padding: 0.75rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .dashboard-modal-table th {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            font-weight: 600;
+            color: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .dashboard-modal-table tr:hover {
+            background-color: var(--hover);
+        }
     </style>
 </head>
 <body>
@@ -1605,10 +1675,12 @@
         let statusChartInstance = null;
         let analyticsChartInstance = null;
         
-        // Selected years
-        let selectedYearDashboard = 2026;
-        let selectedYearProject = 2026;
-        let selectedYearAnalytics = 2026;
+        // Selected years and months
+        let selectedYearDashboard = new Date().getFullYear();
+        let selectedMonthDashboard = new Date().getMonth() + 1;
+        let selectedYearProject = new Date().getFullYear();
+        let selectedMonthProject = new Date().getMonth() + 1;
+        let selectedYearAnalytics = new Date().getFullYear();
 
         // --- Custom Alert Function ---
         function showAlert(message, type = 'info', duration = 3000) {
@@ -1723,6 +1795,282 @@
             return str;
         }
 
+        // --- Format month number to month name ---
+        function formatMonthName(monthNumber) {
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            return months[monthNumber - 1] || '';
+        }
+
+        // --- Get month number from month name ---
+        function getMonthNumber(monthName) {
+            const months = {
+                'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4,
+                'Mei': 5, 'Juni': 6, 'Juli': 7, 'Agustus': 8,
+                'September': 9, 'Oktober': 10, 'November': 11, 'Desember': 12
+            };
+            return months[monthName] || 0;
+        }
+
+        // --- Show Dashboard Projects Modal ---
+        async function showDashboardProjectsModal(category, title) {
+            try {
+                // Get all projects
+                const snapshot = await projectsCol.get();
+                if (snapshot.empty) {
+                    showAlert('Tidak ada data project', 'info');
+                    return;
+                }
+
+                const projects = [];
+                snapshot.forEach(doc => {
+                    const project = doc.data();
+                    projects.push({
+                        ...project,
+                        id: doc.id
+                    });
+                });
+
+                // Filter projects based on category and selected year/month
+                let filteredProjects = [];
+                let filterDescription = '';
+
+                if (category === 'type') {
+                    const typeMap = {
+                        'quotation': 'Quotation',
+                        'dwg': 'DWG',
+                        'hydrolic': 'Hydrolic',
+                        'dokumen': 'Dokumen'
+                    };
+                    const typeName = typeMap[title.toLowerCase()] || title;
+                    
+                    filteredProjects = projects.filter(project => {
+                        // Check if project matches the type
+                        const types = Array.isArray(project.type) ? project.type : [project.type];
+                        const matchesType = types.includes(typeName);
+                        
+                        // Check if project matches selected year and month
+                        let matchesDate = true;
+                        if (selectedYearDashboard && selectedMonthDashboard) {
+                            const projectDate = project.dataIn || project.startDate;
+                            if (projectDate) {
+                                try {
+                                    const dateObj = new Date(projectDate);
+                                    const projectYear = dateObj.getFullYear();
+                                    const projectMonth = dateObj.getMonth() + 1;
+                                    matchesDate = (projectYear === selectedYearDashboard && projectMonth === selectedMonthDashboard);
+                                } catch (error) {
+                                    matchesDate = false;
+                                }
+                            } else {
+                                matchesDate = false;
+                            }
+                        }
+                        
+                        return matchesType && matchesDate;
+                    });
+                    
+                    filterDescription = `Type: ${typeName} | Bulan: ${formatMonthName(selectedMonthDashboard)} ${selectedYearDashboard}`;
+                    
+                } else if (category === 'status') {
+                    filteredProjects = projects.filter(project => {
+                        // Check if project matches the status
+                        const matchesStatus = project.status === title;
+                        
+                        // Check if project matches selected year and month
+                        let matchesDate = true;
+                        if (selectedYearDashboard && selectedMonthDashboard) {
+                            const projectDate = project.dataIn || project.startDate;
+                            if (projectDate) {
+                                try {
+                                    const dateObj = new Date(projectDate);
+                                    const projectYear = dateObj.getFullYear();
+                                    const projectMonth = dateObj.getMonth() + 1;
+                                    matchesDate = (projectYear === selectedYearDashboard && projectMonth === selectedMonthDashboard);
+                                } catch (error) {
+                                    matchesDate = false;
+                                }
+                            } else {
+                                matchesDate = false;
+                            }
+                        }
+                        
+                        return matchesStatus && matchesDate;
+                    });
+                    
+                    filterDescription = `Status: ${title} | Bulan: ${formatMonthName(selectedMonthDashboard)} ${selectedYearDashboard}`;
+                }
+
+                if (filteredProjects.length === 0) {
+                    showAlert(`Tidak ada data untuk ${title} pada ${formatMonthName(selectedMonthDashboard)} ${selectedYearDashboard}`, 'info');
+                    return;
+                }
+
+                // Create modal content
+                const modalContent = `
+                    <div class="modal-content" style="max-width: 1200px;">
+                        <span class="modal-close-btn">&times;</span>
+                        <h2 class="card-title" style="margin-bottom: 1rem;">Detail Project - ${title}</h2>
+                        <p style="color: var(--secondary); margin-bottom: 1.5rem;">${filterDescription} | Total: ${filteredProjects.length} project</p>
+                        
+                        <div class="dashboard-modal-table-container">
+                            <table class="dashboard-modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Sales/Client</th>
+                                        <th>Project Name</th>
+                                        <th>Data In</th>
+                                        <th>No Urut Dokumen</th>
+                                        <th>Type</th>
+                                        <th>PIC</th>
+                                        <th>Start Date</th>
+                                        <th>Status</th>
+                                        <th>Klarifikasi</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filteredProjects.map((project, index) => {
+                                        const types = Array.isArray(project.type) ? project.type.join(', ') : project.type;
+                                        const clarificationIcon = project.clarification ? 
+                                            '<i class="fas fa-check-circle" style="color: var(--analytic-green);"></i>' : 
+                                            '<i class="fas fa-times-circle" style="color: var(--analytic-red);"></i>';
+                                        
+                                        let statusClass = '';
+                                        if (project.status === 'On Progress') statusClass = 'status-on-progress';
+                                        else if (project.status === 'Done') statusClass = 'status-done';
+                                        else if (project.status === 'Hold') statusClass = 'status-hold';
+                                        
+                                        return `
+                                            <tr>
+                                                <td>${index + 1}</td>
+                                                <td>${project.salesClient || '-'}</td>
+                                                <td>${project.projectName || '-'}</td>
+                                                <td>${project.dataIn || '-'}</td>
+                                                <td>${project.noUrutDokumen || '-'}</td>
+                                                <td>${types || '-'}</td>
+                                                <td>${project.pic || '-'}</td>
+                                                <td>${project.startDate || '-'}</td>
+                                                <td><span class="status-button ${statusClass}" style="display: inline-block;">${project.status || '-'}</span></td>
+                                                <td style="text-align: center;">${clarificationIcon}</td>
+                                                <td>${formatTextForDisplay(project.remarks, 30)}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary" id="export-dashboard-pdf">Export PDF</button>
+                            <button type="button" class="btn btn-outline modal-close-btn">Tutup</button>
+                        </div>
+                    </div>
+                `;
+
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'flex';
+                modal.innerHTML = modalContent;
+                document.body.appendChild(modal);
+
+                // Add event listeners
+                modal.querySelector('.modal-close-btn').addEventListener('click', function() {
+                    modal.remove();
+                });
+
+                modal.querySelector('#export-dashboard-pdf').addEventListener('click', function() {
+                    exportDashboardToPDF(category, title, filteredProjects);
+                });
+
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error showing dashboard projects:", error);
+                showAlert('Gagal memuat data project', 'error');
+            }
+        }
+
+        // --- Export Dashboard Projects to PDF ---
+        function exportDashboardToPDF(category, title, projects) {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'mm', 'a4');
+
+                // Add title
+                doc.setFontSize(16);
+                doc.text(`LAPORAN PROJECT - ${title.toUpperCase()}`, 148, 15, { align: 'center' });
+                
+                // Add filter info
+                const monthName = formatMonthName(selectedMonthDashboard);
+                doc.setFontSize(10);
+                doc.text(`Periode: ${monthName} ${selectedYearDashboard} | Jumlah: ${projects.length} project`, 148, 22, { align: 'center' });
+
+                if (projects.length === 0) {
+                    showAlert('Tidak ada data untuk diexport', 'warning');
+                    return;
+                }
+
+                const tableData = projects.map((project, index) => [
+                    index + 1,
+                    project.salesClient || '-',
+                    project.projectName || '-',
+                    project.dataIn || '-',
+                    project.noUrutDokumen || '-',
+                    Array.isArray(project.type) ? project.type.join(', ') : project.type || '-',
+                    project.pic || '-',
+                    project.startDate || '-',
+                    project.status || '-',
+                    project.clarification ? 'Ya' : 'Tidak',
+                    project.remarks || '-'
+                ]);
+
+                // Add table
+                doc.autoTable({
+                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Klarifikasi', 'Remarks']],
+                    body: tableData,
+                    startY: 30,
+                    styles: { 
+                        fontSize: 7,
+                        cellPadding: 2
+                    },
+                    headStyles: { 
+                        fillColor: [67, 97, 238],
+                        textColor: 255,
+                        fontSize: 8
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 10 },
+                        1: { cellWidth: 20 },
+                        2: { cellWidth: 25 },
+                        3: { cellWidth: 15 },
+                        4: { cellWidth: 30 },
+                        5: { cellWidth: 20 },
+                        6: { cellWidth: 20 },
+                        7: { cellWidth: 15 },
+                        8: { cellWidth: 15 },
+                        9: { cellWidth: 15 },
+                        10: { cellWidth: 35 }
+                    }
+                });
+
+                // Save the PDF
+                const currentDate = new Date().toLocaleDateString('id-ID');
+                doc.save(`${title}_${monthName}_${selectedYearDashboard}_${currentDate.replace(/\//g, '-')}.pdf`);
+                showAlert(`PDF berhasil diexport! (${projects.length} data)`, 'success');
+            } catch (error) {
+                console.error("Error exporting dashboard to PDF:", error);
+                showAlert('Gagal mengexport PDF', 'error');
+            }
+        }
+
         // --- Render Projects to Table with Year Filter ---
         function renderProjectsTable(data, year) {
             const projectTableBody = document.querySelector('#project-table tbody');
@@ -1796,7 +2144,6 @@
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
-                // TANPA KOLOM AKSI - tombol edit/hapus dipindahkan ke modal detail
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
@@ -1851,10 +2198,9 @@
                 });
             });
 
-            // Klik pada baris tabel untuk membuka detail (opsional)
+            // Klik pada baris tabel untuk membuka detail
             document.querySelectorAll('#project-table tbody tr').forEach(row => {
                 row.addEventListener('click', function(e) {
-                    // Hanya jika klik bukan pada link atau tombol
                     if (!e.target.closest('a') && !e.target.closest('button')) {
                         const projectId = this.getAttribute('data-project-id');
                         if (projectId) {
@@ -2127,7 +2473,7 @@
         }
 
         // --- Load Dashboard Data ---
-        async function loadDashboardData(year = selectedYearDashboard) {
+        async function loadDashboardData(year = selectedYearDashboard, month = selectedMonthDashboard) {
             try {
                 const dashboardContainer = document.getElementById('dashboard-section');
                 if (dashboardContainer) {
@@ -2145,7 +2491,7 @@
                 const snapshot = await projectsCol.get();
                 
                 if (snapshot.empty) {
-                    updateDashboardCounts([], year);
+                    updateDashboardCounts([], year, month);
                     updateAnalyticsData([], year);
                     const loadingDiv = document.getElementById('dashboard-loading');
                     if (loadingDiv) loadingDiv.remove();
@@ -2155,12 +2501,15 @@
                 const currentProjects = [];
                 snapshot.forEach(doc => {
                     const project = doc.data();
-                    // Filter by year from startDate or dataIn
+                    // Filter by year and month from startDate or dataIn
                     let projectYear = null;
+                    let projectMonth = null;
                     
                     if (project.startDate) {
                         try {
-                            projectYear = new Date(project.startDate).getFullYear();
+                            const date = new Date(project.startDate);
+                            projectYear = date.getFullYear();
+                            projectMonth = date.getMonth() + 1;
                         } catch (error) {
                             console.error("Error parsing startDate:", error);
                         }
@@ -2168,18 +2517,20 @@
                     
                     if (!projectYear && project.dataIn) {
                         try {
-                            projectYear = new Date(project.dataIn).getFullYear();
+                            const date = new Date(project.dataIn);
+                            projectYear = date.getFullYear();
+                            projectMonth = date.getMonth() + 1;
                         } catch (error) {
                             console.error("Error parsing dataIn:", error);
                         }
                     }
                     
-                    if (projectYear === year) {
+                    if (projectYear === year && projectMonth === month) {
                         currentProjects.push(project);
                     }
                 });
                 
-                updateDashboardCounts(currentProjects, year);
+                updateDashboardCounts(currentProjects, year, month);
                 updateAnalyticsData(currentProjects, year);
                 
                 const loadingDiv = document.getElementById('dashboard-loading');
@@ -2195,7 +2546,7 @@
         }
 
         // --- Update Dashboard Counts ---
-        function updateDashboardCounts(projects, year) {
+        function updateDashboardCounts(projects, year, month) {
             let quotationCount = 0;
             let dwgCount = 0;
             let hydrolicCount = 0;
@@ -2243,12 +2594,18 @@
             document.getElementById('hold-count').textContent = holdCount;
             document.getElementById('total-projects-count').textContent = totalProjects;
 
+            // Update month filter label
+            const monthSelect = document.getElementById('month-filter-dashboard');
+            if (monthSelect) {
+                monthSelect.value = month;
+            }
+
             // Update charts
-            updateDashboardCharts(projects, year);
+            updateDashboardCharts(projects, year, month);
         }
 
         // --- Update Dashboard Charts ---
-        function updateDashboardCharts(projects, year) {
+        function updateDashboardCharts(projects, year, month) {
             // Destroy existing charts if they exist
             if (typeChartInstance) {
                 typeChartInstance.destroy();
@@ -2256,6 +2613,8 @@
             if (statusChartInstance) {
                 statusChartInstance.destroy();
             }
+
+            const monthName = formatMonthName(month);
 
             const typeData = {
                 labels: ['Quotation', 'DWG', 'Hydrolic', 'Dokumen'],
@@ -2339,7 +2698,7 @@
                             },
                             title: {
                                 display: true,
-                                text: `Distribusi Project Tahun ${year}`,
+                                text: `Distribusi Project ${monthName} ${year}`,
                                 font: {
                                     size: 14,
                                     weight: 'bold'
@@ -2370,7 +2729,7 @@
                             },
                             title: {
                                 display: true,
-                                text: `Status Project Tahun ${year}`,
+                                text: `Status Project ${monthName} ${year}`,
                                 font: {
                                     size: 14,
                                     weight: 'bold'
@@ -2844,7 +3203,7 @@
             document.getElementById('status-modal').style.display = 'flex';
         }
 
-        // --- Show Project Details Modal (DITAMBAHKAN: dengan project tambahan) ---
+        // --- Show Project Details Modal ---
         async function showProjectDetailsModal(projectId) {
             try {
                 const project = allProjectData.find(p => p.No_Urut_Dokumen === projectId);
@@ -2978,7 +3337,7 @@
                             }
                         </div>
 
-                        <!-- Tombol Edit dan Hapus dipindahkan ke sini -->
+                        <!-- Tombol Edit dan Hapus -->
                         <div class="detail-actions">
                             <button type="button" class="btn detail-edit-btn" id="detail-edit-btn" data-project-id="${projectId}">
                                 <i class="fas fa-edit"></i> Edit Project Utama
@@ -3650,9 +4009,23 @@
             }
         }
 
-        // --- Initialize Year Selectors ---
-        function initializeYearSelectors() {
+        // --- Initialize Year and Month Selectors ---
+        function initializeYearMonthSelectors() {
             const years = [2025, 2026];
+            const months = [
+                { value: 1, name: 'Januari' },
+                { value: 2, name: 'Februari' },
+                { value: 3, name: 'Januari' },
+                { value: 4, name: 'April' },
+                { value: 5, name: 'Mei' },
+                { value: 6, name: 'Juni' },
+                { value: 7, name: 'Juli' },
+                { value: 8, name: 'Agustus' },
+                { value: 9, name: 'September' },
+                { value: 10, name: 'Oktober' },
+                { value: 11, name: 'November' },
+                { value: 12, name: 'Desember' }
+            ];
             
             // Dashboard year selector
             const dashboardYearSelect = document.getElementById('year-filter-dashboard');
@@ -3666,7 +4039,23 @@
                 dashboardYearSelect.value = selectedYearDashboard;
                 dashboardYearSelect.addEventListener('change', function() {
                     selectedYearDashboard = parseInt(this.value);
-                    loadDashboardData(selectedYearDashboard);
+                    loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
+                });
+            }
+
+            // Dashboard month selector
+            const dashboardMonthSelect = document.getElementById('month-filter-dashboard');
+            if (dashboardMonthSelect) {
+                months.forEach(month => {
+                    const option = document.createElement('option');
+                    option.value = month.value;
+                    option.textContent = month.name;
+                    dashboardMonthSelect.appendChild(option);
+                });
+                dashboardMonthSelect.value = selectedMonthDashboard;
+                dashboardMonthSelect.addEventListener('change', function() {
+                    selectedMonthDashboard = parseInt(this.value);
+                    loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
                 });
             }
 
@@ -3721,9 +4110,9 @@
                     document.getElementById('auth-container').style.display = 'none';
                     document.getElementById('main-container').style.display = 'flex';
                     // Initialize year selectors
-                    initializeYearSelectors();
+                    initializeYearMonthSelectors();
                     // Load initial data
-                    loadDashboardData(selectedYearDashboard);
+                    loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
                     showSection('dashboard-section');
                 } else {
                     document.getElementById('auth-container').style.display = 'flex';
@@ -3795,7 +4184,7 @@
             }
 
             if (targetId === 'dashboard-section') {
-                loadDashboardData(selectedYearDashboard);
+                loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
             } else if (targetId === 'project-list-section') {
                 loadProjectsToTable(selectedYearProject);
             } else if (targetId === 'analytics-section') {
@@ -3981,7 +4370,7 @@
                             loadProjectsToTable(selectedYearProject);
                         }
                         if (document.getElementById('dashboard-section').style.display !== 'none') {
-                            loadDashboardData(selectedYearDashboard);
+                            loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
                         }
                         if (document.getElementById('analytics-section').style.display !== 'none') {
                             loadDashboardData(selectedYearAnalytics);
@@ -4008,7 +4397,7 @@
                             loadProjectsToTable(selectedYearProject);
                         }
                         if (document.getElementById('dashboard-section').style.display !== 'none') {
-                            loadDashboardData(selectedYearDashboard);
+                            loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
                         }
                         if (document.getElementById('analytics-section').style.display !== 'none') {
                             loadDashboardData(selectedYearAnalytics);
@@ -4033,7 +4422,7 @@
                             loadProjectsToTable(selectedYearProject);
                         }
                         if (document.getElementById('dashboard-section').style.display !== 'none') {
-                            loadDashboardData(selectedYearDashboard);
+                            loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
                         }
                         if (document.getElementById('analytics-section').style.display !== 'none') {
                             loadDashboardData(selectedYearAnalytics);
@@ -4083,24 +4472,17 @@
 
             // Summary item click handlers for dashboard
             document.addEventListener('click', function(e) {
-                if (e.target.closest('.summary-item')) {
-                    const summaryItem = e.target.closest('.summary-item');
+                const summaryItem = e.target.closest('.summary-item');
+                if (summaryItem) {
                     const type = summaryItem.dataset.type;
-                    
-                    // Show analytics section
-                    showSection('analytics-section');
-                    
-                    // Scroll to type details
-                    setTimeout(() => {
-                        const typeCard = document.querySelector(`.type-detail-card[data-type="${type}"]`);
-                        if (typeCard) {
-                            typeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            typeCard.classList.add('active');
-                            setTimeout(() => {
-                                typeCard.classList.remove('active');
-                            }, 2000);
-                        }
-                    }, 100);
+                    const typeName = summaryItem.querySelector('.summary-label').textContent;
+                    showDashboardProjectsModal('type', typeName);
+                }
+                
+                const statusSummaryItem = e.target.closest('.status-summary-item');
+                if (statusSummaryItem) {
+                    const statusName = statusSummaryItem.querySelector('.status-summary-label').textContent;
+                    showDashboardProjectsModal('status', statusName);
                 }
             });
 
@@ -4173,11 +4555,19 @@
             <section id="dashboard-section" class="content-section">
                 <div class="header">
                     <h1 class="page-title">Dashboard</h1>
-                    <div class="year-filter-container">
-                        <span class="year-filter-label">Tahun:</span>
-                        <select id="year-filter-dashboard" class="year-select">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
+                    <div style="display: flex; gap: 1rem;">
+                        <div class="year-filter-container">
+                            <span class="year-filter-label">Tahun:</span>
+                            <select id="year-filter-dashboard" class="year-select">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="month-filter-container">
+                            <span class="month-filter-label">Bulan:</span>
+                            <select id="month-filter-dashboard" class="month-select">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
