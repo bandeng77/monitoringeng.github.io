@@ -36,6 +36,7 @@
             --analytic-red: #dc3545;
             --analytic-blue: #1565c0;
             --analytic-purple: #8a2be2;
+            --analytic-teal: #20c997;
         }
 
         * {
@@ -392,6 +393,18 @@
             overflow: hidden;
         }
 
+        /* Role Badge */
+        .role-badge {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
         /* Sidebar Toggle Button */
         .sidebar-toggle {
             position: absolute;
@@ -454,6 +467,8 @@
         .header-actions {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
         }
 
         /* Year Filter Container */
@@ -557,6 +572,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, var(--analytic-green), #20c997);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+        }
+
         .btn-icon {
             margin-right: 0.5rem;
         }
@@ -631,6 +656,11 @@
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
+        .filter-input:disabled {
+            background-color: #f8fafc;
+            cursor: not-allowed;
+        }
+
         /* ========== PERBAIKAN TABEL PROJEK ========== */
         .table-container {
             overflow-x: auto;
@@ -645,7 +675,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            min-width: 1200px;
+            min-width: 1300px;
         }
 
         th, td {
@@ -691,17 +721,18 @@
         }
 
         /* Table Column Widths - PERBAIKAN LEBAR KOLOM */
-        th:nth-child(1), td:nth-child(1) { width: 60px; min-width: 60px; max-width: 60px; } /* No */
-        th:nth-child(2), td:nth-child(2) { width: 110px; min-width: 110px; max-width: 110px; } /* Sales/Client */
-        th:nth-child(3), td:nth-child(3) { width: 140px; min-width: 140px; max-width: 140px; } /* Project Name */
-        th:nth-child(4), td:nth-child(4) { width: 90px; min-width: 90px; max-width: 90px; } /* Data In */
-        th:nth-child(5), td:nth-child(5) { width: 160px; min-width: 160px; max-width: 160px; } /* No Urut Dokumen */
-        th:nth-child(6), td:nth-child(6) { width: 120px; min-width: 120px; max-width: 120px; } /* Type */
-        th:nth-child(7), td:nth-child(7) { width: 110px; min-width: 110px; max-width: 110px; } /* PIC */
-        th:nth-child(8), td:nth-child(8) { width: 90px; min-width: 90px; max-width: 90px; } /* Start Date */
-        th:nth-child(9), td:nth-child(9) { width: 110px; min-width: 110px; max-width: 110px; } /* Status */
-        th:nth-child(10), td:nth-child(10) { width: 130px; min-width: 130px; max-width: 130px; } /* Remarks */
+        th:nth-child(1), td:nth-child(1) { width: 50px; min-width: 50px; max-width: 50px; } /* No */
+        th:nth-child(2), td:nth-child(2) { width: 100px; min-width: 100px; max-width: 100px; } /* Sales/Client */
+        th:nth-child(3), td:nth-child(3) { width: 130px; min-width: 130px; max-width: 130px; } /* Project Name */
+        th:nth-child(4), td:nth-child(4) { width: 85px; min-width: 85px; max-width: 85px; } /* Data In */
+        th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 150px; max-width: 150px; } /* No Urut Dokumen */
+        th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 100px; max-width: 100px; } /* Type */
+        th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 100px; max-width: 100px; } /* PIC */
+        th:nth-child(8), td:nth-child(8) { width: 85px; min-width: 85px; max-width: 85px; } /* Start Date */
+        th:nth-child(9), td:nth-child(9) { width: 100px; min-width: 100px; max-width: 100px; } /* Status */
+        th:nth-child(10), td:nth-child(10) { width: 120px; min-width: 120px; max-width: 120px; } /* Remarks */
         th:nth-child(11), td:nth-child(11) { width: 80px; min-width: 80px; max-width: 80px; } /* Klarifikasi */
+        th:nth-child(12), td:nth-child(12) { width: 110px; min-width: 110px; max-width: 110px; } /* Sales Sent Date */
 
         /* Cell Content Styling - Improved for readability */
         .cell-content {
@@ -801,6 +832,56 @@
 
         .klarifikasi-icon .fa-times-circle {
             color: var(--analytic-red);
+        }
+
+        /* Sales Sent Date Cell */
+        .sales-sent-date-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+            padding: 0.3rem;
+            text-align: center;
+        }
+
+        .sales-sent-date-input {
+            padding: 0.3rem 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 11px;
+            width: 100%;
+            max-width: 100px;
+            text-align: center;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .sales-sent-date-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .sales-sent-date-input:disabled {
+            background-color: #f8fafc;
+            cursor: not-allowed;
+            color: var(--secondary);
+        }
+
+        .sales-sent-date-input.sales-editable {
+            background-color: #fff3e0;
+            border-color: var(--analytic-orange);
+        }
+
+        .sales-sent-date-input.sales-editable:hover {
+            border-color: var(--analytic-orange);
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.2);
+        }
+
+        .sales-sent-date-input.sales-editable:focus {
+            border-color: var(--analytic-orange);
+            box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.3);
         }
 
         /* Pagination */
@@ -1420,7 +1501,7 @@
             }
 
             table {
-                min-width: 1100px;
+                min-width: 1200px;
             }
         }
 
@@ -1471,7 +1552,7 @@
             }
 
             table {
-                min-width: 1000px;
+                min-width: 1100px;
             }
         }
 
@@ -1511,7 +1592,7 @@
             }
 
             table {
-                min-width: 900px;
+                min-width: 1000px;
             }
         }
 
@@ -1633,6 +1714,74 @@
         .dashboard-modal-table tr:hover {
             background-color: var(--hover);
         }
+
+        /* Sales Role Specific Styles */
+        .sales-only-message {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            background: var(--light);
+            border-radius: 10px;
+            color: var(--secondary);
+        }
+
+        .sales-only-message i {
+            font-size: 3rem;
+            color: var(--analytic-orange);
+            margin-bottom: 1rem;
+        }
+
+        body.sales-role .sales-only-message {
+            display: block;
+        }
+
+        body.sales-role .card-header .card-title {
+            font-size: 1rem;
+        }
+
+        /* Access Denied Overlay */
+        .access-denied-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .access-denied-overlay.show {
+            display: flex;
+        }
+
+        .access-denied-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 450px;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .access-denied-content i {
+            font-size: 4rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
+        }
+
+        .access-denied-content h2 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .access-denied-content p {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -1681,6 +1830,10 @@
         let selectedYearProject = new Date().getFullYear();
         let selectedMonthProject = new Date().getMonth() + 1;
         let selectedYearAnalytics = new Date().getFullYear();
+
+        // User role
+        let currentUserRole = 'admin'; // 'admin', 'sales'
+        let currentUserEmail = '';
 
         // --- Custom Alert Function ---
         function showAlert(message, type = 'info', duration = 3000) {
@@ -1972,6 +2125,7 @@
                                         <th>Start Date</th>
                                         <th>Status</th>
                                         <th>Klarifikasi</th>
+                                        <th>Sales Sent Date</th>
                                         <th>Remarks</th>
                                     </tr>
                                 </thead>
@@ -1999,6 +2153,7 @@
                                                 <td>${project.startDate || '-'}</td>
                                                 <td><span class="status-button ${statusClass}" style="display: inline-block;">${project.status || '-'}</span></td>
                                                 <td style="text-align: center;">${clarificationIcon}</td>
+                                                <td>${project.salesSentDate || '-'}</td>
                                                 <td>${formatTextForDisplay(project.remarks, 30)}</td>
                                             </tr>
                                         `;
@@ -2071,12 +2226,13 @@
                     project.startDate || '-',
                     project.status || '-',
                     project.clarification ? 'Ya' : 'Tidak',
+                    project.salesSentDate || '-',
                     project.remarks || '-'
                 ]);
 
                 // Add table
                 doc.autoTable({
-                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Klarifikasi', 'Remarks']],
+                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Klarifikasi', 'Sales Sent Date', 'Remarks']],
                     body: tableData,
                     startY: 30,
                     styles: { 
@@ -2099,7 +2255,8 @@
                         7: { cellWidth: 15 },
                         8: { cellWidth: 15 },
                         9: { cellWidth: 15 },
-                        10: { cellWidth: 35 }
+                        10: { cellWidth: 20 },
+                        11: { cellWidth: 35 }
                     }
                 });
 
@@ -2124,7 +2281,7 @@
             if (data.length === 0) {
                 projectTableBody.innerHTML = `
                     <tr>
-                        <td colspan="11" class="empty-state">
+                        <td colspan="12" class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <h3>Tidak ada data project</h3>
                             <p>Tidak ditemukan project yang cocok dengan filter yang diterapkan</p>
@@ -2153,7 +2310,7 @@
             if (filteredByYear.length === 0) {
                 projectTableBody.innerHTML = `
                     <tr>
-                        <td colspan="11" class="empty-state">
+                        <td colspan="12" class="empty-state">
                             <i class="fas fa-calendar-times"></i>
                             <h3>Tidak ada data untuk tahun ${year}</h3>
                             <p>Tidak ditemukan project pada tahun yang dipilih</p>
@@ -2187,6 +2344,16 @@
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
+                // Sales Sent Date - editable only for sales role
+                const isSalesRole = currentUserRole === 'sales';
+                const salesSentDateValue = project.Sales_Sent_Date || '';
+                const salesSentDateInput = isSalesRole ? 
+                    `<input type="date" class="sales-sent-date-input sales-editable" value="${salesSentDateValue}" 
+                            data-project-id="${project.No_Urut_Dokumen}" 
+                            data-current-value="${salesSentDateValue}"
+                            title="Klik untuk mengubah tanggal kirim sales">` :
+                    `<input type="text" class="sales-sent-date-input" value="${salesSentDateValue || '-'}" disabled>`;
+
                 rowsHtml.push(`
                     <tr data-project-id="${project.No_Urut_Dokumen}">
                         <td>${rowNum++}</td>
@@ -2202,15 +2369,19 @@
                         <td><div class="cell-content" title="${project.PIC || '-'}">${formatTextForDisplay(project.PIC, 15)}</div></td>
                         <td><div class="cell-content">${project.Start_Date || '-'}</div></td>
                         <td>
-                            <button class="status-button ${statusClass}" data-project-id="${project.No_Urut_Dokumen}" data-current-status="${project.Status}">
-                                ${project.Status}
-                            </button>
+                            ${isSalesRole ? 
+                                `<span class="status-button ${statusClass}">${project.Status}</span>` :
+                                `<button class="status-button ${statusClass}" data-project-id="${project.No_Urut_Dokumen}" data-current-status="${project.Status}">${project.Status}</button>`
+                            }
                         </td>
                         <td><div class="cell-content" title="${project.Remarks || '-'}">${formatTextForDisplay(project.Remarks, 20)}</div></td>
                         <td class="klarifikasi-cell">
                             <div class="klarifikasi-icon" title="${project.Clarification ? 'Sudah diklarifikasi' : 'Belum diklarifikasi'}">
                                 ${clarificationIcon}
                             </div>
+                        </td>
+                        <td class="sales-sent-date-cell">
+                            ${salesSentDateInput}
                         </td>
                     </tr>
                 `);
@@ -2223,9 +2394,18 @@
 
         // --- Attach event listeners to table buttons ---
         function attachTableEventListeners() {
-            // Status buttons
+            // Status buttons (only for non-sales role)
             document.querySelectorAll('.status-button').forEach(btn => {
-                btn.addEventListener('click', function() {
+                // Remove existing listeners to avoid duplicates
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.addEventListener('click', function() {
+                    // Only allow if not sales role
+                    if (currentUserRole === 'sales') {
+                        showAlert('Anda tidak memiliki akses untuk mengubah status', 'error');
+                        return;
+                    }
                     const projectId = this.getAttribute('data-project-id');
                     const currentStatus = this.getAttribute('data-current-status');
                     showStatusChangeModal(projectId, currentStatus);
@@ -2234,17 +2414,23 @@
 
             // Document number links
             document.querySelectorAll('.doc-number-link').forEach(link => {
-                link.addEventListener('click', function(e) {
+                const newLink = link.cloneNode(true);
+                link.parentNode.replaceChild(newLink, link);
+                
+                newLink.addEventListener('click', function(e) {
                     e.preventDefault();
                     const projectId = this.getAttribute('data-project-id');
                     showProjectDetailsModal(projectId);
                 });
             });
 
-            // Klik pada baris tabel untuk membuka detail
+            // Klik pada baris tabel untuk membuka detail (only for non-sales)
             document.querySelectorAll('#project-table tbody tr').forEach(row => {
-                row.addEventListener('click', function(e) {
-                    if (!e.target.closest('a') && !e.target.closest('button')) {
+                const newRow = row.cloneNode(true);
+                row.parentNode.replaceChild(newRow, row);
+                
+                newRow.addEventListener('click', function(e) {
+                    if (!e.target.closest('a') && !e.target.closest('button') && !e.target.closest('input')) {
                         const projectId = this.getAttribute('data-project-id');
                         if (projectId) {
                             showProjectDetailsModal(projectId);
@@ -2252,6 +2438,56 @@
                     }
                 });
             });
+
+            // Sales Sent Date input changes
+            document.querySelectorAll('.sales-sent-date-input.sales-editable').forEach(input => {
+                const newInput = input.cloneNode(true);
+                input.parentNode.replaceChild(newInput, input);
+                
+                newInput.addEventListener('change', function() {
+                    const projectId = this.getAttribute('data-project-id');
+                    const newDate = this.value;
+                    updateSalesSentDate(projectId, newDate);
+                });
+
+                newInput.addEventListener('blur', function() {
+                    // Optional: auto-save on blur
+                });
+            });
+        }
+
+        // --- Update Sales Sent Date ---
+        async function updateSalesSentDate(projectId, date) {
+            try {
+                // Only sales can update
+                if (currentUserRole !== 'sales') {
+                    showAlert('Hanya Sales yang dapat mengisi Sales Sent Date', 'error');
+                    return;
+                }
+
+                // Get the project document
+                const projectDoc = await projectsCol.doc(projectId).get();
+                if (!projectDoc.exists) {
+                    showAlert('Project tidak ditemukan', 'error');
+                    return;
+                }
+
+                // Update the salesSentDate field
+                await projectsCol.doc(projectId).update({
+                    salesSentDate: date,
+                    salesSentBy: currentUserEmail,
+                    salesSentAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showAlert('Sales Sent Date berhasil diperbarui!', 'success');
+                
+                // Refresh the table
+                loadProjectsToTable(selectedYearProject);
+                
+            } catch (error) {
+                console.error("Error updating sales sent date:", error);
+                showAlert('Gagal memperbarui Sales Sent Date: ' + error.message, 'error');
+            }
         }
 
         // --- Load Projects to Table with Year Filter ---
@@ -2261,7 +2497,7 @@
 
             projectTableBody.innerHTML = `
                 <tr>
-                    <td colspan="11" class="loading-state">
+                    <td colspan="12" class="loading-state">
                         <div class="loading-spinner"></div>
                         <div class="loading-text">Memuat data project...</div>
                     </td>
@@ -2322,7 +2558,8 @@
                         Start_Date: project.startDate || '',
                         Status: project.status || '',
                         Clarification: project.clarification || false,
-                        Remarks: project.remarks || ''
+                        Remarks: project.remarks || '',
+                        Sales_Sent_Date: project.salesSentDate || ''
                     });
                 });
                 
@@ -2338,7 +2575,7 @@
                 console.error("Error loading projects: ", error);
                 projectTableBody.innerHTML = `
                     <tr>
-                        <td colspan="11" class="empty-state">
+                        <td colspan="12" class="empty-state">
                             <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
                             <h3>Gagal memuat data</h3>
                             <p>${error.message}</p>
@@ -3150,6 +3387,9 @@
                 const completeProjectData = {
                     ...projectData,
                     noUrutDokumen: projectNumber,
+                    salesSentDate: '',
+                    salesSentBy: '',
+                    salesSentAt: null,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
@@ -3351,6 +3591,10 @@
                                 <strong>Klarifikasi:</strong><br>
                                 ${clarificationIcon}
                             </div>
+                            <div>
+                                <strong>Sales Sent Date:</strong><br>
+                                ${project.Sales_Sent_Date || '-'}
+                            </div>
                         </div>
 
                         <div>
@@ -3364,9 +3608,11 @@
                         <div style="margin-top: 2.5rem; border-top: 2px solid var(--border); padding-top: 1.5rem;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                                 <h3 style="color: var(--dark);">Project Tambahan</h3>
-                                <button class="btn btn-primary" id="add-project-detail-btn">
-                                    <i class="fas fa-plus btn-icon"></i> Tambah Project
-                                </button>
+                                ${currentUserRole !== 'sales' ? `
+                                    <button class="btn btn-primary" id="add-project-detail-btn">
+                                        <i class="fas fa-plus btn-icon"></i> Tambah Project
+                                    </button>
+                                ` : ''}
                             </div>
                             
                             ${projectDetails.length > 0 ? 
@@ -3374,14 +3620,16 @@
                                     <div class="project-additional-card">
                                         <div class="project-additional-header">
                                             <h4 style="color: var(--primary);">Project Tambahan ${index + 1}</h4>
-                                            <div class="project-additional-actions">
-                                                <button class="action-btn edit-detail-btn" data-detail-id="${detail.id}" title="Edit Project">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Project">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
+                                            ${currentUserRole !== 'sales' ? `
+                                                <div class="project-additional-actions">
+                                                    <button class="action-btn edit-detail-btn" data-detail-id="${detail.id}" title="Edit Project">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="action-btn delete-detail-btn" data-detail-id="${detail.id}" title="Hapus Project">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            ` : ''}
                                         </div>
                                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
                                             <div><strong>Sales/Client:</strong><br>${detail.salesClient || '-'}</div>
@@ -3400,15 +3648,22 @@
                             }
                         </div>
 
-                        <!-- Tombol Edit dan Hapus -->
-                        <div class="detail-actions">
-                            <button type="button" class="btn detail-edit-btn" id="detail-edit-btn" data-project-id="${projectId}">
-                                <i class="fas fa-edit"></i> Edit Project Utama
-                            </button>
-                            <button type="button" class="btn detail-delete-btn" id="detail-delete-btn" data-project-id="${projectId}">
-                                <i class="fas fa-trash"></i> Hapus Project Utama
-                            </button>
-                        </div>
+                        <!-- Tombol Edit dan Hapus (only for non-sales) -->
+                        ${currentUserRole !== 'sales' ? `
+                            <div class="detail-actions">
+                                <button type="button" class="btn detail-edit-btn" id="detail-edit-btn" data-project-id="${projectId}">
+                                    <i class="fas fa-edit"></i> Edit Project Utama
+                                </button>
+                                <button type="button" class="btn detail-delete-btn" id="detail-delete-btn" data-project-id="${projectId}">
+                                    <i class="fas fa-trash"></i> Hapus Project Utama
+                                </button>
+                            </div>
+                        ` : `
+                            <div style="margin-top: 1.5rem; padding: 1rem; background: #fff3e0; border-radius: 10px; text-align: center; border: 1px solid var(--analytic-orange);">
+                                <i class="fas fa-info-circle" style="color: var(--analytic-orange);"></i>
+                                <span style="color: var(--analytic-orange); font-weight: 500;">Anda login sebagai Sales - hanya dapat melihat data</span>
+                            </div>
+                        `}
                     </div>
                 `;
 
@@ -3418,43 +3673,45 @@
                 modal.innerHTML = modalContent;
                 document.body.appendChild(modal);
 
-                // Add event listeners for edit and delete buttons
-                modal.querySelector('#detail-edit-btn').addEventListener('click', function() {
-                    const projectId = this.getAttribute('data-project-id');
-                    modal.remove();
-                    showEditProjectModal(projectId);
-                });
-
-                modal.querySelector('#detail-delete-btn').addEventListener('click', function() {
-                    const projectId = this.getAttribute('data-project-id');
-                    modal.remove();
-                    showDeleteConfirmationModal(projectId);
-                });
-
-                // Add event listener for add project detail button
-                modal.querySelector('#add-project-detail-btn').addEventListener('click', function() {
-                    modal.remove();
-                    showAddProjectDetailModal(projectId, project);
-                });
-
-                // Add event listeners for edit detail buttons
-                modal.querySelectorAll('.edit-detail-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const detailId = this.getAttribute('data-detail-id');
+                // Add event listeners for edit and delete buttons (only for non-sales)
+                if (currentUserRole !== 'sales') {
+                    modal.querySelector('#detail-edit-btn').addEventListener('click', function() {
+                        const projectId = this.getAttribute('data-project-id');
                         modal.remove();
-                        showEditProjectDetailModal(detailId, projectId);
+                        showEditProjectModal(projectId);
                     });
-                });
 
-                // Add event listeners for delete detail buttons
-                modal.querySelectorAll('.delete-detail-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const detailId = this.getAttribute('data-detail-id');
-                        if (confirm('Apakah Anda yakin ingin menghapus project tambahan ini?')) {
-                            deleteProjectDetail(detailId, projectId);
-                        }
+                    modal.querySelector('#detail-delete-btn').addEventListener('click', function() {
+                        const projectId = this.getAttribute('data-project-id');
+                        modal.remove();
+                        showDeleteConfirmationModal(projectId);
                     });
-                });
+
+                    // Add event listener for add project detail button
+                    modal.querySelector('#add-project-detail-btn').addEventListener('click', function() {
+                        modal.remove();
+                        showAddProjectDetailModal(projectId, project);
+                    });
+
+                    // Add event listeners for edit detail buttons
+                    modal.querySelectorAll('.edit-detail-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const detailId = this.getAttribute('data-detail-id');
+                            modal.remove();
+                            showEditProjectDetailModal(detailId, projectId);
+                        });
+                    });
+
+                    // Add event listeners for delete detail buttons
+                    modal.querySelectorAll('.delete-detail-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const detailId = this.getAttribute('data-detail-id');
+                            if (confirm('Apakah Anda yakin ingin menghapus project tambahan ini?')) {
+                                deleteProjectDetail(detailId, projectId);
+                            }
+                        });
+                    });
+                }
 
                 modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                     modal.remove();
@@ -4033,12 +4290,13 @@
                     project.Start_Date || '-',
                     project.Status || '-',
                     project.Remarks || '-',
-                    project.Clarification ? 'Ya' : 'Tidak'
+                    project.Clarification ? 'Ya' : 'Tidak',
+                    project.Sales_Sent_Date || '-'
                 ]);
 
                 // Add table
                 doc.autoTable({
-                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Remarks', 'Klarifikasi']],
+                    head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Remarks', 'Klarifikasi', 'Sales Sent Date']],
                     body: tableData,
                     startY: 30,
                     styles: { 
@@ -4052,16 +4310,17 @@
                     },
                     columnStyles: {
                         0: { cellWidth: 10 },
-                        1: { cellWidth: 25 },
-                        2: { cellWidth: 30 },
-                        3: { cellWidth: 20 },
-                        4: { cellWidth: 35 },
-                        5: { cellWidth: 25 },
-                        6: { cellWidth: 25 },
-                        7: { cellWidth: 20 },
-                        8: { cellWidth: 20 },
-                        9: { cellWidth: 40 },
-                        10: { cellWidth: 20 }
+                        1: { cellWidth: 22 },
+                        2: { cellWidth: 28 },
+                        3: { cellWidth: 18 },
+                        4: { cellWidth: 32 },
+                        5: { cellWidth: 22 },
+                        6: { cellWidth: 22 },
+                        7: { cellWidth: 18 },
+                        8: { cellWidth: 18 },
+                        9: { cellWidth: 35 },
+                        10: { cellWidth: 18 },
+                        11: { cellWidth: 22 }
                     }
                 });
 
@@ -4158,6 +4417,122 @@
             }
         }
 
+        // --- Determine User Role based on email ---
+        function determineUserRole(email) {
+            // List of sales emails
+            const salesEmails = [
+                'adminsales@genetek.co.id',
+                'sales@genetek.com'
+            ];
+            
+            // List of admin emails (all non-sales are admins)
+            if (salesEmails.includes(email)) {
+                return 'sales';
+            }
+            return 'admin';
+        }
+
+        // --- Apply role-based UI changes ---
+        function applyRoleBasedUI(role) {
+            document.body.classList.remove('sales-role', 'admin-role');
+            document.body.classList.add(role + '-role');
+
+            // Update role badge
+            const roleBadge = document.getElementById('role-badge');
+            if (roleBadge) {
+                roleBadge.textContent = role === 'sales' ? '🔑 Sales' : '👑 Admin';
+                roleBadge.style.background = role === 'sales' ? 'rgba(255, 152, 0, 0.3)' : 'rgba(67, 97, 238, 0.3)';
+                roleBadge.style.borderColor = role === 'sales' ? 'var(--analytic-orange)' : 'var(--primary)';
+            }
+
+            // Show/hide elements based on role
+            const adminOnlyElements = document.querySelectorAll('.admin-only');
+            const salesOnlyElements = document.querySelectorAll('.sales-only');
+
+            if (role === 'sales') {
+                adminOnlyElements.forEach(el => el.style.display = 'none');
+                salesOnlyElements.forEach(el => el.style.display = 'block');
+                
+                // Hide add project button
+                const addBtn = document.getElementById('add-project-btn');
+                if (addBtn) addBtn.style.display = 'none';
+                
+                // Hide export PDF button
+                const exportBtn = document.getElementById('export-pdf-btn');
+                if (exportBtn) exportBtn.style.display = 'none';
+                
+                // Hide reset filters button
+                const resetBtn = document.getElementById('reset-filters-btn');
+                if (resetBtn) resetBtn.style.display = 'none';
+                
+                // Hide filter apply button
+                const filterSubmit = document.querySelector('#filter-form button[type="submit"]');
+                if (filterSubmit) filterSubmit.style.display = 'none';
+                
+                // Disable status filter for sales
+                const statusFilter = document.getElementById('filter-status');
+                if (statusFilter) statusFilter.disabled = true;
+                
+                // Show sales info message
+                const salesMessage = document.getElementById('sales-info-message');
+                if (salesMessage) salesMessage.style.display = 'block';
+
+                // Hide Dashboard and Analytics menu for sales
+                const dashboardNav = document.querySelector('.nav-item[data-target="dashboard-section"]');
+                const analyticsNav = document.querySelector('.nav-item[data-target="analytics-section"]');
+                if (dashboardNav) dashboardNav.style.display = 'none';
+                if (analyticsNav) analyticsNav.style.display = 'none';
+                
+                // Hide dashboard and analytics sections
+                const dashboardSection = document.getElementById('dashboard-section');
+                const analyticsSection = document.getElementById('analytics-section');
+                if (dashboardSection) dashboardSection.style.display = 'none';
+                if (analyticsSection) analyticsSection.style.display = 'none';
+                
+                // Show only project list
+                const projectSection = document.getElementById('project-list-section');
+                if (projectSection) projectSection.style.display = 'block';
+                
+                // Activate project nav
+                const projectNav = document.querySelector('.nav-item[data-target="project-list-section"]');
+                if (projectNav) projectNav.classList.add('active');
+                
+            } else {
+                adminOnlyElements.forEach(el => el.style.display = 'block');
+                salesOnlyElements.forEach(el => el.style.display = 'none');
+                
+                // Show add project button
+                const addBtn = document.getElementById('add-project-btn');
+                if (addBtn) addBtn.style.display = 'inline-flex';
+                
+                // Show export PDF button
+                const exportBtn = document.getElementById('export-pdf-btn');
+                if (exportBtn) exportBtn.style.display = 'inline-flex';
+                
+                // Show reset filters button
+                const resetBtn = document.getElementById('reset-filters-btn');
+                if (resetBtn) resetBtn.style.display = 'inline-flex';
+                
+                // Show filter apply button
+                const filterSubmit = document.querySelector('#filter-form button[type="submit"]');
+                if (filterSubmit) filterSubmit.style.display = 'inline-flex';
+                
+                // Enable status filter
+                const statusFilter = document.getElementById('filter-status');
+                if (statusFilter) statusFilter.disabled = false;
+                
+                // Hide sales info message
+                const salesMessage = document.getElementById('sales-info-message');
+                if (salesMessage) salesMessage.style.display = 'none';
+
+                // Show Dashboard and Analytics menu for admin
+                const dashboardNav = document.querySelector('.nav-item[data-target="dashboard-section"]');
+                const analyticsNav = document.querySelector('.nav-item[data-target="analytics-section"]');
+                if (dashboardNav) dashboardNav.style.display = 'flex';
+                if (analyticsNav) analyticsNav.style.display = 'flex';
+            }
+        }
+
         // --- Login Functionality ---
         function initLogin() {
             const loginForm = document.getElementById('login-form');
@@ -4173,13 +4548,26 @@
             // Check if user is already logged in
             auth.onAuthStateChanged(user => {
                 if (user) {
+                    currentUserEmail = user.email;
+                    currentUserRole = determineUserRole(user.email);
+                    
                     document.getElementById('auth-container').style.display = 'none';
                     document.getElementById('main-container').style.display = 'flex';
+                    
+                    // Apply role-based UI
+                    applyRoleBasedUI(currentUserRole);
+                    
                     // Initialize year selectors
                     initializeYearMonthSelectors();
+                    
                     // Load initial data
-                    loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
-                    showSection('dashboard-section');
+                    if (currentUserRole === 'sales') {
+                        // Only load project list for sales
+                        loadProjectsToTable(selectedYearProject);
+                    } else {
+                        loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
+                        showSection('dashboard-section');
+                    }
                 } else {
                     document.getElementById('auth-container').style.display = 'flex';
                     document.getElementById('main-container').style.display = 'none';
@@ -4231,6 +4619,14 @@
 
         // --- Navigation Function ---
         function showSection(targetId) {
+            // For sales role, only show project list
+            if (currentUserRole === 'sales') {
+                if (targetId !== 'project-list-section') {
+                    showAlert('Anda hanya dapat mengakses daftar project', 'info');
+                    return;
+                }
+            }
+            
             const contentSections = document.querySelectorAll('.content-section');
             const navItems = document.querySelectorAll('.nav-item');
             
@@ -4321,10 +4717,14 @@
                 });
             }
 
-            // Add project button
+            // Add project button (admin only)
             const addProjectBtn = document.getElementById('add-project-btn');
             if (addProjectBtn) {
                 addProjectBtn.addEventListener('click', function() {
+                    if (currentUserRole === 'sales') {
+                        showAlert('Anda tidak memiliki akses untuk menambah project', 'error');
+                        return;
+                    }
                     document.getElementById('project-form').reset();
                     document.getElementById('data-in').disabled = false;
                     document.getElementById('no-urut-dokumen').disabled = true;
@@ -4349,10 +4749,14 @@
                 });
             }
 
-            // Export to PDF button
+            // Export to PDF button (admin only)
             const exportPdfBtn = document.getElementById('export-pdf-btn');
             if (exportPdfBtn) {
                 exportPdfBtn.addEventListener('click', function() {
+                    if (currentUserRole === 'sales') {
+                        showAlert('Anda tidak memiliki akses untuk export PDF', 'error');
+                        return;
+                    }
                     exportToPDF();
                 });
             }
@@ -4366,11 +4770,16 @@
                 }
             });
 
-            // Project form submission
+            // Project form submission (admin only)
             const projectForm = document.getElementById('project-form');
             if (projectForm) {
                 projectForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    
+                    if (currentUserRole === 'sales') {
+                        showAlert('Anda tidak memiliki akses untuk mengubah data', 'error');
+                        return;
+                    }
                     
                     const salesClient = document.getElementById('sales-client').value;
                     const otherSales = document.getElementById('other-sales').value;
@@ -4445,11 +4854,16 @@
                 });
             }
 
-            // Status form submission
+            // Status form submission (admin only)
             const statusForm = document.getElementById('status-form');
             if (statusForm) {
                 statusForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
+                    
+                    if (currentUserRole === 'sales') {
+                        showAlert('Anda tidak memiliki akses untuk mengubah status', 'error');
+                        return;
+                    }
                     
                     const newStatus = document.getElementById('status-select').value;
                     const success = await updateProject(currentEditingProjectId, { status: newStatus });
@@ -4472,12 +4886,16 @@
                 });
             }
 
-            // Delete confirmation handlers
+            // Delete confirmation handlers (admin only)
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
             
             if (confirmDeleteBtn) {
                 confirmDeleteBtn.addEventListener('click', async function() {
+                    if (currentUserRole === 'sales') {
+                        showAlert('Anda tidak memiliki akses untuk menghapus data', 'error');
+                        return;
+                    }
                     const success = await deleteProject(currentEditingProjectId);
                     if (success) {
                         document.getElementById('delete-modal').style.display = 'none';
@@ -4536,8 +4954,10 @@
                 }
             });
 
-            // Summary item click handlers for dashboard
+            // Summary item click handlers for dashboard (admin only)
             document.addEventListener('click', function(e) {
+                if (currentUserRole === 'sales') return;
+                
                 const summaryItem = e.target.closest('.summary-item');
                 if (summaryItem) {
                     const type = summaryItem.dataset.type;
@@ -4595,6 +5015,9 @@
                 <div class="logo-text">Engineering Monitor</div>
             </div>
             
+            <!-- Role Badge -->
+            <div id="role-badge" class="role-badge">👑 Admin</div>
+            
             <nav class="nav-menu">
                 <a href="#" class="nav-item active" data-target="dashboard-section">
                     <div class="nav-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -4617,6 +5040,17 @@
 
         <!-- Main Content -->
         <main class="main-content">
+            <!-- Sales Info Message -->
+            <div id="sales-info-message" style="display: none; background: #fff3e0; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid var(--analytic-orange);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-info-circle" style="color: var(--analytic-orange); font-size: 1.5rem;"></i>
+                    <div>
+                        <strong style="color: var(--analytic-orange);">Mode Sales</strong>
+                        <span style="color: var(--secondary); margin-left: 0.5rem;">Anda hanya dapat melihat daftar project dan mengisi Sales Sent Date</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Dashboard Section -->
             <section id="dashboard-section" class="content-section">
                 <div class="header">
@@ -4722,10 +5156,10 @@
                             </select>
                         </div>
                         <div>
-                            <button class="btn btn-primary" id="add-project-btn">
+                            <button class="btn btn-primary admin-only" id="add-project-btn">
                                 <i class="fas fa-plus btn-icon"></i> Tambah Project
                             </button>
-                            <button class="btn btn-outline" id="export-pdf-btn">
+                            <button class="btn btn-outline admin-only" id="export-pdf-btn">
                                 <i class="fas fa-file-pdf btn-icon"></i> Export PDF
                             </button>
                         </div>
@@ -4777,10 +5211,10 @@
                                 <input type="text" class="filter-input" id="filter-search" placeholder="Cari project...">
                             </div>
                             <div class="filter-group" style="align-self: flex-end;">
-                                <button type="button" class="btn btn-outline" id="reset-filters-btn">
+                                <button type="button" class="btn btn-outline admin-only" id="reset-filters-btn">
                                     Reset Filter
                                 </button>
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary admin-only">
                                     Terapkan Filter
                                 </button>
                             </div>
@@ -4792,6 +5226,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Daftar Project</h2>
+                        <span style="font-size: 0.8rem; color: var(--secondary);">
+                            <i class="fas fa-info-circle"></i> 
+                            ${currentUserRole === 'sales' ? 'Klik kolom Sales Sent Date untuk mengisi tanggal' : ''}
+                        </span>
                     </div>
                     <div class="card-body">
                         <div class="table-container">
@@ -4809,6 +5247,7 @@
                                         <th>Status</th>
                                         <th>Remarks</th>
                                         <th>Klarifikasi</th>
+                                        <th>Sales Sent Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
