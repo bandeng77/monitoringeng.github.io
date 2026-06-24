@@ -30,7 +30,6 @@
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             
-            /* WARNA TERANG UNTUK ANALYTICS/DASHBOARD */
             --analytic-orange: #FF9800;
             --analytic-green: #28a745;
             --analytic-red: #dc3545;
@@ -54,7 +53,6 @@
             overflow-x: hidden;
         }
 
-        /* ========== IMPROVED LOGIN STYLES ========== */
         .auth-container {
             display: flex;
             justify-content: center;
@@ -273,14 +271,12 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ========== MAIN CONTAINER ========== */
         .container {
             display: flex;
             min-height: 100vh;
             width: 100%;
         }
 
-        /* Sidebar Styles */
         .sidebar {
             width: 280px;
             background: var(--sidebar-bg);
@@ -393,7 +389,6 @@
             overflow: hidden;
         }
 
-        /* Role Badge */
         .role-badge {
             background: rgba(255,255,255,0.1);
             color: white;
@@ -405,7 +400,6 @@
             border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Sidebar Toggle Button */
         .sidebar-toggle {
             position: absolute;
             top: 1.5rem;
@@ -434,7 +428,6 @@
             transform: rotate(180deg);
         }
 
-        /* Main Content Styles */
         .main-content {
             flex: 1;
             padding: 2rem;
@@ -443,7 +436,6 @@
             background-color: var(--bg);
         }
 
-        /* Header Styles */
         .header {
             display: flex;
             justify-content: space-between;
@@ -471,7 +463,6 @@
             align-items: center;
         }
 
-        /* Year Filter Container */
         .year-filter-container {
             display: flex;
             align-items: center;
@@ -504,7 +495,6 @@
             box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
 
-        /* Month Filter Container */
         .month-filter-container {
             display: flex;
             align-items: center;
@@ -586,7 +576,6 @@
             margin-right: 0.5rem;
         }
 
-        /* Card Styles */
         .card {
             background-color: var(--card-bg);
             border-radius: 15px;
@@ -620,7 +609,6 @@
             padding: 1.5rem;
         }
 
-        /* Filter Section */
         .filter-section {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -661,7 +649,6 @@
             cursor: not-allowed;
         }
 
-        /* ========== PERBAIKAN TABEL PROJEK ========== */
         .table-container {
             overflow-x: auto;
             border-radius: 10px;
@@ -707,7 +694,6 @@
             font-size: 12px;
         }
 
-        /* PERBAIKAN: Hilangkan border kanan untuk kolom terakhir */
         th:last-child, td:last-child {
             border-right: none;
         }
@@ -720,21 +706,19 @@
             background-color: var(--hover);
         }
 
-        /* Table Column Widths - PERBAIKAN LEBAR KOLOM */
-        th:nth-child(1), td:nth-child(1) { width: 50px; min-width: 50px; max-width: 50px; } /* No */
-        th:nth-child(2), td:nth-child(2) { width: 100px; min-width: 100px; max-width: 100px; } /* Sales/Client */
-        th:nth-child(3), td:nth-child(3) { width: 130px; min-width: 130px; max-width: 130px; } /* Project Name */
-        th:nth-child(4), td:nth-child(4) { width: 85px; min-width: 85px; max-width: 85px; } /* Data In */
-        th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 150px; max-width: 150px; } /* No Urut Dokumen */
-        th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 100px; max-width: 100px; } /* Type */
-        th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 100px; max-width: 100px; } /* PIC */
-        th:nth-child(8), td:nth-child(8) { width: 85px; min-width: 85px; max-width: 85px; } /* Start Date */
-        th:nth-child(9), td:nth-child(9) { width: 100px; min-width: 100px; max-width: 100px; } /* Status */
-        th:nth-child(10), td:nth-child(10) { width: 120px; min-width: 120px; max-width: 120px; } /* Remarks */
-        th:nth-child(11), td:nth-child(11) { width: 80px; min-width: 80px; max-width: 80px; } /* Klarifikasi */
-        th:nth-child(12), td:nth-child(12) { width: 110px; min-width: 110px; max-width: 110px; } /* Sales Sent Date */
+        th:nth-child(1), td:nth-child(1) { width: 50px; min-width: 50px; max-width: 50px; }
+        th:nth-child(2), td:nth-child(2) { width: 100px; min-width: 100px; max-width: 100px; }
+        th:nth-child(3), td:nth-child(3) { width: 130px; min-width: 130px; max-width: 130px; }
+        th:nth-child(4), td:nth-child(4) { width: 85px; min-width: 85px; max-width: 85px; }
+        th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 150px; max-width: 150px; }
+        th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 100px; max-width: 100px; }
+        th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 100px; max-width: 100px; }
+        th:nth-child(8), td:nth-child(8) { width: 85px; min-width: 85px; max-width: 85px; }
+        th:nth-child(9), td:nth-child(9) { width: 100px; min-width: 100px; max-width: 100px; }
+        th:nth-child(10), td:nth-child(10) { width: 120px; min-width: 120px; max-width: 120px; }
+        th:nth-child(11), td:nth-child(11) { width: 80px; min-width: 80px; max-width: 80px; }
+        th:nth-child(12), td:nth-child(12) { width: 110px; min-width: 110px; max-width: 110px; }
 
-        /* Cell Content Styling - Improved for readability */
         .cell-content {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -748,7 +732,6 @@
             font-size: 12px;
         }
 
-        /* Status Button - PERBAIKAN: Dipindahkan ke kolom status */
         .status-button {
             display: inline-flex;
             align-items: center;
@@ -787,7 +770,6 @@
             color: white;
         }
 
-        /* Document Number Link */
         .doc-number-link {
             display: inline-flex;
             align-items: center;
@@ -800,6 +782,7 @@
             word-break: break-all;
             padding: 2px 4px;
             line-height: 1.3;
+            cursor: pointer;
         }
 
         .doc-number-link:hover {
@@ -807,9 +790,8 @@
             color: var(--primary-dark);
         }
 
-        /* PERBAIKAN: Klarifikasi Icon - posisi tengah dan sejajar */
         .klarifikasi-cell {
-            /*display: flex;*/
+            display: flex;
             justify-content: center;
             align-items: center;
             height: 60px;
@@ -834,7 +816,6 @@
             color: var(--analytic-red);
         }
 
-        /* Sales Sent Date Cell */
         .sales-sent-date-cell {
             display: flex;
             justify-content: center;
@@ -884,7 +865,6 @@
             box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.3);
         }
 
-        /* Pagination */
         .pagination {
             display: flex;
             justify-content: space-between;
@@ -927,7 +907,6 @@
             border-color: transparent;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -1035,7 +1014,6 @@
             cursor: not-allowed;
         }
 
-        /* Custom Alert/Notification Styles */
         .custom-alert {
             display: none;
             position: fixed;
@@ -1082,7 +1060,6 @@
             background: linear-gradient(135deg, var(--primary), var(--analytic-purple));
         }
 
-        /* Dashboard Summary Grid */
         .dashboard-summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1137,7 +1114,6 @@
             color: var(--secondary);
         }
 
-        /* Specific colors for summary items - WARNA LEBIH TERANG */
         .summary-item:nth-child(1) .summary-value { 
             color: var(--analytic-orange);
             text-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
@@ -1155,7 +1131,6 @@
             text-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
         }
 
-        /* Status Summary Grid */
         .status-summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1190,7 +1165,6 @@
             color: var(--secondary);
         }
 
-        /* Specific colors for status summary items - WARNA LEBIH TERANG */
         .status-on-progress-summary {
             border-left-color: var(--analytic-orange);
         }
@@ -1223,7 +1197,6 @@
             text-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
         }
 
-        /* Analytics Chart Containers */
         .analytics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1252,7 +1225,6 @@
             width: 100%;
         }
 
-        /* Type Details in Analytics */
         .type-details-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -1322,7 +1294,6 @@
             white-space: nowrap;
         }
 
-        /* WARNA UNTUK ANALYTICS SESUAI PERMINTAAN - LEBIH TERANG */
         .on-progress-stat .stat-value { 
             color: var(--analytic-orange);
             text-shadow: 0 1px 2px rgba(255, 152, 0, 0.2);
@@ -1340,7 +1311,6 @@
             text-shadow: 0 1px 2px rgba(21, 101, 192, 0.2);
         }
 
-        /* Multiple Select Styles */
         .multiple-select-container {
             display: flex;
             flex-wrap: wrap;
@@ -1370,7 +1340,6 @@
             accent-color: var(--primary);
         }
 
-        /* Checkbox styling */
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -1384,7 +1353,6 @@
             accent-color: var(--primary);
         }
 
-        /* Delete Confirmation Modal */
         .delete-modal {
             display: none;
             position: fixed;
@@ -1419,7 +1387,6 @@
             margin-top: 1.5rem;
         }
 
-        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
@@ -1444,7 +1411,6 @@
             margin: 0 auto;
         }
 
-        /* Loading State */
         .loading-state {
             text-align: center;
             padding: 2rem;
@@ -1466,7 +1432,6 @@
             font-size: 0.9rem;
         }
 
-        /* Responsive Styles */
         @media (max-width: 1024px) {
             .container {
                 flex-direction: column;
@@ -1596,36 +1561,6 @@
             }
         }
 
-        /* Tooltip */
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-
-        .tooltip .tooltip-text {
-            visibility: hidden;
-            width: 200px;
-            background-color: var(--dark);
-            color: white;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -100px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-        }
-
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        /* Tombol Edit dan Hapus di modal detail */
         .detail-actions {
             display: flex;
             justify-content: flex-end;
@@ -1650,7 +1585,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* Styling untuk project tambahan dalam modal detail */
         .project-additional-card {
             background: #f8f9fa;
             border-radius: 10px;
@@ -1679,7 +1613,6 @@
             gap: 0.5rem;
         }
 
-        /* Dashboard Table in Modal */
         .dashboard-modal-table-container {
             overflow-x: auto;
             border-radius: 10px;
@@ -1715,7 +1648,6 @@
             background-color: var(--hover);
         }
 
-        /* Sales Role Specific Styles */
         .sales-only-message {
             display: none;
             text-align: center;
@@ -1738,60 +1670,14 @@
         body.sales-role .card-header .card-title {
             font-size: 1rem;
         }
-
-        /* Access Denied Overlay */
-        .access-denied-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .access-denied-overlay.show {
-            display: flex;
-        }
-
-        .access-denied-content {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 450px;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-
-        .access-denied-content i {
-            font-size: 4rem;
-            color: var(--danger);
-            margin-bottom: 1rem;
-        }
-
-        .access-denied-content h2 {
-            color: var(--dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .access-denied-content p {
-            color: var(--secondary);
-            margin-bottom: 1.5rem;
-        }
     </style>
 </head>
 <body>
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
-        // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD-wZ0y0jG-MstU1MPIQQg8pyLnefx8ADQ",
             authDomain: "monitoring-finance.firebaseapp.com",
@@ -1801,41 +1687,34 @@
             appId: "1:312581732577:web:0ee71d80770eea1ed39fa0"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
 
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Firestore Collections references
         const projectsCol = db.collection('projects');
         const projectDetailsCol = db.collection('projectDetails');
         const countersCol = db.collection('counters');
 
-        // Global variables
         let allProjectData = [];
         let filteredProjectData = [];
         window.currentPage = 1;
         const itemsPerPage = 10;
         let currentEditingProjectId = null;
         
-        // Chart instances
         let typeChartInstance = null;
         let statusChartInstance = null;
         let analyticsChartInstance = null;
         
-        // Selected years and months
         let selectedYearDashboard = new Date().getFullYear();
-        let selectedMonthDashboard = 0; // 0 = Semua Bulan
+        let selectedMonthDashboard = 0;
         let selectedYearProject = new Date().getFullYear();
         let selectedMonthProject = new Date().getMonth() + 1;
         let selectedYearAnalytics = new Date().getFullYear();
 
-        // User role
-        let currentUserRole = 'admin'; // 'admin', 'sales'
+        let currentUserRole = 'engineering';
         let currentUserEmail = '';
 
-        // --- Custom Alert Function ---
         function showAlert(message, type = 'info', duration = 3000) {
             let alertBox = document.getElementById('custom-alert-box');
             if (!alertBox) {
@@ -1861,7 +1740,6 @@
             }, duration);
         }
 
-        // --- Format date to DDMM ---
         function formatDateToDDMM(dateString) {
             if (!dateString) return '0000';
             try {
@@ -1875,7 +1753,6 @@
             }
         }
 
-        // --- Get type code ---
         function getTypeCode(types) {
             const typeMap = {
                 'Quotation': 'QTN',
@@ -1890,22 +1767,16 @@
             return typeMap[types] || 'OTH';
         }
 
-        // --- Generate project number with year-specific counter ---
         async function generateProjectNumber(dataIn, types, projectName) {
             try {
-                // Get year from dataIn
                 const dataInDate = new Date(dataIn);
                 const year = dataInDate.getFullYear();
                 
-                // Only allow 2025 and 2026
                 if (year !== 2025 && year !== 2026) {
                     throw new Error("Hanya tahun 2025 dan 2026 yang diperbolehkan");
                 }
                 
-                // Counter key for the year
                 const counterKey = `projectCounter_${year}`;
-                
-                // Get or create counter for the year
                 const counterDoc = await countersCol.doc(counterKey).get();
                 let nextNumber = 1;
                 
@@ -1920,7 +1791,6 @@
                 const dateCode = formatDateToDDMM(dataIn);
                 const typeCode = getTypeCode(types);
                 
-                // Shorten project name if too long
                 let shortProjectName = projectName;
                 if (projectName.length > 20) {
                     shortProjectName = projectName.substring(0, 20);
@@ -1933,22 +1803,15 @@
             }
         }
 
-        // --- Helper function to format text for display ---
         function formatTextForDisplay(text, maxLength = 50) {
             if (!text) return '-';
-            
-            // Convert to string and trim
             let str = String(text).trim();
-            
-            // If too long, truncate and add ellipsis
             if (str.length > maxLength) {
                 return str.substring(0, maxLength) + '...';
             }
-            
             return str;
         }
 
-        // --- Format month number to month name ---
         function formatMonthName(monthNumber) {
             if (monthNumber === 0) return 'Semua Bulan';
             const months = [
@@ -1958,21 +1821,116 @@
             return months[monthNumber - 1] || '';
         }
 
-        // --- Get month number from month name ---
-        function getMonthNumber(monthName) {
-            if (monthName === 'Semua Bulan') return 0;
-            const months = {
-                'Januari': 1, 'Februari': 2, 'Maret': 3, 'April': 4,
-                'Mei': 5, 'Juni': 6, 'Juli': 7, 'Agustus': 8,
-                'September': 9, 'Oktober': 10, 'November': 11, 'Desember': 12
-            };
-            return months[monthName] || 0;
+        // ==================== PERUBAHAN: Role ====================
+        function determineUserRole(email) {
+            // List of sales emails
+            const salesEmails = [
+                'sales1@genetek.com',
+                'sales2@genetek.com',
+                'rangga@genetek.com',
+                'dhea@genetek.com',
+                'rory@genetek.com',
+                'pamungkas@genetek.com',
+                'adminsales@genetek.co.id'
+            ];
+            
+            if (salesEmails.includes(email)) {
+                return 'sales';
+            }
+            // Semua selain sales adalah engineering (bukan admin)
+            return 'engineering';
+        }
+
+        function applyRoleBasedUI(role) {
+            document.body.classList.remove('sales-role', 'engineering-role');
+            document.body.classList.add(role + '-role');
+
+            const roleBadge = document.getElementById('role-badge');
+            if (roleBadge) {
+                if (role === 'sales') {
+                    roleBadge.textContent = '🔑 Sales';
+                    roleBadge.style.background = 'rgba(255, 152, 0, 0.3)';
+                    roleBadge.style.borderColor = 'var(--analytic-orange)';
+                } else {
+                    roleBadge.textContent = '⚙️ Engineering';
+                    roleBadge.style.background = 'rgba(67, 97, 238, 0.3)';
+                    roleBadge.style.borderColor = 'var(--primary)';
+                }
+            }
+
+            const adminOnlyElements = document.querySelectorAll('.admin-only');
+            const salesOnlyElements = document.querySelectorAll('.sales-only');
+
+            if (role === 'sales') {
+                adminOnlyElements.forEach(el => el.style.display = 'none');
+                salesOnlyElements.forEach(el => el.style.display = 'block');
+                
+                const addBtn = document.getElementById('add-project-btn');
+                if (addBtn) addBtn.style.display = 'none';
+                
+                const exportBtn = document.getElementById('export-pdf-btn');
+                if (exportBtn) exportBtn.style.display = 'none';
+                
+                const resetBtn = document.getElementById('reset-filters-btn');
+                if (resetBtn) resetBtn.style.display = 'none';
+                
+                const filterSubmit = document.querySelector('#filter-form button[type="submit"]');
+                if (filterSubmit) filterSubmit.style.display = 'none';
+                
+                const statusFilter = document.getElementById('filter-status');
+                if (statusFilter) statusFilter.disabled = true;
+                
+                const salesMessage = document.getElementById('sales-info-message');
+                if (salesMessage) salesMessage.style.display = 'block';
+
+                const dashboardNav = document.querySelector('.nav-item[data-target="dashboard-section"]');
+                const analyticsNav = document.querySelector('.nav-item[data-target="analytics-section"]');
+                if (dashboardNav) dashboardNav.style.display = 'none';
+                if (analyticsNav) analyticsNav.style.display = 'none';
+                
+                const dashboardSection = document.getElementById('dashboard-section');
+                const analyticsSection = document.getElementById('analytics-section');
+                if (dashboardSection) dashboardSection.style.display = 'none';
+                if (analyticsSection) analyticsSection.style.display = 'none';
+                
+                const projectSection = document.getElementById('project-list-section');
+                if (projectSection) projectSection.style.display = 'block';
+                
+                const projectNav = document.querySelector('.nav-item[data-target="project-list-section"]');
+                if (projectNav) projectNav.classList.add('active');
+                
+            } else {
+                adminOnlyElements.forEach(el => el.style.display = 'block');
+                salesOnlyElements.forEach(el => el.style.display = 'none');
+                
+                const addBtn = document.getElementById('add-project-btn');
+                if (addBtn) addBtn.style.display = 'inline-flex';
+                
+                const exportBtn = document.getElementById('export-pdf-btn');
+                if (exportBtn) exportBtn.style.display = 'inline-flex';
+                
+                const resetBtn = document.getElementById('reset-filters-btn');
+                if (resetBtn) resetBtn.style.display = 'inline-flex';
+                
+                const filterSubmit = document.querySelector('#filter-form button[type="submit"]');
+                if (filterSubmit) filterSubmit.style.display = 'inline-flex';
+                
+                const statusFilter = document.getElementById('filter-status');
+                if (statusFilter) statusFilter.disabled = false;
+                
+                const salesMessage = document.getElementById('sales-info-message');
+                if (salesMessage) salesMessage.style.display = 'none';
+
+                const dashboardNav = document.querySelector('.nav-item[data-target="dashboard-section"]');
+                const analyticsNav = document.querySelector('.nav-item[data-target="analytics-section"]');
+                if (dashboardNav) dashboardNav.style.display = 'flex';
+                if (analyticsNav) analyticsNav.style.display = 'flex';
+            }
         }
 
         // --- Show Dashboard Projects Modal ---
         async function showDashboardProjectsModal(category, title) {
             try {
-                // Get all projects
                 const snapshot = await projectsCol.get();
                 if (snapshot.empty) {
                     showAlert('Tidak ada data project', 'info');
@@ -1988,7 +1946,6 @@
                     });
                 });
 
-                // Filter projects based on category and selected year/month
                 let filteredProjects = [];
                 let filterDescription = '';
 
@@ -2002,11 +1959,9 @@
                     const typeName = typeMap[title.toLowerCase()] || title;
                     
                     filteredProjects = projects.filter(project => {
-                        // Check if project matches the type
                         const types = Array.isArray(project.type) ? project.type : [project.type];
                         const matchesType = types.includes(typeName);
                         
-                        // Check if project matches selected year
                         let matchesDate = true;
                         if (selectedYearDashboard) {
                             const projectDate = project.dataIn || project.startDate;
@@ -2023,7 +1978,6 @@
                             }
                         }
                         
-                        // Check if project matches selected month (if not "Semua Bulan")
                         if (selectedMonthDashboard !== 0) {
                             const projectDate = project.dataIn || project.startDate;
                             if (projectDate) {
@@ -2050,10 +2004,8 @@
                     
                 } else if (category === 'status') {
                     filteredProjects = projects.filter(project => {
-                        // Check if project matches the status
                         const matchesStatus = project.status === title;
                         
-                        // Check if project matches selected year
                         let matchesDate = true;
                         if (selectedYearDashboard) {
                             const projectDate = project.dataIn || project.startDate;
@@ -2070,7 +2022,6 @@
                             }
                         }
                         
-                        // Check if project matches selected month (if not "Semua Bulan")
                         if (selectedMonthDashboard !== 0) {
                             const projectDate = project.dataIn || project.startDate;
                             if (projectDate) {
@@ -2104,7 +2055,6 @@
                     return;
                 }
 
-                // Create modal content
                 const modalContent = `
                     <div class="modal-content" style="max-width: 1200px;">
                         <span class="modal-close-btn">&times;</span>
@@ -2174,7 +2124,6 @@
                 modal.innerHTML = modalContent;
                 document.body.appendChild(modal);
 
-                // Add event listeners
                 modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                     modal.remove();
                 });
@@ -2195,17 +2144,14 @@
             }
         }
 
-        // --- Export Dashboard Projects to PDF ---
         function exportDashboardToPDF(category, title, projects) {
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('l', 'mm', 'a4');
 
-                // Add title
                 doc.setFontSize(16);
                 doc.text(`LAPORAN PROJECT - ${title.toUpperCase()}`, 148, 15, { align: 'center' });
                 
-                // Add filter info
                 const monthName = selectedMonthDashboard === 0 ? 'Semua Bulan' : formatMonthName(selectedMonthDashboard);
                 doc.setFontSize(10);
                 doc.text(`Tahun: ${selectedYearDashboard} | Bulan: ${monthName} | Jumlah: ${projects.length} project`, 148, 22, { align: 'center' });
@@ -2230,7 +2176,6 @@
                     project.remarks || '-'
                 ]);
 
-                // Add table
                 doc.autoTable({
                     head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Klarifikasi', 'Sales Sent Date', 'Remarks']],
                     body: tableData,
@@ -2260,7 +2205,6 @@
                     }
                 });
 
-                // Save the PDF
                 const currentDate = new Date().toLocaleDateString('id-ID');
                 const monthText = selectedMonthDashboard === 0 ? 'Semua-Bulan' : formatMonthName(selectedMonthDashboard);
                 doc.save(`${title}_${selectedYearDashboard}_${monthText}_${currentDate.replace(/\//g, '-')}.pdf`);
@@ -2271,7 +2215,36 @@
             }
         }
 
-        // --- Render Projects to Table with Year Filter ---
+        // --- Update Sales Sent Date ---
+        async function updateSalesSentDate(projectId, date) {
+            try {
+                if (currentUserRole !== 'sales') {
+                    showAlert('Hanya Sales yang dapat mengisi Sales Sent Date', 'error');
+                    return;
+                }
+
+                const projectDoc = await projectsCol.doc(projectId).get();
+                if (!projectDoc.exists) {
+                    showAlert('Project tidak ditemukan', 'error');
+                    return;
+                }
+
+                await projectsCol.doc(projectId).update({
+                    salesSentDate: date,
+                    salesSentBy: currentUserEmail,
+                    salesSentAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showAlert('Sales Sent Date berhasil diperbarui!', 'success');
+                loadProjectsToTable(selectedYearProject);
+                
+            } catch (error) {
+                console.error("Error updating sales sent date:", error);
+                showAlert('Gagal memperbarui Sales Sent Date: ' + error.message, 'error');
+            }
+        }
+
+        // --- Render Projects to Table ---
         function renderProjectsTable(data, year) {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
@@ -2292,7 +2265,6 @@
                 return;
             }
 
-            // Filter by selected year
             const filteredByYear = year ? 
                 data.filter(project => {
                     if (project.Data_In) {
@@ -2334,17 +2306,14 @@
                 else if (project.Status === 'Done') statusClass = 'status-done';
                 else if (project.Status === 'Hold') statusClass = 'status-hold';
 
-                // Format types for display
                 const displayTypes = Array.isArray(project.Type) ? 
                     project.Type.map(type => formatTextForDisplay(type, 15)).join(', ') : 
                     formatTextForDisplay(project.Type, 15);
 
-                // Klarifikasi icon
                 const clarificationIcon = project.Clarification ? 
                     '<i class="fas fa-check-circle"></i>' : 
                     '<i class="fas fa-times-circle"></i>';
 
-                // Sales Sent Date - editable only for sales role
                 const isSalesRole = currentUserRole === 'sales';
                 const salesSentDateValue = project.Sales_Sent_Date || '';
                 const salesSentDateInput = isSalesRole ? 
@@ -2392,16 +2361,11 @@
             attachTableEventListeners();
         }
 
-        // --- Attach event listeners to table buttons ---
+        // --- Attach event listeners ---
         function attachTableEventListeners() {
-            // Status buttons (only for non-sales role)
+            // Status buttons
             document.querySelectorAll('.status-button').forEach(btn => {
-                // Remove existing listeners to avoid duplicates
-                const newBtn = btn.cloneNode(true);
-                btn.parentNode.replaceChild(newBtn, btn);
-                
-                newBtn.addEventListener('click', function() {
-                    // Only allow if not sales role
+                btn.addEventListener('click', function() {
                     if (currentUserRole === 'sales') {
                         showAlert('Anda tidak memiliki akses untuk mengubah status', 'error');
                         return;
@@ -2412,85 +2376,43 @@
                 });
             });
 
-            // Document number links
+            // Document number links - PERBAIKAN: event listener langsung pada link
             document.querySelectorAll('.doc-number-link').forEach(link => {
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-                
-                newLink.addEventListener('click', function(e) {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
+                    e.stopPropagation();
                     const projectId = this.getAttribute('data-project-id');
-                    showProjectDetailsModal(projectId);
-                });
-            });
-
-            // Klik pada baris tabel untuk membuka detail (only for non-sales)
-            document.querySelectorAll('#project-table tbody tr').forEach(row => {
-                const newRow = row.cloneNode(true);
-                row.parentNode.replaceChild(newRow, row);
-                
-                newRow.addEventListener('click', function(e) {
-                    if (!e.target.closest('a') && !e.target.closest('button') && !e.target.closest('input')) {
-                        const projectId = this.getAttribute('data-project-id');
-                        if (projectId) {
-                            showProjectDetailsModal(projectId);
-                        }
+                    if (projectId) {
+                        showProjectDetailsModal(projectId);
                     }
                 });
             });
 
-            // Sales Sent Date input changes
+            // Row click - tapi jangan override link click
+            document.querySelectorAll('#project-table tbody tr').forEach(row => {
+                row.addEventListener('click', function(e) {
+                    // Jika klik pada link atau button atau input, abaikan
+                    if (e.target.closest('a') || e.target.closest('button') || e.target.closest('input')) {
+                        return;
+                    }
+                    const projectId = this.getAttribute('data-project-id');
+                    if (projectId) {
+                        showProjectDetailsModal(projectId);
+                    }
+                });
+            });
+
+            // Sales Sent Date input
             document.querySelectorAll('.sales-sent-date-input.sales-editable').forEach(input => {
-                const newInput = input.cloneNode(true);
-                input.parentNode.replaceChild(newInput, input);
-                
-                newInput.addEventListener('change', function() {
+                input.addEventListener('change', function() {
                     const projectId = this.getAttribute('data-project-id');
                     const newDate = this.value;
                     updateSalesSentDate(projectId, newDate);
                 });
-
-                newInput.addEventListener('blur', function() {
-                    // Optional: auto-save on blur
-                });
             });
         }
 
-        // --- Update Sales Sent Date ---
-        async function updateSalesSentDate(projectId, date) {
-            try {
-                // Only sales can update
-                if (currentUserRole !== 'sales') {
-                    showAlert('Hanya Sales yang dapat mengisi Sales Sent Date', 'error');
-                    return;
-                }
-
-                // Get the project document
-                const projectDoc = await projectsCol.doc(projectId).get();
-                if (!projectDoc.exists) {
-                    showAlert('Project tidak ditemukan', 'error');
-                    return;
-                }
-
-                // Update the salesSentDate field
-                await projectsCol.doc(projectId).update({
-                    salesSentDate: date,
-                    salesSentBy: currentUserEmail,
-                    salesSentAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                showAlert('Sales Sent Date berhasil diperbarui!', 'success');
-                
-                // Refresh the table
-                loadProjectsToTable(selectedYearProject);
-                
-            } catch (error) {
-                console.error("Error updating sales sent date:", error);
-                showAlert('Gagal memperbarui Sales Sent Date: ' + error.message, 'error');
-            }
-        }
-
-        // --- Load Projects to Table with Year Filter ---
+        // --- Load Projects ---
         async function loadProjectsToTable(year = selectedYearProject) {
             const projectTableBody = document.querySelector('#project-table tbody');
             if (!projectTableBody) return;
@@ -2517,7 +2439,6 @@
                 const currentAllProjectData = [];
                 let rowNum = 1;
 
-                // Get all project details for combining PIC
                 let allProjectDetails = [];
                 try {
                     const detailsSnapshot = await projectDetailsCol.get();
@@ -2533,7 +2454,6 @@
                 snapshot.forEach(doc => {
                     const project = doc.data();
                     
-                    // Combine PIC from main project and details
                     let combinedPIC = project.pic || '';
                     
                     const relatedDetails = allProjectDetails.filter(detail => 
@@ -2567,7 +2487,6 @@
                 filteredProjectData = [...allProjectData];
                 renderProjectsTable(filteredProjectData, year);
                 
-                // Update dropdown filters
                 updatePICFilterDropdown(allProjectData);
                 updateTypeFilterDropdown(allProjectData);
                 
@@ -2586,7 +2505,6 @@
             }
         }
 
-        // --- Update Filter Dropdowns ---
         function updatePICFilterDropdown(projects) {
             const picFilter = document.getElementById('filter-pic');
             if (!picFilter) return;
@@ -2654,7 +2572,6 @@
             }
         }
 
-        // --- Apply Filters Function ---
         function applyFilters() {
             const statusFilter = document.getElementById('filter-status').value;
             const typeFilter = document.getElementById('filter-type').value;
@@ -2667,7 +2584,6 @@
             filteredProjectData = allProjectData.filter(project => {
                 let matches = true;
 
-                // Year filter
                 if (yearFilter) {
                     if (project.Data_In) {
                         try {
@@ -2683,12 +2599,10 @@
                     }
                 }
 
-                // Status filter
                 if (statusFilter && statusFilter !== '' && project.Status !== statusFilter) {
                     matches = false;
                 }
 
-                // Type filter
                 if (typeFilter && typeFilter !== '') {
                     const projectTypes = project.Type ? 
                         (Array.isArray(project.Type) ? project.Type : [project.Type]) : [];
@@ -2697,7 +2611,6 @@
                     }
                 }
 
-                // PIC filter
                 if (picFilter && picFilter !== '') {
                     const projectPICs = project.PIC ? project.PIC.toLowerCase().split(',').map(pic => pic.trim()) : [];
                     if (!projectPICs.includes(picFilter.toLowerCase())) {
@@ -2705,7 +2618,6 @@
                     }
                 }
 
-                // Clarification filter
                 if (clarificationFilter && clarificationFilter !== '') {
                     const isClarified = clarificationFilter === 'true';
                     if (project.Clarification !== isClarified) {
@@ -2713,7 +2625,6 @@
                     }
                 }
 
-                // Month filter
                 if (monthFilter && monthFilter !== '') {
                     const projectMonth = project.Data_In ? project.Data_In.substring(0, 7) : '';
                     if (projectMonth !== monthFilter) {
@@ -2721,7 +2632,6 @@
                     }
                 }
 
-                // Keyword search
                 if (searchKeyword) {
                     const searchableFields = [
                         project.Sales_Client,
@@ -2781,7 +2691,6 @@
                 const currentProjects = [];
                 snapshot.forEach(doc => {
                     const project = doc.data();
-                    // Filter by year
                     let projectYear = null;
                     
                     if (project.startDate) {
@@ -2802,7 +2711,6 @@
                         }
                     }
                     
-                    // Filter by month (if not "Semua Bulan")
                     let projectMonth = null;
                     if (projectYear === year) {
                         if (project.startDate) {
@@ -2823,7 +2731,6 @@
                             }
                         }
                         
-                        // Add project if month matches or if "Semua Bulan" is selected
                         if (month === 0 || projectMonth === month) {
                             currentProjects.push(project);
                         }
@@ -2845,7 +2752,6 @@
             }
         }
 
-        // --- Update Dashboard Counts ---
         function updateDashboardCounts(projects, year, month) {
             let quotationCount = 0;
             let dwgCount = 0;
@@ -2862,7 +2768,6 @@
                     const types = project.type || [];
                     const status = project.status || '';
 
-                    // Count by type
                     if (Array.isArray(types)) {
                         if (types.includes('Quotation')) quotationCount++;
                         if (types.includes('DWG')) dwgCount++;
@@ -2875,7 +2780,6 @@
                         else if (types === 'Dokumen') dokumenCount++;
                     }
 
-                    // Count by status
                     if (status === 'On Progress') onProgressCount++;
                     else if (status === 'Done') doneCount++;
                     else if (status === 'Hold') holdCount++;
@@ -2883,7 +2787,6 @@
                 totalProjects = projects.length;
             }
 
-            // Update the dashboard summary
             document.getElementById('inquiry-count').textContent = quotationCount;
             document.getElementById('dwg-count').textContent = dwgCount;
             document.getElementById('hydrolic-count').textContent = hydrolicCount;
@@ -2894,19 +2797,15 @@
             document.getElementById('hold-count').textContent = holdCount;
             document.getElementById('total-projects-count').textContent = totalProjects;
 
-            // Update month filter label
             const monthSelect = document.getElementById('month-filter-dashboard');
             if (monthSelect) {
                 monthSelect.value = month;
             }
 
-            // Update charts
             updateDashboardCharts(projects, year, month);
         }
 
-        // --- Update Dashboard Charts ---
         function updateDashboardCharts(projects, year, month) {
-            // Destroy existing charts if they exist
             if (typeChartInstance) {
                 typeChartInstance.destroy();
             }
@@ -2938,10 +2837,10 @@
                         }).length
                     ],
                     backgroundColor: [
-                        'rgba(255, 152, 0, 0.8)', // Orange cerah
-                        'rgba(21, 101, 192, 0.8)', // Biru laut cerah
-                        'rgba(138, 43, 226, 0.8)', // Ungu cerah
-                        'rgba(40, 167, 69, 0.8)'  // Hijau cerah
+                        'rgba(255, 152, 0, 0.8)',
+                        'rgba(21, 101, 192, 0.8)',
+                        'rgba(138, 43, 226, 0.8)',
+                        'rgba(40, 167, 69, 0.8)'
                     ],
                     borderColor: [
                         'rgba(255, 152, 0, 1)',
@@ -2962,9 +2861,9 @@
                         projects.filter(p => p.status === 'Hold').length
                     ],
                     backgroundColor: [
-                        'rgba(255, 152, 0, 0.8)', // Orange cerah
-                        'rgba(40, 167, 69, 0.8)', // Hijau cerah
-                        'rgba(220, 53, 69, 0.8)'  // Merah cerah
+                        'rgba(255, 152, 0, 0.8)',
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
                     ],
                     borderColor: [
                         'rgba(255, 152, 0, 1)',
@@ -3041,7 +2940,6 @@
             }
         }
 
-        // --- Update Analytics Data ---
         function updateAnalyticsData(projects, year) {
             const analyticsData = {
                 quotation: { onProgress: 0, done: 0, hold: 0, clarification: 0 },
@@ -3050,7 +2948,6 @@
                 dokumen: { onProgress: 0, done: 0, hold: 0, clarification: 0 }
             };
 
-            // Count projects by type, status, and clarification
             projects.forEach(project => {
                 const types = Array.isArray(project.type) ? project.type : [project.type];
                 const status = project.status || '';
@@ -3081,13 +2978,10 @@
                 });
             });
 
-            // Update type detail cards
             updateTypeDetailCards(analyticsData, year);
-            // Update analytics chart
             updateAnalyticsChart(analyticsData, year);
         }
 
-        // --- Update Type Detail Cards ---
         function updateTypeDetailCards(analyticsData, year) {
             const typeDetailsContainer = document.getElementById('type-details-container');
             if (!typeDetailsContainer) return;
@@ -3135,7 +3029,6 @@
 
             typeDetailsContainer.innerHTML = html;
 
-            // Add click event listeners
             document.querySelectorAll('.type-detail-card').forEach(card => {
                 card.addEventListener('click', function() {
                     const type = this.dataset.type;
@@ -3145,7 +3038,6 @@
             });
         }
 
-        // --- Update Analytics Chart ---
         function updateAnalyticsChart(analyticsData, year) {
             if (analyticsChartInstance) {
                 analyticsChartInstance.destroy();
@@ -3168,28 +3060,28 @@
                         {
                             label: 'On Progress',
                             data: onProgressData,
-                            backgroundColor: 'rgba(255, 152, 0, 0.8)', // Orange cerah
+                            backgroundColor: 'rgba(255, 152, 0, 0.8)',
                             borderColor: 'rgba(255, 152, 0, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Done',
                             data: doneData,
-                            backgroundColor: 'rgba(40, 167, 69, 0.8)', // Hijau cerah
+                            backgroundColor: 'rgba(40, 167, 69, 0.8)',
                             borderColor: 'rgba(40, 167, 69, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Hold',
                             data: holdData,
-                            backgroundColor: 'rgba(220, 53, 69, 0.8)', // Merah cerah
+                            backgroundColor: 'rgba(220, 53, 69, 0.8)',
                             borderColor: 'rgba(220, 53, 69, 1)',
                             borderWidth: 1
                         },
                         {
                             label: 'Klarifikasi',
                             data: clarificationData,
-                            backgroundColor: 'rgba(21, 101, 192, 0.8)', // Biru Laut cerah
+                            backgroundColor: 'rgba(21, 101, 192, 0.8)',
                             borderColor: 'rgba(21, 101, 192, 1)',
                             borderWidth: 1
                         }
@@ -3243,7 +3135,6 @@
             });
         }
 
-        // --- Show Type Analytics Modal ---
         function showTypeAnalyticsModal(type, typeName, typeData, year) {
             const total = typeData.onProgress + typeData.done + typeData.hold;
             
@@ -3302,19 +3193,16 @@
             modal.innerHTML = modalContent;
             document.body.appendChild(modal);
 
-            // Add event listener for close button
             modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                 modal.remove();
             });
 
-            // Close modal when clicking outside
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     modal.remove();
                 }
             });
 
-            // Create chart after modal is rendered
             setTimeout(() => {
                 const chartCtx = document.getElementById('type-detail-chart');
                 if (chartCtx) {
@@ -3325,10 +3213,10 @@
                             datasets: [{
                                 data: [typeData.onProgress, typeData.done, typeData.hold, typeData.clarification],
                                 backgroundColor: [
-                                    'rgba(255, 152, 0, 0.8)', // Orange
-                                    'rgba(40, 167, 69, 0.8)', // Hijau
-                                    'rgba(220, 53, 69, 0.8)', // Merah
-                                    'rgba(21, 101, 192, 0.8)' // Biru Laut
+                                    'rgba(255, 152, 0, 0.8)',
+                                    'rgba(40, 167, 69, 0.8)',
+                                    'rgba(220, 53, 69, 0.8)',
+                                    'rgba(21, 101, 192, 0.8)'
                                 ],
                                 borderColor: [
                                     'rgba(255, 152, 0, 1)',
@@ -3366,10 +3254,9 @@
             }, 100);
         }
 
-        // --- Add Project Function ---
+        // --- CRUD Functions ---
         async function addProject(projectData) {
             try {
-                // Validate year
                 const dataInDate = new Date(projectData.dataIn);
                 const year = dataInDate.getFullYear();
                 if (year !== 2025 && year !== 2026) {
@@ -3377,7 +3264,6 @@
                     return false;
                 }
 
-                // Generate project number
                 const projectNumber = await generateProjectNumber(
                     projectData.dataIn, 
                     projectData.type, 
@@ -3404,7 +3290,6 @@
             }
         }
 
-        // --- Update Project Function ---
         async function updateProject(projectId, updatedData) {
             try {
                 updatedData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -3418,7 +3303,6 @@
             }
         }
 
-        // --- Delete Project Function ---
         async function deleteProject(projectId) {
             try {
                 await projectsCol.doc(projectId).delete();
@@ -3431,7 +3315,6 @@
             }
         }
 
-        // --- Get Project Data Function ---
         async function getProject(projectId) {
             try {
                 const doc = await projectsCol.doc(projectId).get();
@@ -3447,20 +3330,17 @@
             }
         }
 
-        // --- Show Edit Project Modal ---
         async function showEditProjectModal(projectId) {
             const project = await getProject(projectId);
             if (!project) return;
 
             currentEditingProjectId = projectId;
 
-            // Fill form with project data
             document.getElementById('sales-client').value = project.salesClient || '';
             document.getElementById('project-name').value = project.projectName || '';
             document.getElementById('data-in').value = project.dataIn || '';
             document.getElementById('no-urut-dokumen').value = project.noUrutDokumen || '';
             
-            // Set multiple types
             const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]');
             typeCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
@@ -3482,24 +3362,20 @@
             document.getElementById('clarification').checked = project.clarification || false;
             document.getElementById('remarks').value = project.remarks || '';
 
-            // Make data-in and no-urut-dokumen readonly
             document.getElementById('data-in').disabled = true;
             document.getElementById('no-urut-dokumen').disabled = true;
             document.getElementById('data-in').classList.add('readonly-field');
             document.getElementById('no-urut-dokumen').classList.add('readonly-field');
 
-            // Show modal
             document.getElementById('project-modal').style.display = 'flex';
             document.getElementById('project-modal-title').textContent = 'Edit Project';
         }
 
-        // --- Show Delete Confirmation Modal ---
         function showDeleteConfirmationModal(projectId) {
             currentEditingProjectId = projectId;
             document.getElementById('delete-modal').style.display = 'flex';
         }
 
-        // --- Show Status Change Modal ---
         function showStatusChangeModal(projectId, currentStatus) {
             currentEditingProjectId = projectId;
             document.getElementById('status-select').value = currentStatus;
@@ -3515,7 +3391,6 @@
                     return;
                 }
 
-                // Get project details (tambahan) dari collection projectDetails
                 let projectDetails = [];
                 try {
                     const detailsSnapshot = await projectDetailsCol
@@ -3532,12 +3407,10 @@
                     console.error("Error loading project details:", error);
                 }
 
-                // Format types untuk display
                 const displayTypes = Array.isArray(project.Type) ? 
                     project.Type.map(type => formatTextForDisplay(type, 15)).join(', ') : 
                     formatTextForDisplay(project.Type, 15);
 
-                // Klarifikasi icon
                 const clarificationIcon = project.Clarification ? 
                     '<i class="fas fa-check-circle" style="color: var(--analytic-green);"></i> Ya' : 
                     '<i class="fas fa-times-circle" style="color: var(--analytic-red);"></i> Tidak';
@@ -3604,7 +3477,6 @@
                             </div>
                         </div>
 
-                        <!-- SECTION PROJECT TAMBAHAN -->
                         <div style="margin-top: 2.5rem; border-top: 2px solid var(--border); padding-top: 1.5rem;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                                 <h3 style="color: var(--dark);">Project Tambahan</h3>
@@ -3648,7 +3520,6 @@
                             }
                         </div>
 
-                        <!-- Tombol Edit dan Hapus (only for non-sales) -->
                         ${currentUserRole !== 'sales' ? `
                             <div class="detail-actions">
                                 <button type="button" class="btn detail-edit-btn" id="detail-edit-btn" data-project-id="${projectId}">
@@ -3673,7 +3544,6 @@
                 modal.innerHTML = modalContent;
                 document.body.appendChild(modal);
 
-                // Add event listeners for edit and delete buttons (only for non-sales)
                 if (currentUserRole !== 'sales') {
                     modal.querySelector('#detail-edit-btn').addEventListener('click', function() {
                         const projectId = this.getAttribute('data-project-id');
@@ -3687,13 +3557,11 @@
                         showDeleteConfirmationModal(projectId);
                     });
 
-                    // Add event listener for add project detail button
                     modal.querySelector('#add-project-detail-btn').addEventListener('click', function() {
                         modal.remove();
                         showAddProjectDetailModal(projectId, project);
                     });
 
-                    // Add event listeners for edit detail buttons
                     modal.querySelectorAll('.edit-detail-btn').forEach(btn => {
                         btn.addEventListener('click', function() {
                             const detailId = this.getAttribute('data-detail-id');
@@ -3702,7 +3570,6 @@
                         });
                     });
 
-                    // Add event listeners for delete detail buttons
                     modal.querySelectorAll('.delete-detail-btn').forEach(btn => {
                         btn.addEventListener('click', function() {
                             const detailId = this.getAttribute('data-detail-id');
@@ -3729,7 +3596,7 @@
             }
         }
 
-        // --- Show Add Project Detail Modal ---
+        // --- Project Detail Functions ---
         function showAddProjectDetailModal(projectId, baseProject) {
             const modalContent = `
                 <div class="modal-content" style="max-width: 800px;">
@@ -3837,12 +3704,10 @@
             modal.innerHTML = modalContent;
             document.body.appendChild(modal);
 
-            // Set today's date as default
             const today = new Date();
             const currentDate = today.toISOString().substring(0, 10);
             document.getElementById('add-detail-data-in').value = currentDate;
 
-            // Handle "Other" option in sales client dropdown
             document.getElementById('add-detail-sales-client').addEventListener('change', function() {
                 if (this.value === 'Other') {
                     document.getElementById('add-detail-other-sales-container').style.display = 'block';
@@ -3851,7 +3716,6 @@
                 }
             });
 
-            // Add event listeners
             modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                 modal.remove();
             });
@@ -3865,7 +3729,6 @@
                 await addProjectDetail(projectId, modal);
             });
 
-            // Close modal when clicking outside
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     modal.remove();
@@ -3873,7 +3736,6 @@
             });
         }
 
-        // --- Show Edit Project Detail Modal ---
         async function showEditProjectDetailModal(detailId, projectId) {
             try {
                 const detailDoc = await projectDetailsCol.doc(detailId).get();
@@ -3989,7 +3851,6 @@
                 modal.innerHTML = modalContent;
                 document.body.appendChild(modal);
 
-                // Handle "Other" option in sales client dropdown
                 document.getElementById('edit-detail-sales-client').addEventListener('change', function() {
                     if (this.value === 'Other') {
                         document.getElementById('edit-detail-other-sales-container').style.display = 'block';
@@ -3998,7 +3859,6 @@
                     }
                 });
 
-                // Add event listeners
                 modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                     modal.remove();
                 });
@@ -4013,7 +3873,6 @@
                     modal.remove();
                 });
 
-                // Close modal when clicking outside
                 modal.addEventListener('click', function(e) {
                     if (e.target === modal) {
                         modal.remove();
@@ -4026,7 +3885,6 @@
             }
         }
 
-        // --- Add Project Detail Function ---
         async function addProjectDetail(projectId, modal) {
             const salesClient = document.getElementById('add-detail-sales-client').value;
             const otherSales = document.getElementById('add-detail-other-sales').value;
@@ -4039,7 +3897,6 @@
             const clarification = document.getElementById('add-detail-clarification').checked;
             const remarks = document.getElementById('add-detail-remarks').value;
 
-            // Get selected types
             const selectedTypes = [];
             if (document.getElementById('add-detail-type-quotation').checked) selectedTypes.push('Quotation');
             if (document.getElementById('add-detail-type-dwg').checked) selectedTypes.push('DWG');
@@ -4071,7 +3928,6 @@
                 showAlert('Project tambahan berhasil ditambahkan!', 'success');
                 
                 modal.remove();
-                // Refresh the details modal
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
@@ -4080,7 +3936,6 @@
             }
         }
 
-        // --- Update Project Detail Function ---
         async function updateProjectDetail(detailId, projectId) {
             const salesClient = document.getElementById('edit-detail-sales-client').value;
             const otherSales = document.getElementById('edit-detail-other-sales').value;
@@ -4093,7 +3948,6 @@
             const clarification = document.getElementById('edit-detail-clarification').checked;
             const remarks = document.getElementById('edit-detail-remarks').value;
 
-            // Get selected types
             const selectedTypes = [];
             if (document.getElementById('edit-detail-type-quotation').checked) selectedTypes.push('Quotation');
             if (document.getElementById('edit-detail-type-dwg').checked) selectedTypes.push('DWG');
@@ -4121,8 +3975,6 @@
 
                 await projectDetailsCol.doc(detailId).update(projectData);
                 showAlert('Project tambahan berhasil diperbarui!', 'success');
-                
-                // Refresh the details modal
                 showProjectDetailsModal(projectId);
                 
             } catch (error) {
@@ -4131,22 +3983,18 @@
             }
         }
 
-        // --- Delete Project Detail Function ---
         async function deleteProjectDetail(detailId, projectId) {
             try {
                 await projectDetailsCol.doc(detailId).delete();
                 showAlert('Project tambahan berhasil dihapus!', 'success');
-                
-                // Refresh the details modal
                 showProjectDetailsModal(projectId);
-                
             } catch (error) {
                 console.error("Error deleting project detail:", error);
                 showAlert('Gagal menghapus project tambahan: ' + error.message, 'error');
             }
         }
 
-        // --- Render Pagination Controls ---
+        // --- Pagination ---
         function renderPagination(totalItems, currentPage) {
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const pageControls = document.querySelector('.pagination .page-controls');
@@ -4165,7 +4013,6 @@
             const endItem = Math.min(currentPage * itemsPerPage, totalItems);
             pageInfo.textContent = `Menampilkan ${startItem}-${endItem} dari ${totalItems} data`;
 
-            // Previous button
             const prevBtn = document.createElement('button');
             prevBtn.className = 'page-btn';
             prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -4178,7 +4025,6 @@
             });
             pageControls.appendChild(prevBtn);
 
-            // Page numbers
             const maxPageButtons = 5;
             let startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
             let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
@@ -4232,7 +4078,6 @@
                 pageControls.appendChild(lastPageBtn);
             }
 
-            // Next button
             const nextBtn = document.createElement('button');
             nextBtn.className = 'page-btn';
             nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
@@ -4246,22 +4091,19 @@
             pageControls.appendChild(nextBtn);
         }
 
-        // --- Export to PDF Function ---
+        // --- Export to PDF ---
         function exportToPDF() {
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('l', 'mm', 'a4');
 
-                // Add title
                 doc.setFontSize(16);
                 doc.text('LAPORAN PROJECT ENGINEERING', 148, 15, { align: 'center' });
                 
-                // Add date and year filter
                 const currentDate = new Date().toLocaleDateString('id-ID');
                 doc.setFontSize(10);
                 doc.text(`Tahun: ${selectedYearProject} | Dibuat: ${currentDate}`, 148, 22, { align: 'center' });
 
-                // Prepare table data
                 const dataForExport = filteredProjectData.filter(project => {
                     if (project.Data_In) {
                         try {
@@ -4294,7 +4136,6 @@
                     project.Sales_Sent_Date || '-'
                 ]);
 
-                // Add table
                 doc.autoTable({
                     head: [['No', 'Sales/Client', 'Project Name', 'Data In', 'No Urut Dokumen', 'Type', 'PIC', 'Start Date', 'Status', 'Remarks', 'Klarifikasi', 'Sales Sent Date']],
                     body: tableData,
@@ -4324,7 +4165,6 @@
                     }
                 });
 
-                // Save the PDF
                 doc.save(`Laporan_Project_${selectedYearProject}_${currentDate.replace(/\//g, '-')}.pdf`);
                 showAlert(`PDF berhasil diexport! (${dataForExport.length} data)`, 'success');
             } catch (error) {
@@ -4333,7 +4173,7 @@
             }
         }
 
-        // --- Initialize Year and Month Selectors ---
+        // --- Initialize Selectors ---
         function initializeYearMonthSelectors() {
             const years = [2025, 2026];
             const months = [
@@ -4352,7 +4192,6 @@
                 { value: 12, name: 'Desember' }
             ];
             
-            // Dashboard year selector
             const dashboardYearSelect = document.getElementById('year-filter-dashboard');
             if (dashboardYearSelect) {
                 years.forEach(year => {
@@ -4368,7 +4207,6 @@
                 });
             }
 
-            // Dashboard month selector
             const dashboardMonthSelect = document.getElementById('month-filter-dashboard');
             if (dashboardMonthSelect) {
                 months.forEach(month => {
@@ -4384,7 +4222,6 @@
                 });
             }
 
-            // Project year selector
             const projectYearSelect = document.getElementById('year-filter-project');
             if (projectYearSelect) {
                 years.forEach(year => {
@@ -4400,7 +4237,6 @@
                 });
             }
 
-            // Analytics year selector
             const analyticsYearSelect = document.getElementById('year-filter-analytics');
             if (analyticsYearSelect) {
                 years.forEach(year => {
@@ -4417,123 +4253,7 @@
             }
         }
 
-        // --- Determine User Role based on email ---
-        function determineUserRole(email) {
-            // List of sales emails
-            const salesEmails = [
-                'adminsales@genetek.co.id',
-                'sales@genetek.com'
-            ];
-            
-            // List of admin emails (all non-sales are admins)
-            if (salesEmails.includes(email)) {
-                return 'sales';
-            }
-            return 'admin';
-        }
-
-        // --- Apply role-based UI changes ---
-        function applyRoleBasedUI(role) {
-            document.body.classList.remove('sales-role', 'admin-role');
-            document.body.classList.add(role + '-role');
-
-            // Update role badge
-            const roleBadge = document.getElementById('role-badge');
-            if (roleBadge) {
-                roleBadge.textContent = role === 'sales' ? '🔑 Sales' : '👑 Admin';
-                roleBadge.style.background = role === 'sales' ? 'rgba(255, 152, 0, 0.3)' : 'rgba(67, 97, 238, 0.3)';
-                roleBadge.style.borderColor = role === 'sales' ? 'var(--analytic-orange)' : 'var(--primary)';
-            }
-
-            // Show/hide elements based on role
-            const adminOnlyElements = document.querySelectorAll('.admin-only');
-            const salesOnlyElements = document.querySelectorAll('.sales-only');
-
-            if (role === 'sales') {
-                adminOnlyElements.forEach(el => el.style.display = 'none');
-                salesOnlyElements.forEach(el => el.style.display = 'block');
-                
-                // Hide add project button
-                const addBtn = document.getElementById('add-project-btn');
-                if (addBtn) addBtn.style.display = 'none';
-                
-                // Hide export PDF button
-                const exportBtn = document.getElementById('export-pdf-btn');
-                if (exportBtn) exportBtn.style.display = 'none';
-                
-                // Hide reset filters button
-                const resetBtn = document.getElementById('reset-filters-btn');
-                if (resetBtn) resetBtn.style.display = 'none';
-                
-                // Hide filter apply button
-                const filterSubmit = document.querySelector('#filter-form button[type="submit"]');
-                if (filterSubmit) filterSubmit.style.display = 'none';
-                
-                // Disable status filter for sales
-                const statusFilter = document.getElementById('filter-status');
-                if (statusFilter) statusFilter.disabled = true;
-                
-                // Show sales info message
-                const salesMessage = document.getElementById('sales-info-message');
-                if (salesMessage) salesMessage.style.display = 'block';
-
-                // Hide Dashboard and Analytics menu for sales
-                const dashboardNav = document.querySelector('.nav-item[data-target="dashboard-section"]');
-                const analyticsNav = document.querySelector('.nav-item[data-target="analytics-section"]');
-                if (dashboardNav) dashboardNav.style.display = 'none';
-                if (analyticsNav) analyticsNav.style.display = 'none';
-                
-                // Hide dashboard and analytics sections
-                const dashboardSection = document.getElementById('dashboard-section');
-                const analyticsSection = document.getElementById('analytics-section');
-                if (dashboardSection) dashboardSection.style.display = 'none';
-                if (analyticsSection) analyticsSection.style.display = 'none';
-                
-                // Show only project list
-                const projectSection = document.getElementById('project-list-section');
-                if (projectSection) projectSection.style.display = 'block';
-                
-                // Activate project nav
-                const projectNav = document.querySelector('.nav-item[data-target="project-list-section"]');
-                if (projectNav) projectNav.classList.add('active');
-                
-            } else {
-                adminOnlyElements.forEach(el => el.style.display = 'block');
-                salesOnlyElements.forEach(el => el.style.display = 'none');
-                
-                // Show add project button
-                const addBtn = document.getElementById('add-project-btn');
-                if (addBtn) addBtn.style.display = 'inline-flex';
-                
-                // Show export PDF button
-                const exportBtn = document.getElementById('export-pdf-btn');
-                if (exportBtn) exportBtn.style.display = 'inline-flex';
-                
-                // Show reset filters button
-                const resetBtn = document.getElementById('reset-filters-btn');
-                if (resetBtn) resetBtn.style.display = 'inline-flex';
-                
-                // Show filter apply button
-                const filterSubmit = document.querySelector('#filter-form button[type="submit"]');
-                if (filterSubmit) filterSubmit.style.display = 'inline-flex';
-                
-                // Enable status filter
-                const statusFilter = document.getElementById('filter-status');
-                if (statusFilter) statusFilter.disabled = false;
-                
-                // Hide sales info message
-                const salesMessage = document.getElementById('sales-info-message');
-                if (salesMessage) salesMessage.style.display = 'none';
-
-                // Show Dashboard and Analytics menu for admin
-                const dashboardNav = document.querySelector('.nav-item[data-target="dashboard-section"]');
-                const analyticsNav = document.querySelector('.nav-item[data-target="analytics-section"]');
-                if (dashboardNav) dashboardNav.style.display = 'flex';
-                if (analyticsNav) analyticsNav.style.display = 'flex';
-            }
-        }
-
-        // --- Login Functionality ---
+        // --- Login ---
         function initLogin() {
             const loginForm = document.getElementById('login-form');
             const loginBtn = document.getElementById('login-btn');
@@ -4545,7 +4265,6 @@
                 });
             }
 
-            // Check if user is already logged in
             auth.onAuthStateChanged(user => {
                 if (user) {
                     currentUserEmail = user.email;
@@ -4554,15 +4273,10 @@
                     document.getElementById('auth-container').style.display = 'none';
                     document.getElementById('main-container').style.display = 'flex';
                     
-                    // Apply role-based UI
                     applyRoleBasedUI(currentUserRole);
-                    
-                    // Initialize year selectors
                     initializeYearMonthSelectors();
                     
-                    // Load initial data
                     if (currentUserRole === 'sales') {
-                        // Only load project list for sales
                         loadProjectsToTable(selectedYearProject);
                     } else {
                         loadDashboardData(selectedYearDashboard, selectedMonthDashboard);
@@ -4617,9 +4331,8 @@
             });
         }
 
-        // --- Navigation Function ---
+        // --- Navigation ---
         function showSection(targetId) {
-            // For sales role, only show project list
             if (currentUserRole === 'sales') {
                 if (targetId !== 'project-list-section') {
                     showAlert('Anda hanya dapat mengakses daftar project', 'info');
@@ -4655,11 +4368,10 @@
         }
         window.showSection = showSection;
 
-        // --- Initialize Application ---
+        // --- Initialize ---
         document.addEventListener('DOMContentLoaded', function() {
             initLogin();
             
-            // Navigation event listeners
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.nav-item')) {
                     const navItem = e.target.closest('.nav-item');
@@ -4674,7 +4386,6 @@
                 }
             });
 
-            // Sidebar toggle
             const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
             const sidebar = document.querySelector('.sidebar');
             
@@ -4691,7 +4402,6 @@
                 }
             }
 
-            // Filter form handler
             const filterForm = document.querySelector('#filter-form');
             if (filterForm) {
                 filterForm.addEventListener('submit', function(e) {
@@ -4700,7 +4410,6 @@
                 });
             }
 
-            // Reset filters button
             const resetFiltersBtn = document.getElementById('reset-filters-btn');
             if (resetFiltersBtn) {
                 resetFiltersBtn.addEventListener('click', function() {
@@ -4717,7 +4426,6 @@
                 });
             }
 
-            // Add project button (admin only)
             const addProjectBtn = document.getElementById('add-project-btn');
             if (addProjectBtn) {
                 addProjectBtn.addEventListener('click', function() {
@@ -4749,7 +4457,6 @@
                 });
             }
 
-            // Export to PDF button (admin only)
             const exportPdfBtn = document.getElementById('export-pdf-btn');
             if (exportPdfBtn) {
                 exportPdfBtn.addEventListener('click', function() {
@@ -4761,7 +4468,6 @@
                 });
             }
 
-            // Sales dropdown handler for "Other" option
             document.addEventListener('change', function(e) {
                 if (e.target.id === 'sales-client' && e.target.value === 'Other') {
                     document.getElementById('other-sales-container').style.display = 'block';
@@ -4770,7 +4476,6 @@
                 }
             });
 
-            // Project form submission (admin only)
             const projectForm = document.getElementById('project-form');
             if (projectForm) {
                 projectForm.addEventListener('submit', async function(e) {
@@ -4790,7 +4495,6 @@
                         return;
                     }
                     
-                    // Get selected types
                     const selectedTypes = [];
                     const typeCheckboxes = document.querySelectorAll('#type-multiple-container input[type="checkbox"]:checked');
                     typeCheckboxes.forEach(checkbox => {
@@ -4840,7 +4544,6 @@
                         document.getElementById('no-urut-dokumen').classList.remove('readonly-field');
                         currentEditingProjectId = null;
                         
-                        // Refresh data
                         if (document.getElementById('project-list-section').style.display !== 'none') {
                             loadProjectsToTable(selectedYearProject);
                         }
@@ -4854,7 +4557,6 @@
                 });
             }
 
-            // Status form submission (admin only)
             const statusForm = document.getElementById('status-form');
             if (statusForm) {
                 statusForm.addEventListener('submit', async function(e) {
@@ -4872,7 +4574,6 @@
                         document.getElementById('status-modal').style.display = 'none';
                         currentEditingProjectId = null;
                         
-                        // Refresh data
                         if (document.getElementById('project-list-section').style.display !== 'none') {
                             loadProjectsToTable(selectedYearProject);
                         }
@@ -4886,7 +4587,6 @@
                 });
             }
 
-            // Delete confirmation handlers (admin only)
             const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
             const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
             
@@ -4901,7 +4601,6 @@
                         document.getElementById('delete-modal').style.display = 'none';
                         currentEditingProjectId = null;
                         
-                        // Refresh data
                         if (document.getElementById('project-list-section').style.display !== 'none') {
                             loadProjectsToTable(selectedYearProject);
                         }
@@ -4922,7 +4621,6 @@
                 });
             }
 
-            // Modal close buttons
             const closeButtons = document.querySelectorAll('.modal-close-btn');
             closeButtons.forEach(button => {
                 button.addEventListener('click', function() {
@@ -4940,7 +4638,6 @@
                 });
             });
 
-            // Close modal when clicking outside
             window.addEventListener('click', function(e) {
                 if (e.target.classList.contains('modal')) {
                     e.target.style.display = 'none';
@@ -4954,7 +4651,6 @@
                 }
             });
 
-            // Summary item click handlers for dashboard (admin only)
             document.addEventListener('click', function(e) {
                 if (currentUserRole === 'sales') return;
                 
@@ -4972,7 +4668,6 @@
                 }
             });
 
-            // Make showProjectDetailsModal globally available
             window.showProjectDetailsModal = showProjectDetailsModal;
         });
     </script>
@@ -5005,7 +4700,6 @@
 
     <!-- Main Application -->
     <div id="main-container" class="container" style="display: none;">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <button id="sidebar-toggle-btn" class="sidebar-toggle">
                 <i class="fas fa-chevron-left"></i>
@@ -5015,8 +4709,7 @@
                 <div class="logo-text">Engineering Monitor</div>
             </div>
             
-            <!-- Role Badge -->
-            <div id="role-badge" class="role-badge">👑 Admin</div>
+            <div id="role-badge" class="role-badge">⚙️ Engineering</div>
             
             <nav class="nav-menu">
                 <a href="#" class="nav-item active" data-target="dashboard-section">
@@ -5038,9 +4731,7 @@
             </nav>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Sales Info Message -->
             <div id="sales-info-message" style="display: none; background: #fff3e0; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid var(--analytic-orange);">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <i class="fas fa-info-circle" style="color: var(--analytic-orange); font-size: 1.5rem;"></i>
@@ -5051,27 +4742,21 @@
                 </div>
             </div>
 
-            <!-- Dashboard Section -->
             <section id="dashboard-section" class="content-section">
                 <div class="header">
                     <h1 class="page-title">Dashboard</h1>
                     <div style="display: flex; gap: 1rem;">
                         <div class="year-filter-container">
                             <span class="year-filter-label">Tahun:</span>
-                            <select id="year-filter-dashboard" class="year-select">
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
+                            <select id="year-filter-dashboard" class="year-select"></select>
                         </div>
                         <div class="month-filter-container">
                             <span class="month-filter-label">Bulan:</span>
-                            <select id="month-filter-dashboard" class="month-select">
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
+                            <select id="month-filter-dashboard" class="month-select"></select>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Ringkasan Project Berdasarkan Type -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Ringkasan Project Berdasarkan Type</h2>
@@ -5098,7 +4783,6 @@
                     </div>
                 </div>
 
-                <!-- Ringkasan Project Berdasarkan Status -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Ringkasan Project Berdasarkan Status</h2>
@@ -5125,7 +4809,6 @@
                     </div>
                 </div>
 
-                <!-- Chart Visualization -->
                 <div class="analytics-section">
                     <div class="analytics-grid">
                         <div class="analytics-chart-container">
@@ -5144,16 +4827,13 @@
                 </div>
             </section>
 
-            <!-- Project List Section -->
             <section id="project-list-section" class="content-section" style="display: none;">
                 <div class="header">
                     <h1 class="page-title">Daftar Project</h1>
                     <div class="header-actions">
                         <div class="year-filter-container">
                             <span class="year-filter-label">Tahun:</span>
-                            <select id="year-filter-project" class="year-select">
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
+                            <select id="year-filter-project" class="year-select"></select>
                         </div>
                         <div>
                             <button class="btn btn-primary admin-only" id="add-project-btn">
@@ -5166,7 +4846,6 @@
                     </div>
                 </div>
 
-                <!-- Filter Section -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Filter Data</h2>
@@ -5222,11 +4901,12 @@
                     </div>
                 </div>
 
-                <!-- Data Table -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Daftar Project</h2>
                         <span style="font-size: 0.8rem; color: var(--secondary);">
+                            <i class="fas fa-info-circle"></i> 
+                            ${currentUserRole === 'sales' ? 'Klik kolom Sales Sent Date untuk mengisi tanggal' : ''}
                         </span>
                     </div>
                     <div class="card-body">
@@ -5248,50 +4928,36 @@
                                         <th>Sales Sent Date</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <!-- Data will be loaded here by JavaScript -->
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
 
-                        <!-- Pagination -->
                         <div class="pagination">
-                            <div class="page-info">
-                                Menampilkan 0-0 dari 0 data
-                            </div>
-                            <div class="page-controls">
-                                <!-- Pagination buttons will be rendered here by JavaScript -->
-                            </div>
+                            <div class="page-info">Menampilkan 0-0 dari 0 data</div>
+                            <div class="page-controls"></div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Analytics Section -->
             <section id="analytics-section" class="content-section" style="display: none;">
                 <div class="header">
                     <h1 class="page-title">Analytics Diagram</h1>
                     <div class="year-filter-container">
                         <span class="year-filter-label">Tahun:</span>
-                        <select id="year-filter-analytics" class="year-select">
-                            <!-- Options will be populated by JavaScript -->
-                        </select>
+                        <select id="year-filter-analytics" class="year-select"></select>
                     </div>
                 </div>
 
-                <!-- Type Details -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Detail Berdasarkan Type</h2>
                     </div>
                     <div class="card-body">
-                        <div class="type-details-grid" id="type-details-container">
-                            <!-- Type detail cards will be populated by JavaScript -->
-                        </div>
+                        <div class="type-details-grid" id="type-details-container"></div>
                     </div>
                 </div>
 
-                <!-- Analytics Chart -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Analytics Chart</h2>
@@ -5307,7 +4973,6 @@
     </div>
 
     <!-- Modals -->
-    <!-- Modal Tambah/Edit Project Utama -->
     <div id="project-modal" class="modal">
         <div class="modal-content" style="max-width: 800px;">
             <span class="modal-close-btn">&times;</span>
@@ -5406,7 +5071,6 @@
         </div>
     </div>
 
-    <!-- Status Change Modal -->
     <div id="status-modal" class="modal">
         <div class="modal-content">
             <span class="modal-close-btn">&times;</span>
@@ -5427,7 +5091,6 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
     <div id="delete-modal" class="delete-modal">
         <div class="delete-modal-content">
             <h2 class="card-title" style="margin-bottom: 1rem;">Konfirmasi Hapus</h2>
@@ -5439,7 +5102,6 @@
         </div>
     </div>
 
-    <!-- Custom Alert Box -->
     <div id="custom-alert-box" class="custom-alert"></div>
 </body>
 </html>
